@@ -1,0 +1,6 @@
+#Local config for NestCLI
+/node_modules
+*.json
+
+#Backend_Ignore
+/backend/node_modules
