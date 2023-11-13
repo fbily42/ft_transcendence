@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modele example :
+model User {
+	id Int @id @default(autoincrement())
+	createdAt DateTime @default(now())
+	updateAt DateTime @updatedAt
+
+	email String
+	hash String
+
+	firstName String?
+	lastName String?
+}
+// Use "npx prisma generate" = create TSClass from Schema for our code.
+// => import { User } from '@prisma/client';
