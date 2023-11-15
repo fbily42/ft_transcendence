@@ -34,11 +34,20 @@ status:
 	@echo "\n$(BOLD)$(MAGENTA)docker images -a $(RESET)" && docker images -a
 	@echo "\n$(BOLD)$(MAGENTA)docker network ls $(RESET)" && docker network ls
 
-logs:
-	@if [ -n "$$(docker ps -aq)" ]; then \
-		echo "$(YELLOW)\n ----- Showing docker logs  ----- \n$(RESET)"; \
-		echo "\n$(YELLOW)$(APP) logs:$(RESET)"; docker logs $(APP); \
-		echo "\n$(YELLOW)$(DB) logs:$(RESET)\n"; docker logs $(DB); \
+logs: logs_nest logs_db
+
+logs_nest:
+	@if [ -n "$$(docker ps -aq | grep $(APP))" ]; then \
+		echo "$(BOLD)$(YELLOW)\n ----- Showing $(APP) docker logs  ----- \n$(RESET)"; \
+		echo "\n$(BOLD)$(YELLOW)$(APP) logs:$(RESET)"; docker logs --follow $(APP); \
+	else \
+		echo "\n$(BOLD)$(RED)No Docker containers found.$(RESET)\n"; \
+	fi
+
+logs_db:
+	@if [ -n "$$(docker ps -aq | grep $(DB))" ]; then \
+		echo "$(BOLD)$(YELLOW)\n ----- Showing $(DB) docker logs  ----- \n$(RESET)"; \
+		echo "\n$(BOLD)$(YELLOW)$(DB) logs:$(RESET)"; docker logs --follow $(DB); \
 	else \
 		echo "\n$(BOLD)$(RED)No Docker containers found.$(RESET)\n"; \
 	fi
@@ -54,7 +63,7 @@ remove_containers:
 
 remove_volumes:
 	@if [ -n "$$(docker volume ls -q)" ]; then \
-		echo "$(YELLOW)\n ----- Removing docker volumes  ----- \n$(RESET)"; \
+		echo "$(BOLD)$(YELLOW)\n ----- Removing docker volumes  ----- \n$(RESET)"; \
 		docker-compose -f $(COMPOSE_FILE) down --volumes; \
 		echo "\n$(BOLD)$(GREEN)Volumes removed [ ✔ ]\n$(RESET)"; \
 	else \
@@ -63,7 +72,7 @@ remove_volumes:
 
 remove_images:
 	@if [ -n "$$(docker images -aq)" ]; then \
-		echo "$(YELLOW)\n ----- Removing docker images  ----- \n$(RESET)"; \
+		echo "$(BOLD)$(YELLOW)\n ----- Removing docker images  ----- \n$(RESET)"; \
 		docker rmi -f $$(docker image ls -q); \
 		echo "\n$(BOLD)$(GREEN)Images removed [ ✔ ]\n$(RESET)"; \
 	else \
@@ -72,7 +81,7 @@ remove_images:
 
 removes_network:
 	@if [ -n "$$(docker network ls | grep $(NETWORK))" ]; then \
-		echo "$(YELLOW)\n ----- Removing docker network  ----- \n$(RESET)"; \
+		echo "$(BOLD)$(YELLOW)\n ----- Removing docker network  ----- \n$(RESET)"; \
 		@docker network rm -f $(NETWORK); \
 		echo "\n$(BOLD)$(GREEN)Network removed [ ✔ ]\n$(RESET)"; \
 	else \
@@ -87,7 +96,7 @@ re:
 	make all
 
 .PHONY: all re cleaen removes_network remove_images remove_volumes remove_containers \
-	status logs restart start stop
+	status logs restart start stop logs_nest logs_db
 
 # COLORS
 RESET = \033[0m

@@ -2,17 +2,39 @@ version: '3.8'
 
 services:
 
+# PROD-VERSION
+  # nest-api:
+  #   container_name: nest-api
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - ./backend/.env
+  #   networks:
+  #     - transendence
+
+# DEV-VERSION
   nest-api:
     container_name: nest-api
+    restart: always
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
     depends_on:
       - postgres
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
     env_file:
       - ./backend/.env
+    volumes:
+      - ./backend/:/app/dev
+      - ignore:/app/node_modules/
     networks:
       - transendence
 
@@ -32,6 +54,7 @@ services:
 volumes:
   postgres:
     name: nest-db
+  ignore: {}
 
 networks:
   transendence:
