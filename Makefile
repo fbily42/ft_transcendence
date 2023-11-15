@@ -34,8 +34,6 @@ status:
 	@echo "\n$(BOLD)$(MAGENTA)docker images -a $(RESET)" && docker images -a
 	@echo "\n$(BOLD)$(MAGENTA)docker network ls $(RESET)" && docker network ls
 
-logs: logs_nest logs_db
-
 logs_nest:
 	@if [ -n "$$(docker ps -aq | grep $(APP))" ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Showing $(APP) docker logs  ----- \n$(RESET)"; \
@@ -45,7 +43,7 @@ logs_nest:
 	fi
 
 logs_db:
-	@if [ -n "$$(docker ps -aq | grep $(DB))" ]; then \
+	@if [ -n "$$(docker ps -a | grep $(DB))" ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Showing $(DB) docker logs  ----- \n$(RESET)"; \
 		echo "\n$(BOLD)$(YELLOW)$(DB) logs:$(RESET)"; docker logs --follow $(DB); \
 	else \
@@ -53,7 +51,7 @@ logs_db:
 	fi
 
 remove_containers:
-	@if [ -n "$$(docker ps -aq)" ]; then \
+	@if [ -n "$$(docker ps -a)" ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Stopping and removing docker containers  ----- \n$(RESET)"; \
 		docker-compose -f $(COMPOSE_FILE) down; \
 		echo "\n$(BOLD)$(GREEN)Containers stopped and removed [ ✔ ]\n$(RESET)"; \
@@ -96,7 +94,7 @@ re:
 	make all
 
 .PHONY: all re cleaen removes_network remove_images remove_volumes remove_containers \
-	status logs restart start stop logs_nest logs_db
+	status restart start stop logs_nest logs_db
 
 # COLORS
 RESET = \033[0m
