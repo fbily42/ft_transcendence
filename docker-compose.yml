@@ -50,6 +50,26 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - transendence
+
+# DEV-VERSION
+  frontend:
+    container_name: frontend
+    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5000:3000
+    depends_on:
+      - postgres
+      - nest-api
+    # env_file:
+    #   - ./frontend/.env
+    volumes:
+      - ./frontend/:/app
+      - /app/node_modules/
+    networks:
+      - transendence
   
 volumes:
   postgres:
