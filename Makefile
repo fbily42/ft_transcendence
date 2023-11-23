@@ -1,4 +1,5 @@
 APP = nest-api
+FRONT = frontend
 DB = postgres
 NETWORK = transendence
 COMPOSE_FILE = ./docker-compose.yml
@@ -35,15 +36,23 @@ status:
 	@echo "\n$(BOLD)$(MAGENTA)docker network ls $(RESET)" && docker network ls
 
 logs_nest:
-	@if [ -n "$$(docker ps -aq | grep $(APP))" ]; then \
+	@if [ -n "$$(docker ps --format="{{.Names}}" | grep $(APP))" ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Showing $(APP) docker logs  ----- \n$(RESET)"; \
 		echo "\n$(BOLD)$(YELLOW)$(APP) logs:$(RESET)"; docker logs --follow $(APP); \
 	else \
 		echo "\n$(BOLD)$(RED)No Docker containers found.$(RESET)\n"; \
 	fi
 
+logs_front:
+	@if [ -n "$$(docker ps --format="{{.Names}}" | grep $(FRONT))" ]; then \
+		echo "$(BOLD)$(YELLOW)\n ----- Showing $(FRONT) docker logs  ----- \n$(RESET)"; \
+		echo "\n$(BOLD)$(YELLOW)$(FRONT) logs:$(RESET)"; docker logs --follow $(FRONT); \
+	else \
+		echo "\n$(BOLD)$(RED)No Docker containers found.$(RESET)\n"; \
+	fi
+
 logs_db:
-	@if [ -n "$$(docker ps -a | grep $(DB))" ]; then \
+	@if [ -n "$$(docker ps --format="{{.Names}}" | grep $(DB))" ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Showing $(DB) docker logs  ----- \n$(RESET)"; \
 		echo "\n$(BOLD)$(YELLOW)$(DB) logs:$(RESET)"; docker logs --follow $(DB); \
 	else \
@@ -87,13 +96,17 @@ removes_network:
 	fi
 
 clean: remove_containers remove_volumes remove_images removes_network
+	@if [ -d ./$(FRONT)/node_modules ]; then \
+		echo "$(BOLD)$(YELLOW)\n ----- Removing local node_modules  ----- \n$(RESET)"; \
+		rm -rf ./$(FRONT)/node_modules; \
+	fi
 	@echo "\n$(BOLD)$(GREEN)Cleaned [ ✔ ]\n$(RESET)"
 
 re:
 	make clean
 	make all
 
-.PHONY: all re cleaen removes_network remove_images remove_volumes remove_containers \
+.PHONY: all re clean removes_network remove_images remove_volumes remove_containers \
 	status restart start stop logs_nest logs_db
 
 # COLORS

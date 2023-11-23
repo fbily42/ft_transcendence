@@ -1,18 +1,22 @@
-FROM node:16
+FROM node:20
+
+# Create and define the node_modules's cache directory.
+WORKDIR /cache
+
+# install app dependencies
+COPY package*.json .
+
+RUN npm install
 
 #set working directory
 WORKDIR /app
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
-# install app dependencies
-COPY package*.json .
-RUN npm install
-
 # copy source code
 COPY . .
 
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
 EXPOSE 3000
 
-CMD [ "npm", "run", "start" ]
+# CMD [ "npm", "run", "start" ]
