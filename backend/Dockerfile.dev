@@ -8,11 +8,11 @@ COPY prisma ./prisma/
 RUN npm install
 RUN npx prisma generate
 
-WORKDIR /app/dev
+# WORKDIR /app/dev
 
-COPY src ./src
-COPY prisma ./prisma
-COPY .env /
+# COPY src ./src
+# COPY prisma ./prisma
+# COPY .env /
 
 CMD [ "npm", "run", "start:dev" ]
 
