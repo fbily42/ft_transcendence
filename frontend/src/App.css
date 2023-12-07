@@ -36,3 +36,8 @@
     transform: rotate(360deg);
   }
 }
+
+.Chat-Button {
+	font-size: 20px;
+	padding: 15px 25px;
+}
