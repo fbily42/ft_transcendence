@@ -25,7 +25,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     ports:
-      - 5000:3000
+      - 3001:3000
     depends_on:
       - postgres
     environment:
@@ -73,7 +73,7 @@ services:
       - transendence
     command: >
       bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
-      && npm start && rm -rf /cache/node_modules"
+      && npm run dev && rm -rf /cache/node_modules"
   
 volumes:
   postgres:
