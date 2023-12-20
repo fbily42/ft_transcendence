@@ -34,7 +34,7 @@ services:
       - ./backend/.env
     volumes:
       - ./backend/:/app
-      # - ignore:/app/node_modules/
+      - ./backend/node_modules:/app/node_modules/
     networks:
       - transendence
 
@@ -78,7 +78,6 @@ services:
 volumes:
   postgres:
     name: nest-db
-  # ignore: {}
 
 networks:
   transendence:
