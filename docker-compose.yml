@@ -50,6 +50,19 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - transendence
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: always
+    ports:
+      - "8888:80"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - transendence
 
 # DEV-VERSION
   frontend:
@@ -78,6 +91,8 @@ services:
 volumes:
   postgres:
     name: nest-db
+  pgadmin-data:
+    name: pg-data
 
 networks:
   transendence:
