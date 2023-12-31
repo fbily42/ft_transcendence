@@ -13,53 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const VerticalNavbar: React.FC = () => {
-	const [dashboardClicked, setDashboardClicked] = useState(true);
-	const [chatClicked, setChatClicked] = useState(false);
-	const [gameClicked, setGameClicked] = useState(false);
+	const [active, setActive] = useState(1);
 
-	const handleDashboardClick = () => {
-		if (
-			!dashboardClicked ||
-			(dashboardClicked && chatClicked && gameClicked)
-		) {
-			setDashboardClicked(!dashboardClicked);
-			if (chatClicked) {
-				setChatClicked(false);
-			}
-			if (gameClicked) {
-				setGameClicked(false);
-			}
-		}
-	};
-
-	const handleGameClicked = () => {
-		if (!gameClicked || (gameClicked && dashboardClicked && chatClicked)) {
-			setGameClicked(!gameClicked);
-			if (chatClicked) {
-				setChatClicked(false);
-			}
-			if (dashboardClicked) {
-				setDashboardClicked(false);
-			}
-		}
-	};
-
-	const handleChatClick = () => {
-		if (!chatClicked || (chatClicked && dashboardClicked && gameClicked)) {
-			setChatClicked(!chatClicked);
-			if (dashboardClicked) {
-				setDashboardClicked(false);
-			}
-			if (gameClicked) {
-				setGameClicked(false);
-			}
-		}
-	};
-
-	const handleLogoClick = () => {
-		setDashboardClicked(true);
-		setChatClicked(false);
-		setGameClicked(false);
+	const handleNavTabs = (btnId: number) => {
+		if (active !== btnId) setActive(btnId);
 	};
 
 	return (
@@ -68,7 +25,7 @@ const VerticalNavbar: React.FC = () => {
 				<Link
 					to="/"
 					className="text-black font-bold text-lg"
-					onClick={handleLogoClick}
+					onClick={() => handleNavTabs(1)}
 				>
 					Pingu
 				</Link>
@@ -76,18 +33,14 @@ const VerticalNavbar: React.FC = () => {
 					<Link to="/" className="text-black">
 						<Button
 							variant={
-								dashboardClicked
-									? "tabBtnActive"
-									: "tabBtnDefault"
+								active === 1 ? "tabBtnActive" : "tabBtnDefault"
 							}
 							size="openedTabSize"
-							onClick={handleDashboardClick}
+							onClick={() => handleNavTabs(1)}
 						>
 							<div
 								className={`pr-[20px] ${
-									dashboardClicked
-										? "text-white"
-										: "text-black"
+									active === 1 ? "text-white" : "text-black"
 								}`}
 							>
 								<Home className="h-[24px] w-[24px]" />
@@ -97,14 +50,16 @@ const VerticalNavbar: React.FC = () => {
 					<Link to="/pong" className="text-black">
 						<Button
 							variant={
-								gameClicked ? "gameBtnActive" : "gameBtnDefault"
+								active === 2
+									? "gameBtnActive"
+									: "gameBtnDefault"
 							}
 							size="icon"
-							onClick={handleGameClicked}
+							onClick={() => handleNavTabs(2)}
 						>
 							<div
 								className={`${
-									gameClicked ? "text-white" : "text-black"
+									active === 2 ? "text-white" : "text-black"
 								}`}
 							>
 								<Gamepad2 className="h-[24px] w-[24px]" />
@@ -114,14 +69,14 @@ const VerticalNavbar: React.FC = () => {
 					<Link to="/chat" className="text-black">
 						<Button
 							variant={
-								chatClicked ? "tabBtnActive" : "tabBtnDefault"
+								active === 3 ? "tabBtnActive" : "tabBtnDefault"
 							}
 							size="openedTabSize"
-							onClick={handleChatClick}
+							onClick={() => handleNavTabs(3)}
 						>
 							<div
 								className={`pr-[20px] ${
-									chatClicked ? "text-white" : "text-black"
+									active === 3 ? "text-white" : "text-black"
 								}`}
 							>
 								<MessageCircle className="h-[24px] w-[24px]" />
@@ -129,13 +84,42 @@ const VerticalNavbar: React.FC = () => {
 						</Button>
 					</Link>
 				</div>
-				<div className="flex flex-col items-start">
-					<a href="#profile" className="text-black">
-						<CircleUserRound />
-					</a>
-					<a href="#logout" className="text-black">
-						<LogOut />
-					</a>
+				<div className="flex flex-col items-start gap-[13px]">
+					<Link to="/profile" className="text-black">
+						<Button
+							variant={
+								active === 4 ? "tabBtnActive" : "tabBtnDefault"
+							}
+							size="openedTabSize"
+							onClick={() => handleNavTabs(4)}
+						>
+							<div
+								className={`pr-[20px] ${
+									active === 4 ? "text-white" : "text-black"
+								}`}
+							>
+								<CircleUserRound className="h-[24px] w-[24px]" />
+							</div>
+						</Button>
+					</Link>
+
+					<Link to="/auth" className="text-black">
+						<Button
+							variant={
+								active === 5 ? "tabBtnActive" : "tabBtnDefault"
+							}
+							size="openedTabSize"
+							onClick={() => handleNavTabs(5)}
+						>
+							<div
+								className={`pr-[20px] ${
+									active === 5 ? "text-white" : "text-black"
+								}`}
+							>
+								<LogOut className="h-[24px] w-[24px]" />
+							</div>
+						</Button>
+					</Link>
 				</div>
 			</div>
 		</nav>
