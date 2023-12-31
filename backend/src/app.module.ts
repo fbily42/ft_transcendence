@@ -6,14 +6,14 @@ import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [
-	ConfigModule.forRoot({
-	  isGlobal: true,
-	   }),
-	AuthModule,
-	UserModule,
-	PrismaModule,
-	ChatModule,
-	]
+	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+		}),
+		AuthModule,
+		UserModule,
+		PrismaModule,
+		ChatModule,
+	],
 })
 export class AppModule {}
