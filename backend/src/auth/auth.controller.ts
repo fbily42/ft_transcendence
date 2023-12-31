@@ -1,8 +1,7 @@
-import { Controller } from "@nestjs/common";
-import { AuthService } from "./auth.service";
+import { Controller } from '@nestjs/common';
+import { AuthService } from './auth.service';
 
-@Controller ()
-export class AuthController{
-	constructor(private authService: AuthService) {
-	}
+@Controller()
+export class AuthController {
+	constructor(private authService: AuthService) {}
 }
