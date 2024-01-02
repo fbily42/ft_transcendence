@@ -17,6 +17,8 @@ const buttonVariants = cva(
 					"bg-primary text-primary-foreground rounded-full border border-input shadow-drop bg-customDarkBlue",
 				gameBtnDefault:
 					"bg-primary text-primary-foreground rounded-full border border-input bg-transparent shadow-drop hover:bg-customDarkBlue/50",
+				secondNavIconStyle:
+					"bg-primary text-primary-foreground rounded-full bg-transparent",
 				default:
 					"bg-primary text-primary-foreground shadow hover:bg-primary/90",
 				destructive:
@@ -33,6 +35,7 @@ const buttonVariants = cva(
 				sm: "h-8 rounded-md px-3 text-xs",
 				lg: "h-10 rounded-md px-8",
 				icon: "h-[48px] w-[48px]",
+				secondNavIconSize: "h-[24px] w-[24px]",
 				openedTabSize: "w-[68px] h-[42px]",
 			},
 		},

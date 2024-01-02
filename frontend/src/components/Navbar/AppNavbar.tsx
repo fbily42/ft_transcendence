@@ -20,7 +20,7 @@ const VerticalNavbar: React.FC = () => {
 	};
 
 	return (
-		<nav className="bg-white shadow-drop h-screen w-[86px] flex flex-col justify-center pl-[18px] py-[36px]">
+		<nav className="fixed bg-white shadow-drop h-screen w-[86px] flex flex-col justify-center pl-[18px] py-[36px]">
 			<div className="flex flex-col justify-between h-full">
 				<Link
 					to="/"
