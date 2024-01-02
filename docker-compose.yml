@@ -26,6 +26,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - 3001:3000
+      - 5555:5555
     depends_on:
       - postgres
     environment:
