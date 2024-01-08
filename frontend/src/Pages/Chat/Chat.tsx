@@ -1,6 +1,6 @@
-import ChannelPanel from '@/components/Chat/ChannelPanel'
-import ChatWindow from '@/components/Chat/ChatWindow'
-import UserList from '@/components/Chat/UserList'
+import ChannelPanel from '@/components/Chat/ChannelPanel/ChannelPanel'
+import ChatWindow from '@/components/Chat/ChatWindow/ChatWindow'
+import UserList from '@/components/Chat/UserList/UserList'
 import React from 'react'
 
 function Chat() {
@@ -11,6 +11,6 @@ function Chat() {
 		<ChatWindow></ChatWindow>
 	</div>
   )
-}
+}ChannelPanel
 
 export default Chat
