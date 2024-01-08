@@ -1,3 +1,4 @@
+
 import {
 	MessageBody,
 	SubscribeMessage,
@@ -8,7 +9,7 @@ import {
 @WebSocketGateway()
 export class ChatGateway {
 	@WebSocketServer()
-	server;
+	server: Server;
 
 	@SubscribeMessage('message')
 	handleMessage(@MessageBody() message: string): void {

@@ -1,4 +1,3 @@
-//commande pour avoir d'un coup la config: rfce
 // import { Button } from "@/components/ui/button";
 import React from "react";
 import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
