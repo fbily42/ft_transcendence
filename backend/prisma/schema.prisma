@@ -35,8 +35,8 @@ model User {
 	total_point	Int @default(0)
 	level		Int @default(0)
 	rank		Int @default(0)
-	//avatar		String //Voir methode stockage ? photo ou url ?
-	twoFA			Boolean  @default(false)
+	avatar		String?
+	twoFA		Boolean  @default(false)
 	//notifs		String []
 	messages	Message[]
 }

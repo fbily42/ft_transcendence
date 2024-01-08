@@ -1,8 +1,7 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
-# PROD-VERSION
+  # PROD-VERSION
   # nest-api:
   #   container_name: nest-api
   #   build:
@@ -17,7 +16,7 @@ services:
   #   networks:
   #     - transendence
 
-# DEV-VERSION
+  # DEV-VERSION
   nest-api:
     container_name: nest-api
     restart: always
@@ -34,7 +33,8 @@ services:
       - ./backend/.env
     volumes:
       - ./backend/:/app
-      # - ignore:/app/node_modules/
+      # - /app/node_modules/ # Update: mettre le nodes modules: ça écrase pas les nodes modules
+      - ./backend/node_modules:/app/node_modules/ # Update: mettre le nodes modules: ça écrase pas les nodes modules
     networks:
       - transendence
 
@@ -51,7 +51,7 @@ services:
     networks:
       - transendence
 
-# DEV-VERSION
+  # DEV-VERSION
   frontend:
     container_name: frontend
     restart: always
@@ -74,7 +74,7 @@ services:
     command: >
       bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
       && npm run dev && rm -rf /cache/node_modules"
-  
+
 volumes:
   postgres:
     name: nest-db
