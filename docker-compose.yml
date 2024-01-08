@@ -1,8 +1,7 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
-# PROD-VERSION
+  # PROD-VERSION
   # nest-api:
   #   container_name: nest-api
   #   build:
@@ -17,7 +16,7 @@ services:
   #   networks:
   #     - transendence
 
-# DEV-VERSION
+  # DEV-VERSION
   nest-api:
     container_name: nest-api
     restart: always
@@ -51,21 +50,8 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - transendence
-    
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4
-    restart: always
-    ports:
-      - "8888:80"
-    env_file:
-      - ./backend/.env
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    networks:
-      - transendence
 
-# DEV-VERSION
+  # DEV-VERSION
   frontend:
     container_name: frontend
     restart: always
@@ -88,7 +74,7 @@ services:
     command: >
       bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
       && npm run dev && rm -rf /cache/node_modules"
-  
+
 volumes:
   postgres:
     name: nest-db
