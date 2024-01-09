@@ -5,12 +5,14 @@ import Pong from "./Pages/Pong/Pong";
 import Chat from "./Pages/Chat/Chat";
 import Profile from "./Pages/Profile/Profile";
 import Layout from "./components/Layout";
+import Auth from "./Pages/Auth/Auth";
 // import { Button } from "@/components/ui/button"
 
 function App() {
 	return (
 		<>
 			<Routes>
+				<Route path="/auth" element={<Auth />}></Route>
 				<Route element={<Layout />}>
 					<Route index path="/" element={<Dashboard />}></Route>
 					<Route path="/pong" element={<Pong />}></Route>
