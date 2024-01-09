@@ -11,6 +11,6 @@ function Chat() {
 		<ChatWindow></ChatWindow>
 	</div>
   )
-}ChannelPanel
+}
 
 export default Chat

@@ -6,7 +6,7 @@ import React from 'react'
 function ChannelPanel() {
   return (
 	<div className="bg-blue-100 h-full w-1/5 rounded-md border">
-		<div className='space-x-40'>
+		<div className='flex justify-between'>
 			<span className='font-bold text-3xl ml-2'>Channels</span>
 			<Button variant="ghost" size='sm'>
 				<IoAddCircleOutline className="h-4 w-4"></IoAddCircleOutline>

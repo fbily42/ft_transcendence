@@ -2,7 +2,7 @@ import React from 'react'
 
 function ChatWindow() {
   return (
-	<div className="flex flex-col bg-blue-300 w-3/5 ml-10 mr-10 rounded-md border">
+	<div className="flex flex-col bg-blue-300 w-full ml-10 mr-10 rounded-md border">
 	<div className="overflow-y-auto">
 	  Messages List
 	</div>
