@@ -1,5 +1,6 @@
 APP = nest-api
 FRONT = frontend
+BACK = backend
 DB = postgres
 NETWORK = transendence
 COMPOSE_FILE = ./docker-compose.yml
@@ -99,6 +100,8 @@ clean: remove_containers remove_volumes remove_images removes_network
 	@if [ -d ./$(FRONT)/node_modules ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Removing local node_modules  ----- \n$(RESET)"; \
 		rm -rf ./$(FRONT)/node_modules; \
+		rm -rf ./${BACK}/node_modules; \
+		rm -rf ./${BACK}/dist; \
 	fi
 	@echo "\n$(BOLD)$(GREEN)Cleaned [ ✔ ]\n$(RESET)"
 
