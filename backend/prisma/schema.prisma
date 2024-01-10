@@ -18,7 +18,8 @@ model User {
 	name		String @unique // 42 login
 	hash 		String
 
-	tokenAuth 	String // peut etre optionnel si attribution apres creation
+	token42 	Json
+	jwt			Json?
 	pseudo 		String? @unique
 	//friends 	User[]
 	//channels 	Channel[] @relation("channel_member")
