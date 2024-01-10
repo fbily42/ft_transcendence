@@ -1,26 +1,39 @@
 import { Controller, Get, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller ('auth')
 export class AuthController{
 	constructor(private authService: AuthService) {}
 
 	@Get('42')
-	async login(@Req() req : Request) {
+	async login(@Req() req : Request, @Res() res : Response) {
 
 		const code = req.query.code as string;
 		
+		// Get the token access from 42api
 		const token = await this.authService.getToken(code);
 		
+		// Get the login of the user from 42api
 		const login :string = await this.authService.getUserLogin(token);
 		
+		// Find if User exists, create if doesnt
 		const user = await this.authService.findUser(login, token);
 		
-		//CreateJWT
+		// Create JWT and add to the user in DB
+		const jwt = await this.authService.createJwt(user);
 
-		//RedirectToDashboard
+		// Create cookie for browser
+		res.cookie('jwt', jwt);
 
-		return user;
+		// Redirect to Dashboard
+		res.redirect("http://localhost:3000/");
 	}
 }
+/* 
+
+To find Cookie in Chrome :
+
+	Inspect (F12) -> Appplication -> Cookies
+
+*/

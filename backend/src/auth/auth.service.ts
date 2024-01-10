@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable({})
 export class AuthService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService,
+		private jwt : JwtService) {}
 
 	async getToken(code :string){
 
@@ -51,11 +53,29 @@ export class AuthService {
 		const user = await this.prisma.user.create({
 			data: {
 				name: login,
-				hash: 'test',
 				token42: token,
-				status: 'online',
 			},
 		});
 		return user;
+	}
+
+	async createJwt(user: any){
+		const payload = {
+			sub: user.id,
+			login: user.name
+		};
+
+		const signedJwt = await this.jwt.signAsync(payload);
+
+		const updateUser = await this.prisma.user.update({
+			where: {
+				id: user.id,
+			},
+			data: {
+				jwt: signedJwt,
+			},
+		});
+
+		return signedJwt;
 	}
 }

@@ -16,10 +16,9 @@ model User {
 	updateAt 	DateTime @updatedAt
 
 	name		String @unique // 42 login
-	hash 		String
 
 	token42 	Json
-	jwt			Json?
+	jwt			String?
 	pseudo 		String? @unique
 	//friends 	User[]
 	//channels 	Channel[] @relation("channel_member")
@@ -28,7 +27,7 @@ model User {
 	//channelBan
 	//channelInvit
 	//channelMute
-	status 		String
+	status 		String?
 	//history	Game[]
 	nb_win		Int @default(0)
 	nb_loose	Int @default(0) 
