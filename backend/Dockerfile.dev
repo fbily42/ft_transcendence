@@ -8,4 +8,4 @@ COPY prisma ./prisma/
 RUN npm install
 # RUN npx prisma generate
 
-CMD ["/bin/sh", "-c","npx prisma generate && npm run start:dev" ]
+CMD ["/bin/sh", "-c","npx prisma generate && sleep 10 && npx prisma db push && npm run start:dev" ]
