@@ -9,7 +9,7 @@ import axios from 'axios';
 function Dashboard() {
 
 	const [user, setUser] = useState();
-	const [cookies] = useCookies(['jwt']);
+	// const [cookies] = useCookies(['jwt']);
 	
 	//UseEffect mandatory for async user data update
 	useEffect(() => {
@@ -17,7 +17,7 @@ function Dashboard() {
 		  try {
 			//api call with jwt as authorization
 			const response = await axios.get("http://localhost:3333/user/me", {
-			  headers: { Authorization: `Bearer ${cookies.jwt}`}
+				withCredentials: true
 			});
 
 			//Update the user data
@@ -43,7 +43,7 @@ function Dashboard() {
 		//Launch the loop
 		pollData();
 
-	}, [cookies.jwt]);
+	}, []);
 
 	return (
 		<>
