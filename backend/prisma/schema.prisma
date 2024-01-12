@@ -21,12 +21,8 @@ model User {
 	jwt			String?
 	pseudo 		String? @unique
 	//friends 	User[]
-	//channels 	Channel[] @relation("channel_member")
 	channelsOwn	Channel[] @relation("channel_owner")
-	//channelsAdm	Channel[] @relation("channel_admins")
-	//channelBan
-	//channelInvit
-	//channelMute
+	channelsAdmin ChannelAdmins[]
 	status 		String?
 	//history	Game[]
 	nb_win		Int @default(0)
@@ -53,17 +49,19 @@ model	Channel {
 	owner		User @relation(name: "channel_owner", fields: [ownerId], references: [id])
 	ownerId		Int
 
-	//admins	User[] @relation(name: "channel_admins", fields: [adminsIds], references: [id])
-	//adminsIds	Int[]
-	//members	User[] @relation(name: "channel_member", fields: [membersIds]
-	//membersIds Int[]
-	//invite	User[] @relation(name: "channel_invite", fields: [inviteIds]
-	//inviteIds Int[]
-	//banned	User[] @relation(name: "channel_banned", fields: [bannedIds]
-	//bannedIds Int[]
-	//mute	User[] @relation(name: "channel_mute", fields: [muteIds]
-	//muteIds Int[]
-	messages	Message[] 
+	admins		ChannelAdmins[]
+	messages	Message[]
+}
+
+// Relation tables for many-to-many relations
+model ChannelAdmins {
+  channelId Int
+  channel Channel @relation(fields: [channelId], references: [id])
+
+  userId    Int
+  user    User @relation(fields: [userId], references: [id])
+
+  @@id([channelId, userId])
 }
 
 model	Message {
