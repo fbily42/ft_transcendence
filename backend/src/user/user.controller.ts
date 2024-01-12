@@ -8,8 +8,10 @@ export class UserController {
 	constructor(private userService: UserService) {}
 
 	@Get('me')
+	@UseGuards(AuthGuard)
 	async getUserInfo(@Req() req: Request) {
 
+		//To access userLogin and userID in req, see example below
 		const token = req.headers.authorization;
 		const jwt = token.split(' ')
 		
