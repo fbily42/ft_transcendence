@@ -3,13 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-
 	constructor(private jwtService: JwtService) {}
-
 
 	canActivate(context: ExecutionContext): boolean | Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
-		
+
 		//TODO: A l'avenir, les JWT seront toujours transmis dans le header['Authorization'] donc l'extraction du JWT est a modifier.
 		// const cookie: string = request.headers['authorization'];
 		const cookie: string = request.headers.authorization;

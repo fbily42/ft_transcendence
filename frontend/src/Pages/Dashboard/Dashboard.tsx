@@ -3,46 +3,47 @@ import React, { useEffect } from "react";
 import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
 import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
 import { useState } from "react";
-import { useCookies } from 'react-cookie';
-import axios from 'axios';
+import { useCookies } from "react-cookie";
+import axios from "axios";
 
 function Dashboard() {
-
 	const [user, setUser] = useState();
-	const [cookies] = useCookies(['jwt']);
-	
+	const [cookies] = useCookies(["jwt"]);
+
 	//UseEffect mandatory for async user data update
 	useEffect(() => {
 		const fetchData = async () => {
-		  try {
-			//api call with jwt as authorization
-			const response = await axios.get("http://localhost:3333/user/me", {
-			  headers: { Authorization: `Bearer ${cookies.jwt}`}
-			});
+			try {
+				//api call with jwt as authorization
+				const response = await axios.get(
+					"http://localhost:3333/user/me",
+					{
+						headers: { Authorization: `Bearer ${cookies.jwt}` },
+					}
+				);
 
-			//Update the user data
-			setUser(response.data);
-		} catch (error) {
-			console.log("Error getdata", error);
-		}
-	};
+				//Update the user data
+				setUser(response.data);
+			} catch (error) {
+				console.log("Error getdata", error);
+			}
+		};
 
-	const pollData = async () => {
-		//First api call
-		fetchData();
-
-		//Set the interval between each api call
-		const pollingInterval = setInterval(() => {
+		const pollData = async () => {
+			//First api call
 			fetchData();
-		}, 5000);
 
-		//Clear when the component is unmount
-		return () => clearInterval(pollingInterval);
-	};
+			//Set the interval between each api call
+			const pollingInterval = setInterval(() => {
+				fetchData();
+			}, 5000);
+
+			//Clear when the component is unmount
+			return () => clearInterval(pollingInterval);
+		};
 
 		//Launch the loop
 		pollData();
-
 	}, [cookies.jwt]);
 
 	return (

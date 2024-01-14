@@ -10,12 +10,11 @@ export class UserController {
 	@Get('me')
 	@UseGuards(AuthGuard)
 	async getUserInfo(@Req() req: Request) {
-
 		//To access userLogin and userID in req, see example below
 		const token = req.headers.authorization;
-		const jwt = token.split(' ')
-		
-		return  await this.userService.getInfo(jwt[1]);
+		const jwt = token.split(' ');
+
+		return await this.userService.getInfo(jwt[1]);
 	}
 
 	//TESTS du AuthGuard (supprimable)
@@ -27,4 +26,9 @@ export class UserController {
 	}
 	*/
 
+	@Get('leaderboard')
+	@UseGuards(AuthGuard)
+	async getLeaderboard() {
+		return this.userService.getLeaderboard();
+	}
 }
