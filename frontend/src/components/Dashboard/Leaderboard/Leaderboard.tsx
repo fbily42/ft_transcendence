@@ -19,8 +19,31 @@ export default function LeaderBoard(): JSX.Element {
 					}
 				);
 
+				// Sort the data by score in descending order
+				const sortedData = response.data.sort(
+					(a: LeaderboardData, b: LeaderboardData) =>
+						b.score - a.score
+				);
+
+				// Assign ranks based on the position in the sorted array
+				const rankedData = sortedData.map(
+					(user: LeaderboardData, index: number) => ({
+						...user,
+						rank: index + 1,
+					})
+				);
+
 				//Update the user data
-				setData(response.data);
+				// setData(response.data);
+				setData(rankedData);
+				// Update the ranks in the backend
+				await axios.post(
+					"http://localhost:3333/user/updateRanks",
+					rankedData,
+					{
+						headers: { Authorization: `Bearer ${cookies.jwt}` },
+					}
+				);
 			} catch (error) {
 				console.log("Error getdata", error);
 			}
