@@ -1,16 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChannelDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from "argon2";
+import { NewChannelDto, joinChannelDto } from './dto';
 
 @Injectable()
 export class ChatService {
 	constructor(private prisma: PrismaService) {}
 
-	async createChannel(userId: number, dto: ChannelDto) {
+	async createChannel(userId: number, dto: NewChannelDto) {
 		try {
-			let hash = null
+			let hash: string = null
 			if (dto.password)
 				hash = await argon.hash(dto.password)
 			const channel = await this.prisma.channel.create({
@@ -36,5 +36,33 @@ export class ChatService {
 			}
 			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
 		}
+	}
+
+	async joinChannel(userId :number, dto: joinChannelDto) {
+		try {
+			const channel = this.prisma.channel.findUnique({
+				where: {
+					name: dto.name,
+				},
+				}
+			)
+			if ((await channel).private)
+			{
+				// Check if user is in invited list of the channel
+				// else throw Exception
+				return
+			}
+			if ((await channel).hash)
+			{
+				const hash: string = await argon.hash(dto.password)
+				if (hash != (await channel).hash)
+					throw new HttpException("Bad credentials", HttpStatus.BAD_REQUEST)
+			}
+			// Add User to ChannelMember relation
+		} catch (error) {
+			// if prismaknowerror ->
+			// else throw error
+		}
+
 	}
 }

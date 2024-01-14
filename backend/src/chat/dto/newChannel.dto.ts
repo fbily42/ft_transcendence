@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-export class ChannelDto {
+export class NewChannelDto {
 	
 	@IsNotEmpty()
 	@IsString()

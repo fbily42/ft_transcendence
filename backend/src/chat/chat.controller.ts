@@ -2,7 +2,7 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ChannelDto } from './dto';
+import { NewChannelDto } from './dto';
 
 @Controller('chat')
 export class ChatController {
@@ -10,7 +10,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Post('add')
-	addChannel(@Req() req: Request, @Body() dto: ChannelDto) {
+	addChannel(@Req() req: Request, @Body() dto: NewChannelDto) {
 		return this.chatService.createChannel(req['userID'], dto);
 	}
 

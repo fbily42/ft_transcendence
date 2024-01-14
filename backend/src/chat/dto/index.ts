@@ -1,1 +1,2 @@
-export * from './channel.dto'
+export * from './newChannel.dto'
+export * from './joinChannel.dto'
