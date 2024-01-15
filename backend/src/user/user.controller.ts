@@ -13,11 +13,13 @@ export class UserController {
 	async getUserInfo(@Req() req: Request) {
 
 		//To access userLogin and userID in req, see example below
-		const token = req.headers.authorization;
-		const jwt = token.split(' ')
+		// return {};
+		// const token = req.headers.authorization;
+		// const jwt = token.split(' ')
+		const jwt = req.cookies.jwt
 		
 		console.log('hello');
-		return  await this.userService.getInfo(jwt[1]);
+		return  await this.userService.getInfo(jwt);
 	}
 
 	//TESTS du AuthGuard (supprimable)

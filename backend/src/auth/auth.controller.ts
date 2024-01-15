@@ -24,7 +24,14 @@ export class AuthController{
 		const jwt = await this.authService.createJwt(user);
 
 		// Create cookie for browser
-		res.cookie('jwt', jwt);
+		// res.cookie('jwt', jwt);
+		res.cookie('jwt', jwt, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: true,
+			domain: process.env.FRONTEND_DOMAIN,
+		});
+		// res.cookie('jwt', jwt);
 
 		// Redirect to Dashboard
 		res.redirect("http://localhost:3000/");
