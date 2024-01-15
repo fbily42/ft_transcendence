@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-export class joinChannelDto{
+export class JoinChannelDto{
 
 	@IsNotEmpty()
 	@IsString()

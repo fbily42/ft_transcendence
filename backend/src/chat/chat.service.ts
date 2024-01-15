@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from "argon2";
-import { NewChannelDto, joinChannelDto } from './dto';
+import { JoinChannelDto, NewChannelDto } from './dto';
 
 @Injectable()
 export class ChatService {
@@ -30,39 +30,51 @@ export class ChatService {
 		} catch(error) {
 			if (error instanceof PrismaClientKnownRequestError){
 				if (error.code === 'P2002')
-				{
 					throw new HttpException('Channel already exists', HttpStatus.CONFLICT)
-				}
 			}
 			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
 		}
 	}
 
-	async joinChannel(userId :number, dto: joinChannelDto) {
+	async joinChannel(userId :number, dto: JoinChannelDto) {
 		try {
-			const channel = this.prisma.channel.findUnique({
+			const channel = await this.prisma.channel.findUnique({
 				where: {
 					name: dto.name,
 				},
-				}
-			)
-			if ((await channel).private)
+				},
+			);
+			if (!channel)
+				throw new HttpException('Channel does not exists', HttpStatus.BAD_REQUEST);
+			if (channel.private)
 			{
-				// Check if user is in invited list of the channel
-				// else throw Exception
-				return
+				const invited = await this.prisma.channelInvited.findUnique({
+					where:{
+						channelId_userId:{
+						userId: userId,
+						channelId: channel.id,
+						},
+					},
+				});
+				if (!invited)
+					throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST)
 			}
-			if ((await channel).hash)
+			if (channel.hash)
 			{
-				const hash: string = await argon.hash(dto.password)
-				if (hash != (await channel).hash)
+				if (!await argon.verify(channel.hash, dto.password))
 					throw new HttpException("Bad credentials", HttpStatus.BAD_REQUEST)
 			}
-			// Add User to ChannelMember relation
+			const joined = await this.prisma.channelMember.create({
+				data:{
+					userId: userId,
+					channelId: channel.id,
+				},
+			});
+			return joined
 		} catch (error) {
-			// if prismaknowerror ->
-			// else throw error
+			if (error instanceof HttpException || error instanceof PrismaClientKnownRequestError)
+				throw error
+			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
 		}
-
 	}
 }
