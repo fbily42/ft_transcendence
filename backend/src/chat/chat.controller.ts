@@ -3,6 +3,7 @@ import { ChatService } from './chat.service';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { NewChannelDto, JoinChannelDto } from './dto';
+import { Channel, ChannelMember } from '@prisma/client';
 
 @Controller('chat')
 export class ChatController {
@@ -10,13 +11,13 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Post('add')
-	addChannel(@Req() req: Request, @Body() dto: NewChannelDto) {
-		return this.chatService.createChannel(req['userID'], dto);
+	async addChannel(@Req() req: Request, @Body() dto: NewChannelDto): Promise<Channel> {
+		return await this.chatService.createChannel(req['userID'], dto);
 	}
 
 	@UseGuards(AuthGuard)
 	@Post('join')
-	joinChannel(@Req() req: Request, @Body() dto: JoinChannelDto) {
-		return this.chatService.joinChannel(req['userID'], dto);
+	async joinChannel(@Req() req: Request, @Body() dto: JoinChannelDto): Promise<ChannelMember> {
+		return await this.chatService.joinChannel(req['userID'], dto);
 	}
 }
