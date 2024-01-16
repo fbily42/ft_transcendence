@@ -1,6 +1,7 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
+import { AuthGuard } from './auth.guard';
 
 @Controller ('auth')
 export class AuthController{
@@ -35,6 +36,12 @@ export class AuthController{
 
 		// Redirect to Dashboard
 		res.redirect("http://localhost:3000/");
+	}
+
+	@Get('isAuth')
+	@UseGuards(AuthGuard)
+	@HttpCode(200)
+	isAuthentified(){
 	}
 }
 /* 
