@@ -17,7 +17,7 @@ const Modal: React.FC<propTypes> = ({open, onClose, children}) => {
 			${open ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}
 			onClick={(e) => e.stopPropagation()}>
 			<button className='absolute top-2 right-2 py-1 px-2 border berder-neutral-200 rounded-md' onClick={onClose}>X</button>
-		{children}
+			{children}
 		</div>
 	</div>
   )

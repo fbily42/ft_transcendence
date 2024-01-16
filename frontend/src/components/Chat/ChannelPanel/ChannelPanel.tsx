@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { IoAddCircleOutline } from "react-icons/io5";
-
 import React, { useState } from "react";
 import Modal from "./Modal";
+import TabsChannel from "./TabsChannel";
 
 function ChannelPanel() {
 	const [open, setOpen] = useState<boolean>(false)
@@ -15,10 +15,7 @@ function ChannelPanel() {
 					<IoAddCircleOutline className="h-4 w-4"></IoAddCircleOutline>
 				</Button>
 				<Modal open={open} onClose={() => setOpen(false)}>
-					<div className="flex flex-col gap-4">
-						<p>Inserer ici le formulaire</p>
-					</div>
-					<Button onClick={() => setOpen(false)}>Submit</Button>
+					<TabsChannel></TabsChannel>
 				</Modal>
 			</div>
 			<div className="overflow-y-auto">
