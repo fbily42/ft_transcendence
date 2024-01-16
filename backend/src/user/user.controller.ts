@@ -31,4 +31,11 @@ export class UserController {
 	async getLeaderboard() {
 		return this.userService.getLeaderboard();
 	}
+
+	// TODO: DTO pour la data pour etre sure de ce qu'on envoi
+	@Post('updateRanks')
+	@UseGuards(AuthGuard)
+	async updateRanks(@Body() data: any) {
+		return this.userService.updateRanks(data);
+	}
 }
