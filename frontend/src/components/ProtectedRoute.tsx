@@ -8,7 +8,7 @@ function ProtectedRoute() : JSX.Element {
 	const [auth, setAuth] = useState<boolean>(false);
 
 	useEffect(() => {
-		async function checkIsAuth() {
+		async function checkIsAuth() : Promise<void> {
 			try {
 				const response = await axios.get("http://localhost:3333/auth/isAuth", {
 					withCredentials: true
@@ -16,24 +16,17 @@ function ProtectedRoute() : JSX.Element {
 				setAuth(true);
 			}
 			catch (error){
-				console.log("Error", error);
-				setAuth(() => {
-					return false;
-				});
+				setAuth(false);
 				navigate('/auth');
 			}
 		}
 		checkIsAuth();
 	}, []);
 
-	console.log("auth", auth);
-	// return (
-		// auth ? <Outlet/> : <Navigate to="/auth"/>
-	// );
 	if (auth){
-		return <Outlet></Outlet>
+		return (<Outlet></Outlet>);
 	}
-	return <div></div>
+	return (<div></div>);
 }
 
 export default ProtectedRoute;
