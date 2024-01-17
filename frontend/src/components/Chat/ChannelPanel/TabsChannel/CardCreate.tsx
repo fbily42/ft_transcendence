@@ -11,7 +11,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
-import { useCookies } from 'react-cookie'
 import { useForm, SubmitHandler } from 'react-hook-form'
 
 type FormValues = {
@@ -28,7 +27,6 @@ interface CardCreateProps {
 
 function CardCreate({onClose}: CardCreateProps) {
 
-	const [cookies] = useCookies(['jwt']);
 	const { register, handleSubmit} = useForm<FormValues>()
 	const [ errorMessage, setErrorMessage ] = useState<string>('')
 
@@ -37,7 +35,7 @@ function CardCreate({onClose}: CardCreateProps) {
 				if (data.password === '')
 					delete data.password;
 				const response = await axios.post("http://localhost:3333/chat/add", data, {
-					headers: { Authorization: `Bearer ${cookies.jwt}`}
+					withCredentials: true,
 				});
 				onClose();
 			} catch (error) {
