@@ -1,10 +1,11 @@
-import { Outlet, useNavigate,Navigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState  } from "react";
 import axios from 'axios';
 
 
 function ProtectedRoute() : JSX.Element {
-	const navigate = useNavigate()
+	const navigate = useNavigate();
+	const location = useLocation();
 	const [auth, setAuth] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -21,7 +22,7 @@ function ProtectedRoute() : JSX.Element {
 			}
 		}
 		checkIsAuth();
-	}, []);
+	}, [location.pathname]);
 
 	if (auth){
 		return (<Outlet></Outlet>);
