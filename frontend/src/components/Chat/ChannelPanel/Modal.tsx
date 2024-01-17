@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import React from 'react'
 
 type propTypes = {
@@ -13,10 +14,10 @@ const Modal: React.FC<propTypes> = ({open, onClose, children}) => {
 		${open ? "visible bg-black/20" : "invisible"}`}
 		onClick={onClose}>
 		<div
-			className={`bg-white roundd-lg shadow p-6 transition-all max-w-md
+			className={`bg-white roundd-lg shadow p-4 transition-all max-w-md border rounded-md
 			${open ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}
 			onClick={(e) => e.stopPropagation()}>
-			<button className='absolute top-2 right-2 py-1 px-2 border berder-neutral-200 rounded-md' onClick={onClose}>X</button>
+			<Button variant={'destructive'} size='sm' className="flex ml-auto -mt-2 mb-2" onClick={onClose}>X</Button>
 			{children}
 		</div>
 	</div>

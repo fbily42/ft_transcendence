@@ -2,20 +2,20 @@ import { Button } from "@/components/ui/button";
 import { IoAddCircleOutline } from "react-icons/io5";
 import React, { useState } from "react";
 import Modal from "./Modal";
-import TabsChannel from "./TabsChannel";
+import TabsChannel from "./TabsChannel/TabsChannel";
 
 function ChannelPanel() {
-	const [open, setOpen] = useState<boolean>(false)
+	const [open, setOpen] = useState<boolean>(false);
 
 	return (
 		<div className="bg-blue-100 h-full w-1/5 rounded-md border">
 			<div className="flex justify-between">
-				<span className="font-bold text-3xl ml-2">Channels</span>
+				<h1 className="font-bold text-3xl ml-2">Channels</h1>
 				<Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
 					<IoAddCircleOutline className="h-4 w-4"></IoAddCircleOutline>
 				</Button>
 				<Modal open={open} onClose={() => setOpen(false)}>
-					<TabsChannel></TabsChannel>
+					<TabsChannel onClose={() => setOpen(false)}></TabsChannel>
 				</Modal>
 			</div>
 			<div className="overflow-y-auto">

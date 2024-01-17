@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,25 +16,32 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 
 type FormValues = {
 	name: string
-	password: string
+	password?: string
 	private: boolean
 }
 
-// TODO : If channel create, close the modal. If not, display error
+interface CardCreateProps {
+	onClose: () => void;
+}
 
-function CardCreate() {
+// TODO : Check if error exists + Find a way to clear error when modal closed
+
+function CardCreate({onClose}: CardCreateProps) {
 
 	const [cookies] = useCookies(['jwt']);
 	const { register, handleSubmit} = useForm<FormValues>()
+	const [ errorMessage, setErrorMessage ] = useState<string>('')
+
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 			try {
 				if (data.password === '')
 					delete data.password;
-				console.log(data)
 				const response = await axios.post("http://localhost:3333/chat/add", data, {
 					headers: { Authorization: `Bearer ${cookies.jwt}`}
 				});
+				onClose();
 			} catch (error) {
+				setErrorMessage(error.response.data.message)
 				throw error
 			}
 		}
@@ -64,6 +71,9 @@ function CardCreate() {
 						className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
 						Invitation only
 					</Label>
+				</div>
+				<div className='text-red-600'>
+					{errorMessage}
 				</div>
 			  </CardContent>
 			  <CardFooter>
