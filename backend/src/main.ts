@@ -9,7 +9,10 @@ async function bootstrap() {
 	whitelist: true,
   	}),
   );
-  app.enableCors();
+  app.enableCors({
+    credentials: true,
+    origin: process.env.FRONTEND_URL,
+  });
   app.use(cookieParser());
   await app.listen(3000);
 }

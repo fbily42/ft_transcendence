@@ -9,7 +9,6 @@ import axios from 'axios';
 function Dashboard() {
 
 	const [user, setUser] = useState();
-	const [cookies] = useCookies(['jwt']);
 	
 	//UseEffect mandatory for async user data update
 	useEffect(() => {
@@ -17,7 +16,7 @@ function Dashboard() {
 		  try {
 			//api call with jwt as authorization
 			const response = await axios.get("http://localhost:3333/user/me", {
-			  headers: { Authorization: `Bearer ${cookies.jwt}`}
+				withCredentials: true
 			});
 
 			//Update the user data
@@ -27,12 +26,12 @@ function Dashboard() {
 		}
 	};
 
-	const pollData = async () => {
+	const pollData = () => {
 		//First api call
 		fetchData();
 
 		//Set the interval between each api call
-		const pollingInterval = setInterval(() => {
+		const pollingInterval = setInterval(async () => {
 			fetchData();
 		}, 5000);
 
@@ -41,9 +40,9 @@ function Dashboard() {
 	};
 
 		//Launch the loop
-		pollData();
+		return pollData();
 
-	}, [cookies.jwt]);
+	}, []);
 
 	return (
 		<>

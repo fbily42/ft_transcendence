@@ -1,27 +1,49 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Redirect } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-	constructor(private jwtService: JwtService) {}
+	constructor(private jwtService: JwtService,
+		private prisma: PrismaService) {}
 
-
-	canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
 		
-		//TODO: A l'avenir, les JWT seront toujours transmis dans le header['Authorization'] donc l'extraction du JWT est a modifier.
-		// const cookie: string = request.headers['authorization'];
-		const cookie: string = request.headers.authorization;
-		const encodedJwt: string = cookie.split(' ', 2)[1];
-		// console.log(encodedJwt);
+		const encodedJwt: string = request.cookies.jwt;
 
-		//TODO: Implementer la verification du JWT
-		const decode = this.jwtService.decode(encodedJwt);
-		// console.log(decode.login);
-		// console.log(decode.sub);
-		request['userLogin'] = decode.login;
-		request['userID'] = decode.sub;
-		return true;
+		//check if JWT exists in the cookies
+		if (!encodedJwt)
+		{
+			// console.log('NO PERMISSION : jwt cookie doesn\'t exist');
+			return false;
+		}
+
+		try {
+			//Verify if the JWT is valid
+			this.jwtService.verify(encodedJwt);
+			const decode = this.jwtService.decode(encodedJwt);
+			const user = await this.prisma.user.findUnique({
+				where:{
+					name: decode.login,
+					id: decode.sub,
+				}
+			})
+			if (!user)
+				return false;
+			request['userLogin'] = decode.login;
+			request['userID'] = decode.sub;
+			return true;
+		}
+		catch (error)
+		{
+			// console.log('NO PERMISSION : authorization incorrect');
+			return false;
+		}
+
 	}
+
+	
 }

@@ -6,6 +6,7 @@ import Chat from "./Pages/Chat/Chat";
 import Profile from "./Pages/Profile/Profile";
 import Layout from "./components/Layout";
 import Auth from "./Pages/Auth/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 // import { Button } from "@/components/ui/button"
 
 function App() {
@@ -13,11 +14,13 @@ function App() {
 		<>
 			<Routes>
 				<Route path="/auth" element={<Auth />}></Route>
-				<Route element={<Layout />}>
-					<Route index path="/" element={<Dashboard />}></Route>
-					<Route path="/pong" element={<Pong />}></Route>
-					<Route path="/chat" element={<Chat />}></Route>
-					<Route path="/profile" element={<Profile />}></Route>
+				<Route element= {<ProtectedRoute />}>
+					<Route element={<Layout />}>
+						<Route index path="/" element={<Dashboard />}></Route>
+						<Route path="/pong" element={<Pong />}></Route>
+						<Route path="/chat" element={<Chat />}></Route>
+						<Route path="/profile" element={<Profile />}></Route>
+					</Route>
 				</Route>
 			</Routes>
 		</>
