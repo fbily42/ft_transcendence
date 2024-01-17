@@ -2,6 +2,7 @@ import { Controller, Get, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Controller ('auth')
 export class AuthController{
@@ -11,7 +12,11 @@ export class AuthController{
 	async login(@Req() req : Request, @Res() res : Response) {
 
 		try {
-			const code = req.query.code as string;
+			const code = req.query?.code as string ;
+
+			if (!code || req.query?.error) {
+				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
+			}
 			
 			// Get the token access from 42api
 			const token = await this.authService.getToken(code);
@@ -26,21 +31,18 @@ export class AuthController{
 			const jwt = await this.authService.createJwt(user);
 		
 			// Create cookie for browser
-			// res.cookie('jwt', jwt);
 			res.cookie('jwt', jwt, {
 				httpOnly: true,
 				sameSite: 'strict',
 				secure: true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
-			
 			res.redirect("http://localhost:3000/");
+
 		} catch(error) {
+			res.redirect("http://localhost:3000/auth");
 			throw error;
 		}
-		// res.cookie('jwt', jwt);
-
-		// Redirect to Dashboard
 	}
 
 	@Get('isAuth')

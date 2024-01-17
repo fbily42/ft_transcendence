@@ -1,12 +1,15 @@
 import { Injectable, CanActivate, ExecutionContext, Redirect } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-	constructor(private jwtService: JwtService) {}
+	constructor(private jwtService: JwtService,
+		private prisma: PrismaService) {}
 
-	canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
 		
 		const encodedJwt: string = request.cookies.jwt;
@@ -22,6 +25,14 @@ export class AuthGuard implements CanActivate {
 			//Verify if the JWT is valid
 			this.jwtService.verify(encodedJwt);
 			const decode = this.jwtService.decode(encodedJwt);
+			const user = await this.prisma.user.findUnique({
+				where:{
+					name: decode.login,
+					id: decode.sub,
+				}
+			})
+			if (!user)
+				return false;
 			request['userLogin'] = decode.login;
 			request['userID'] = decode.sub;
 			return true;
