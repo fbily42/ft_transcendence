@@ -37,6 +37,8 @@ export class ChatService {
 		}
 	}
 
+	//ADD : - If Banned -> Error
+	//		- If already if channel -> Error
 	async joinChannel(userId :number, dto: JoinChannelDto): Promise<ChannelMember>{
 		try {
 			const channel: Channel = await this.prisma.channel.findUnique({
@@ -62,8 +64,8 @@ export class ChatService {
 			}
 			if (channel.hash)
 			{
-				if (!await argon.verify(channel.hash, dto.password))
-					throw new HttpException("Bad credentials", HttpStatus.BAD_REQUEST);
+				if (!dto.password || !await argon.verify(channel.hash, dto.password))
+					throw new HttpException("Wrong password", HttpStatus.BAD_REQUEST);
 			}
 			const joined: ChannelMember = await this.prisma.channelMember.create({
 				data:{
