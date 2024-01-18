@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { LeaderboardData, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
-import { useCookies } from "react-cookie";
 
 export default function LeaderBoard(): JSX.Element {
 	const [data, setData] = useState<LeaderboardData[]>([]);
-	const [cookies] = useCookies(["jwt"]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -15,7 +13,7 @@ export default function LeaderBoard(): JSX.Element {
 				const response = await axios.get(
 					"http://localhost:3333/user/leaderboard",
 					{
-						headers: { Authorization: `Bearer ${cookies.jwt}` },
+						withCredentials: true,
 					}
 				);
 
@@ -41,7 +39,7 @@ export default function LeaderBoard(): JSX.Element {
 					"http://localhost:3333/user/updateRanks",
 					rankedData,
 					{
-						headers: { Authorization: `Bearer ${cookies.jwt}` },
+						withCredentials: true,
 					}
 				);
 			} catch (error) {
@@ -64,7 +62,7 @@ export default function LeaderBoard(): JSX.Element {
 
 		//Launch the loop
 		pollData();
-	}, [cookies]);
+	}, []);
 
 	console.log(data);
 

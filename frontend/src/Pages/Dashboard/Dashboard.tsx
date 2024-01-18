@@ -57,13 +57,13 @@ function Dashboard() {
 						<div className="bg-yellow-100 h-[30%]">
 							<CardsDashboard
 								title="Game Played"
-								content={user ? user.nb_game : 0}
+								content={user ? user.games : 0}
 							></CardsDashboard>
 						</div>
 						<div className="bg-yellow-100 h-[30%]">
 							<CardsDashboard
 								title="Game Won"
-								content={user ? user.nb_win : 0}
+								content={user ? user.wins : 0}
 							></CardsDashboard>
 						</div>
 					</div>
