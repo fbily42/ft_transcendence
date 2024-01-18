@@ -3,11 +3,9 @@ import React, { useEffect } from "react";
 import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
 import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
 import { useState } from "react";
-import { useCookies } from 'react-cookie';
-import axios from 'axios';
+import axios from "axios";
 
 function Dashboard() {
-
 	const [user, setUser] = useState();
 	
 	//UseEffect mandatory for async user data update
@@ -32,12 +30,12 @@ function Dashboard() {
 
 		//Set the interval between each api call
 		const pollingInterval = setInterval(async () => {
-			fetchData();
-		}, 5000);
+				fetchData();
+			}, 5000);
 
-		//Clear when the component is unmount
-		return () => clearInterval(pollingInterval);
-	};
+			//Clear when the component is unmount
+			return () => clearInterval(pollingInterval);
+		};
 
 		//Launch the loop
 		return pollData();

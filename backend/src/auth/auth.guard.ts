@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-
 	constructor(private jwtService: JwtService,
 		private prisma: PrismaService) {}
 

@@ -1,19 +1,55 @@
-import React from "react";
-import { useState } from "react";
-
-// Icons
-import { Gamepad2 } from "lucide-react";
-import { Home } from "lucide-react";
-import { MessageCircle } from "lucide-react";
-import { LogOut } from "lucide-react";
-import { CircleUserRound } from "lucide-react";
-
-// Buttons
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+	Gamepad2,
+	Home,
+	MessageCircle,
+	LogOut,
+	CircleUserRound,
+} from "lucide-react";
 
 const VerticalNavbar: React.FC = () => {
-	const [active, setActive] = useState(1);
+	const [active, setActive] = useState<number>(0);
+	const location = useLocation();
+
+	// Update active state when the route changes
+	useEffect(() => {
+		const path = location.pathname;
+		switch (path) {
+			case "/":
+				setActive(1);
+				break;
+			case "/pong":
+				setActive(2);
+				break;
+			case "/chat":
+				setActive(3);
+				break;
+			case "/profile":
+				setActive(4);
+				break;
+			case "/auth":
+				setActive(5);
+				break;
+			default:
+				setActive(1);
+		}
+	}, [location.pathname]);
+
+	// Update local storage when the active state changes
+	useEffect(() => {
+		localStorage.setItem("activeButton", String(active));
+	}, [active]);
+
+	useEffect(() => {
+		// Retrieve the last active button from local storage only if not already set by the route
+		const storedActiveButton = localStorage.getItem("activeButton");
+		if (storedActiveButton && active !== Number(storedActiveButton)) {
+			setActive(Number(storedActiveButton));
+		}
+	}, [active]);
 
 	const handleNavTabs = (btnId: number) => {
 		if (active !== btnId) setActive(btnId);
