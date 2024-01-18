@@ -34,7 +34,7 @@ export class UserService {
 				score: true,
 			},
 		});
-		console.log('Leaderboard Data:', leaderboardData);
+		//console.log('Leaderboard Data:', leaderboardData);
 
 		return leaderboardData;
 	}
