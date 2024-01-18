@@ -5,15 +5,21 @@ import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
 import { useState } from "react";
 import axios from "axios";
 
-function Dashboard() {
-	const [user, setUser] = useState();
+interface UserData {
+	rank: number;
+	games: number;
+	wins: number;
+}
+
+function Dashboard(): JSX.Element {
+	const [user, setUser] = useState<UserData | null>(null);
 	
 	//UseEffect mandatory for async user data update
 	useEffect(() => {
 		const fetchData = async () => {
 		  try {
 			//api call with jwt as authorization
-			const response = await axios.get("http://localhost:3333/user/me", {
+			const response = await axios.get<UserData>("http://localhost:3333/user/me", {
 				withCredentials: true
 			});
 
