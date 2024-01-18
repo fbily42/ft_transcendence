@@ -17,18 +17,6 @@ export class UserController {
 		// const token = req.headers.authorization;
 		// const jwt = token.split(' ')
 		const jwt = req.cookies.jwt
-		
-		console.log('hello');
 		return  await this.userService.getInfo(jwt);
-	}
-
-	//TESTS du AuthGuard (supprimable)
-	
-	@Get()
-	@UseGuards(AuthGuard)
-	getUser(@Req() req: Request) { 
-		return ({login: req['userLogin'], id: req['userID']});
-	}
-	
-
+	}	
 }

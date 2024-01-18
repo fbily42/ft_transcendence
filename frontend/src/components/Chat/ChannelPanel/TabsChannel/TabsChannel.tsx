@@ -18,7 +18,7 @@ function TabsChannel({onClose}: TabsChannelProps) {
 				<CardCreate onClose={onClose}></CardCreate>
 			</TabsContent>
 			<TabsContent value="join">
-				<CardJoin></CardJoin>
+				<CardJoin onClose={onClose}></CardJoin>
 			</TabsContent>
 		</Tabs>
 	);
