@@ -96,7 +96,12 @@ removes_network:
 		echo "\n$(BOLD)$(RED)No Docker network found.\n$(RESET)"; \
 	fi
 
-clean: remove_containers remove_volumes remove_images removes_network
+prune:
+	@echo "$(YELLOW)\n. . . pruning docker system . . . \n$(RESET)"
+	@docker system prune -fa
+	@echo "\n$(BOLD)$(GREEN)Pruned [ ✔ ]\n$(RESET)"
+
+clean: remove_containers remove_volumes remove_images removes_network prune
 	@if [ -d ./$(FRONT)/node_modules ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Removing local node_modules  ----- \n$(RESET)"; \
 		rm -rf ./$(FRONT)/node_modules; \

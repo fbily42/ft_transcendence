@@ -3,38 +3,33 @@ import React, { useEffect } from "react";
 import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
 import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
 import { useState } from "react";
-import { useCookies } from "react-cookie";
 import axios from "axios";
 
 function Dashboard() {
 	const [user, setUser] = useState();
-	const [cookies] = useCookies(["jwt"]);
-
+	
 	//UseEffect mandatory for async user data update
 	useEffect(() => {
 		const fetchData = async () => {
-			try {
-				//api call with jwt as authorization
-				const response = await axios.get(
-					"http://localhost:3333/user/me",
-					{
-						headers: { Authorization: `Bearer ${cookies.jwt}` },
-					}
-				);
+		  try {
+			//api call with jwt as authorization
+			const response = await axios.get("http://localhost:3333/user/me", {
+				withCredentials: true
+			});
 
-				//Update the user data
-				setUser(response.data);
-			} catch (error) {
-				console.log("Error getdata", error);
-			}
-		};
+			//Update the user data
+			setUser(response.data);
+		} catch (error) {
+			console.log("Error getdata", error);
+		}
+	};
 
-		const pollData = async () => {
-			//First api call
-			fetchData();
+	const pollData = () => {
+		//First api call
+		fetchData();
 
-			//Set the interval between each api call
-			const pollingInterval = setInterval(() => {
+		//Set the interval between each api call
+		const pollingInterval = setInterval(async () => {
 				fetchData();
 			}, 5000);
 
@@ -43,8 +38,9 @@ function Dashboard() {
 		};
 
 		//Launch the loop
-		pollData();
-	}, [cookies.jwt]);
+		return pollData();
+
+	}, []);
 
 	return (
 		<>
