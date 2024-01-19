@@ -98,12 +98,14 @@ export class AuthService {
 	
 			const signedJwt = await this.jwt.signAsync(payload);
 	
+
+			//recuperer 
 			const updateUser = await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
-					jwt: signedJwt,
+					jwt: {push: signedJwt},
 				},
 			});
 	

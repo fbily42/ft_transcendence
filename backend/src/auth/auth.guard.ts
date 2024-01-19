@@ -10,8 +10,10 @@ export class AuthGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
+		const response = context.switchToHttp().getResponse();
 		
 		const encodedJwt: string = request.cookies.jwt;
+		// const encodedRefereshJwt: string = request.cookies.refresh_jwt;
 
 		//check if JWT exists in the cookies
 		if (!encodedJwt)
@@ -38,6 +40,7 @@ export class AuthGuard implements CanActivate {
 		}
 		catch (error)
 		{
+			response.clearCookie('jwt', { path: '/' });
 			// console.log('NO PERMISSION : authorization incorrect');
 			return false;
 		}

@@ -18,11 +18,12 @@ model User {
 	name			String @unique // 42 login
 	pseudo 			String? @unique // by default == name ?
 	avatar			String?
-	status 			Boolean?
 	twoFA			Boolean  @default(false)
+	Log_in			Boolean  @default(true)
 
 	token42 		Json
-	jwt				String?
+	jwt				String[]
+	Ban_jwt			String[]
 
 	channelsOwn		Channel[] @relation("channel_owner")
 	channelsAdmin	ChannelAdmin[]
