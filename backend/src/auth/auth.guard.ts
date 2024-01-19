@@ -22,8 +22,7 @@ export class AuthGuard implements CanActivate {
 
 		try {
 			//Verify if the JWT is valid
-			this.jwtService.verify(encodedJwt);
-			const decode = this.jwtService.decode(encodedJwt);
+			const decode = this.jwtService.verify(encodedJwt);
 			const user = await this.prisma.user.findUnique({
 				where:{
 					name: decode.login,
