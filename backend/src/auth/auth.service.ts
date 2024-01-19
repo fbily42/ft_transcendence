@@ -28,6 +28,7 @@ export class AuthService {
 			}
 			const token = await response.json();
 			return token;
+
 		} catch(error)
 		{
 			throw error;
@@ -45,7 +46,8 @@ export class AuthService {
 				throw new HttpException('Unexpected HTTP error ', HttpStatus.INTERNAL_SERVER_ERROR);//check HttpStatus
 
 			const user = await response.json();
-			return user.login;
+			return {login: user.login,
+				photo: user.image.link};
 
 		} catch(error)
 		{
@@ -53,7 +55,7 @@ export class AuthService {
 		}	
 	};
 
-	async findUser(login :string, token :any){
+	async findUser(login :string, token :any, photo :string){
 
 		try {
 			const user = await this.prisma.user.findUnique({
@@ -63,7 +65,7 @@ export class AuthService {
 			})
 			if (!user)
 			{
-				return this.createUser(login, token);
+				return this.createUser(login, token, photo);
 			}
 			return user;
 		}
@@ -72,13 +74,14 @@ export class AuthService {
 		}
 	}
 
-	async createUser(login :string, token :any) {
+	async createUser(login: string, token :any, photo: string) {
 
 		try {
 			const user = await this.prisma.user.create({
 				data: {
 					name: login,
 					token42: token,
+					photo42: photo,
 				},
 			});
 			return user;

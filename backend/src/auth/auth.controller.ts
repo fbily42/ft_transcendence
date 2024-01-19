@@ -17,16 +17,22 @@ export class AuthController{
 			if (!code || req.query?.error) {
 				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
 			}
-			
+			console.log("1. Retrieved code");
+
+			console.log("2. Fetch POST 42AuthServer for access_token");
 			// Get the token access from 42api
 			const token = await this.authService.getToken(code);
-			
+			console.log("3. Retrieved access_token");
+
+			console.log("4. Fetch GET 42API for user");
 			// Get the login of the user from 42api
-			const login :string = await this.authService.getUserLogin(token);
+			const {login, photo} = await this.authService.getUserLogin(token);
 			
+			console.log("5. Look for user in DB");
 			// Find if User exists, create if doesnt
-			const user = await this.authService.findUser(login, token);
+			const user = await this.authService.findUser(login, token, photo);
 			
+			console.log("6. Creates JWT and stores it in DB");
 			// Create JWT and add to the user in DB
 			const jwt = await this.authService.createJwt(user);
 		
