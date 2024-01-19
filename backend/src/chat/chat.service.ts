@@ -3,9 +3,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from "argon2";
 import { JoinChannelDto, NewChannelDto } from './dto';
-import { Channel, ChannelMember, Prisma } from '@prisma/client';
+import { Channel, ChannelUser, Prisma } from '@prisma/client';
 
-type ChannelWithRelation = Prisma.ChannelGetPayload<{include: {admins: true, banned: true, members: true, invited: true, muted: true}}>
+type ChannelWithRelation = Prisma.ChannelGetPayload<{
+	include: {
+		users: true,
+	}
+}>
 
 @Injectable()
 export class ChatService {
@@ -41,49 +45,54 @@ export class ChatService {
 		}
 	}
 
-	async joinChannel(userId :number, dto: JoinChannelDto): Promise<any>{
+	async joinChannel(userId :number, dto: JoinChannelDto): Promise<void>{
 		try {
 			const channel: ChannelWithRelation = await this.prisma.channel.findUnique({
 				where: {name: dto.name},
 				include:{
 					owner:true,
-					admins: {
-						where: {userId: userId}
+					users: true,
 					},
-					members: {
-						where: {userId: userId}
-					},
-					banned: {
-						where: {userId: userId}
-					},
-					muted: {
-						where: {userId: userId}
-					},
-					invited: {
-						where: {userId: userId}
-					}
-				}
 			})
 			if (!channel)
 				throw new HttpException('Channel does not exists', HttpStatus.BAD_REQUEST);
-			if (channel.ownerId === userId || channel.members.some(member => member.userId === userId) || channel.muted.some(muted => muted.userId === userId))
-				throw new HttpException('Channel already joined', HttpStatus.CONFLICT);
-			if (channel.banned.some(banned => banned.userId === userId))
-				throw new HttpException('You are banned from this channel', HttpStatus.BAD_REQUEST);
-			if (channel.private)
-			{
-				if (!channel.invited.some(invite => invite.userId === userId))
-					throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
-			}
+			if (channel.private && !channel.users[0])
+				throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
 			if (channel.hash)
 			{
 				if (!dto.password || !await argon.verify(channel.hash, dto.password))
 					throw new HttpException("Wrong password", HttpStatus.BAD_REQUEST);
 			}
-			const joined: ChannelMember = await this.prisma.channelMember.create({
+			if (channel.users[0]) {
+				const user: ChannelUser = channel.users.find(user => user.userId === userId);
+				if (channel.ownerId === userId || user.member || user.muted || user.admin)
+					throw new HttpException('Channel already joined', HttpStatus.CONFLICT);
+				if (user.banned)
+					throw new HttpException('You are banned from this channel', HttpStatus.BAD_REQUEST);
+				if (channel.private)
+				{
+					if (!user.invited)
+						throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
+					await this.prisma.channelUser.update({
+						where: {
+							channelId_userId: {
+								channelId: user.channelId,
+								userId: userId,
+							},
+						},
+						data: {
+								invited: false,
+								member: true,
+							}
+					})
+					return;
+				}
+			}
+			await this.prisma.channelUser.create({
 				data:{
 					userId: userId,
 					channelId: channel.id,
+					member: true,
 				},
 			});
 			return;
@@ -95,37 +104,58 @@ export class ChatService {
 			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	async getChannels(userId: number): Promise<any> {
+		try {
+			const channels: any = await this.prisma.channel.findMany({
+				where: {
+					users: {
+						every: {
+							userId: userId,
+						},
+					},
+				},
+				select:{
+					id: true,
+					name: true,
+					ownerId: true,
+				},
+			})
+			return channels
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	async getChannelUsers(channelId: number): Promise<any> {
+		try {
+			const users: any = await this.prisma.channel.findMany({
+				where: {
+					id: channelId,
+				},
+				select: {
+					id: true,
+					name:true,
+					ownerId: true,
+					users: {
+						select: {
+							userId: true,
+							admin: true,
+							member: true,
+							banned: true,
+							muted: true,
+							invited: true,
+						}
+					}
+				},
+			})
+			return users
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
+		throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
-
-/* 
-
-User [
-
-	channelsOwn Channel[]
-	channels 	ChannelRelation []
-]
-
-Channel [
-
-	owner		User
-	members 	ChannelRelation []
-]
-
-ChannelRelation [
-
-  channelId 	Int
-  channel 		Channel @relation(fields: [channelId], references: [id])
-
-  userId    	Int
-  user    		User @relation(fields: [userId], references: [id])
-
-  admins		boolean
-  member		boolean
-  banned		boolean
-  muted			boolean
-  invited		boolean
-
-  @@id([channelId, userId])
-]
-
-*/

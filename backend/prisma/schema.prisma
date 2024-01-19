@@ -2,12 +2,12 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+	provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+	provider = "postgresql"
+	url      = env("DATABASE_URL")
 }
 
 model User {
@@ -25,11 +25,7 @@ model User {
 	jwt				String?
 
 	channelsOwn		Channel[] @relation("channel_owner")
-	channelsAdmin	ChannelAdmin[]
-	channelsMember	ChannelMember[]
-	channelBanned	ChannelBanned[]
-	channelMuted	ChannelMuted[]
-	channelInvit	ChannelInvited[]
+	channels		ChannelUser[]
 	messages		Message[]
 
 	wins			Int @default(0)
@@ -44,7 +40,6 @@ model User {
 	//notifs		String [] or NotificationModel[] -> TODO
 }
 
-// Probably final model
 model	Channel {
 	id 				Int @id @default(autoincrement())
 	createdAt 		DateTime @default(now())
@@ -57,11 +52,7 @@ model	Channel {
 	owner			User @relation(name: "channel_owner", fields: [ownerId], references: [id])
 	ownerId			Int
 
-	admins			ChannelAdmin[]
-	members			ChannelMember[]
-	banned			ChannelBanned[]
-	muted			ChannelMuted[]
-	invited			ChannelInvited[]
+	users			ChannelUser[]
 	messages		Message[]
 }
 
@@ -98,55 +89,21 @@ model	Game {
 	matchmaking		Boolean
 }
 
-// Relation tables for many-to-many relations
-model ChannelAdmin {
-  channelId Int
-  channel Channel @relation(fields: [channelId], references: [id])
+// Relation table for many-to-many relation
+model ChannelUser {
+	channelId	Int
+	channel		Channel @relation(fields: [channelId], references: [id])
 
-  userId    Int
-  user    User @relation(fields: [userId], references: [id])
+	userId		Int
+	user		User @relation(fields: [userId], references: [id])
 
-  @@id([channelId, userId])
-}
+	admin		Boolean @default(false)
+	member		Boolean @default(false)
+	banned		Boolean @default(false)
+	muted		Boolean @default(false)
+	invited		Boolean @default(false)
 
-model ChannelMember {
-  channelId Int
-  channel Channel @relation(fields: [channelId], references: [id])
-
-  userId    Int
-  user    User @relation(fields: [userId], references: [id])
-
-  @@id([channelId, userId])
-}
-
-model ChannelBanned {
-  channelId Int
-  channel Channel @relation(fields: [channelId], references: [id])
-
-  userId    Int
-  user    User @relation(fields: [userId], references: [id])
-
-  @@id([channelId, userId])
-}
-
-model ChannelMuted {
-  channelId Int
-  channel Channel @relation(fields: [channelId], references: [id])
-
-  userId    Int
-  user    User @relation(fields: [userId], references: [id])
-
-  @@id([channelId, userId])
-}
-
-model ChannelInvited {
-  channelId Int
-  channel Channel @relation(fields: [channelId], references: [id])
-
-  userId    Int
-  user    User @relation(fields: [userId], references: [id])
-
-  @@id([channelId, userId])
+	@@id([channelId, userId])
 }
 
 // Use "npx prisma generate" = create TSClass from Schema for our code.
