@@ -9,6 +9,7 @@ import {
 	LogOut,
 	CircleUserRound,
 } from "lucide-react";
+import axios from "axios";
 
 const VerticalNavbar: React.FC = () => {
 	const [active, setActive] = useState<number>(0);
@@ -54,6 +55,20 @@ const VerticalNavbar: React.FC = () => {
 	const handleNavTabs = (btnId: number) => {
 		if (active !== btnId) setActive(btnId);
 	};
+
+	const handleLogout = async () => {
+		try {
+			await axios.get(
+				"http://localhost:3333/auth/logout",
+				{
+					withCredentials: true,
+				}
+			);
+
+		} catch (error) {
+			console.log("Error getdata", error);
+		}
+	}
 
 	return (
 		<nav className="fixed bg-white shadow-drop h-screen w-[86px] flex flex-col justify-center pl-[18px] py-[36px]">
@@ -139,7 +154,7 @@ const VerticalNavbar: React.FC = () => {
 						</Button>
 					</Link>
 
-					<Link to="/auth" className="text-black">
+					<Link to="/auth" className="text-black" onClick={handleLogout}>
 						<Button
 							variant={
 								active === 5 ? "tabBtnActive" : "tabBtnDefault"

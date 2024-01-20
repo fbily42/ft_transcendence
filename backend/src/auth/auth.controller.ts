@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, HttpCode, Delete, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
@@ -8,9 +8,11 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class AuthController{
 	constructor(private authService: AuthService) {}
 
+	
+	
 	@Get('42')
 	async login(@Req() req : Request, @Res() res : Response) {
-
+		
 		try {
 			const code = req.query?.code as string ;
 
@@ -29,7 +31,7 @@ export class AuthController{
 			
 			// Create JWT and add to the user in DB
 			const jwt = await this.authService.createJwt(user);
-		
+			
 			// Create cookie for browser
 			res.cookie('jwt', jwt, {
 				httpOnly: true,
@@ -38,17 +40,37 @@ export class AuthController{
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect("http://localhost:3000/");
-
+			
 		} catch(error) {
 			res.redirect("http://localhost:3000/auth");
 			throw error;
 		}
 	}
-
+	
 	@Get('isAuth')
 	@UseGuards(AuthGuard)
 	@HttpCode(200)
 	isAuthentified(){
+	}
+
+	@Get('logout')
+	async logout(@Req() req : Request, @Res() res : Response): Promise<void> {
+
+		try {
+
+			const jwt = req.cookies['jwt'] as string;
+			//supprimer le cookie
+			console.log('valeur', jwt);
+			
+			//gerer la mise a jour de mon token
+			await this.authService.deleteTokens(jwt);
+			res.clearCookie('jwt', {path: '/' });
+			res.status(200).send('Déconnexion réussie');
+
+		} catch (error) {
+			console.log('issu in logout ');
+			// throw error;
+		}
 	}
 }
 /* 

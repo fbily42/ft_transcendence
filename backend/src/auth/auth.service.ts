@@ -106,12 +106,44 @@ export class AuthService {
 				},
 				data: {
 					jwt: {push: signedJwt},
+					Log_in: true,
 				},
 			});
 	
 			return signedJwt;
 		}
 		catch(error){
+			throw error;
+		}
+	}
+
+	async deleteTokens(jwtoken : string){
+
+		try {
+			// console.log('bonjour', jwtoken);
+			const decode = this.jwt.decode(jwtoken);
+	
+			const updateUser = await this.prisma.user.update({
+				where: {
+					id: decode.sub,
+				},
+				data: {
+					Ban_jwt: {push: jwtoken},
+					Log_in : false,
+				},
+			});
+			const updatejwt = updateUser.jwt.filter(item => item !== jwtoken);
+			const updateUser2 = await this.prisma.user.update({
+				where: { id: decode.sub },
+				data: {
+					jwt: { set: updatejwt},
+				},
+			});
+			  
+	
+		}
+		catch(error){
+			console.log('issu in deletokens');
 			throw error;
 		}
 	}
