@@ -47,12 +47,12 @@ export default function LeaderBoard(): JSX.Element {
 			}
 		};
 
-		const pollData = async () => {
+		const pollData = () => {
 			//First api call
 			fetchData();
 
 			//Set the interval between each api call
-			const pollingInterval = setInterval(() => {
+			const pollingInterval = setInterval(async () => {
 				fetchData();
 			}, 5000);
 
@@ -61,7 +61,8 @@ export default function LeaderBoard(): JSX.Element {
 		};
 
 		//Launch the loop
-		pollData();
+		return pollData();
+
 	}, []);
 
 	console.log(data);

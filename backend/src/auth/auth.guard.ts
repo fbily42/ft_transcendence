@@ -26,30 +26,55 @@ export class AuthGuard implements CanActivate {
 			//Verify if the JWT is valid
 			this.jwtService.verify(encodedJwt);
 			//que se passe t il si on a passe la date d'expiration ? envoie une erreur ? 
+			// const decode = this.jwtService.decode(encodedJwt);
 			const decode = this.jwtService.decode(encodedJwt);
-			const user = await this.prisma.user.findUnique({
-				where:{
-					name: decode.login,
-					id: decode.sub,
-				}
+
+			const user = await this.prisma.user.findFirst({
+				where: {
+					OR: [
+						{
+							name: decode.login,
+							id: decode.sub,
+						},
+						{
+							Ban_jwt: {
+								has: encodedJwt,
+							},
+						},
+					],
+				},
 			});
-			if (!user)
+
+			if (!user || user.Ban_jwt.includes(encodedJwt)) {
+				console.log('jwt banned or user not found')
 				return false;
-			const user1 = await this.prisma.user.findFirst({
-				where:{
-					Ban_jwt: {
-						has: encodedJwt,
-					},
-				}
-			});
-			if (user1)
-			{
-				//faire un redirect vers le logout, car si une personne fait un appel a un token blacklist c'est qu'il l'a vole ou que la personne est deconnecte
-				console.log('jwt banned')
-				return false
 			}
+
 			request['userLogin'] = decode.login;
 			request['userID'] = decode.sub;
+			// const user = await this.prisma.user.findUnique({
+			// 	where:{
+			// 		name: decode.login,
+			// 		id: decode.sub,
+			// 	}
+			// });
+			// if (!user)
+			// 	return false;
+			// const user1 = await this.prisma.user.findFirst({
+			// 	where:{
+			// 		Ban_jwt: {
+			// 			has: encodedJwt,
+			// 		},
+			// 	}
+			// });
+			// if (user1)
+			// {
+			// 	//faire un redirect vers le logout, car si une personne fait un appel a un token blacklist c'est qu'il l'a vole ou que la personne est deconnecte
+			// 	console.log('jwt banned')
+			// 	return false
+			// }
+			// request['userLogin'] = decode.login;
+			// request['userID'] = decode.sub;
 			return true;
 		}
 		catch (error)
