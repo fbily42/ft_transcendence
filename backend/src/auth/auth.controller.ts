@@ -53,7 +53,20 @@ export class AuthController{
 	isAuthentified(){
 	}
 
-	@Get('logout')
+	@Put('referesh-token')
+	async refreshToken(@Req() req : Request, @Res() res : Response)
+	{
+
+		try{
+			const jwt = req.cookies['jwt'] as string;
+		}
+	}
+
+
+
+
+	@Get('logout')//Change Get intp put
+	//@UseGuards(AuthGuard)
 	async logout(@Req() req : Request, @Res() res : Response): Promise<void> {
 
 		try {

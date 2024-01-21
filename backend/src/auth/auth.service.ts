@@ -97,6 +97,7 @@ export class AuthService {
 			};
 	
 			const signedJwt = await this.jwt.signAsync(payload);
+			const signrefreshToken = await this.jwt.signAsync(payload, {expireIn: '7h'});
 	
 
 			//recuperer 
@@ -105,6 +106,7 @@ export class AuthService {
 					id: user.id,
 				},
 				data: {
+					refreshToken : {push: signrefreshToken},
 					jwt: {push: signedJwt},
 					Log_in: true,
 				},

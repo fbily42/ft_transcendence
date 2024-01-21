@@ -24,6 +24,7 @@ model User {
 	token42 		Json
 	jwt				String[]
 	Ban_jwt			String[]
+	refreshToken	String[]
 
 	channelsOwn		Channel[] @relation("channel_owner")
 	channelsAdmin	ChannelAdmin[]
