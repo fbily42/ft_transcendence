@@ -70,6 +70,7 @@ export class AuthController{
 			// 	domain: process.env.FRONTEND_DOMAIN,
 			// });
 			console.log(jwtsign)
+			res.clearCookie('jwt', {path: '/' });
 			res.cookie('jwt', jwtsign, {
 				path: '/',
 				sameSite: 'strict',
@@ -77,14 +78,16 @@ export class AuthController{
 				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
-			res.status(200);
+			res.status(200).send('NewToken');
 			// res.redirect("http://localhost:3000/")
 		}
 		catch(error)
 		{
 			// res.clearCookie('jwt', {path: '/' });
-			res.redirect("http://localhost:3000/auth")
-			throw error;
+			// res.redirect("http://localhost:3000/auth")
+			console.log('logout');
+			res.status(403).send('forbidden');
+			// throw error;
 		}
 	}
 

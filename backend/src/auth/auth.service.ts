@@ -173,12 +173,13 @@ export class AuthService {
 				console.log("User n'existe pas");
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
-			else if (user.Ban_jwt.find(jwtoken => jwtoken === jwtoken))
+			else if (user.Ban_jwt.find(token => token === jwtoken))
 			{
 				//il essaye de se log avec un token qui a deja servi, donc posisble leak
 				//il faut log out
 				//soit coter backend soit coter client a verifier
-				console.log("Token ban");
+				console.log(jwtoken);
+				console.log("Token ban de ouf ");
 				throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 			}
 			this.jwt.verify(user.refreshToken)

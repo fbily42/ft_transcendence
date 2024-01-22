@@ -37,8 +37,9 @@ const instance = axios.create({
 instance.interceptors.response.use(
     response => response,
     async error => {
-        if (axios.isAxiosError(error) && error.response && error.response.status === 403) {
+        if (error.response && error.response.status === 403) {
             try {
+				const originalRequest = error.config;
 				console.log('je suis intercepte');
                 // URL de la nouvelle API à appeler en cas d'erreur 403
                 // const urlNouvelleAPI = 'http://localhost:3333/refresh-token';
@@ -48,7 +49,7 @@ instance.interceptors.response.use(
 				const Newresponse = await axios.get("http://localhost:3333/auth/refresh-token", {
 					withCredentials: true,
 			});
-                return Newresponse;
+			return instance(originalRequest);
             } catch (nouvelleErreur) {
                 // Gérer ou transmettre les erreurs du nouvel appel Axios
                 return Promise.reject(nouvelleErreur);
