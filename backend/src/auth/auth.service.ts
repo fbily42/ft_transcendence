@@ -22,7 +22,7 @@ export class AuthService {
 				  },
 				body: `grant_type=authorization_code&client_id=${process.env.CLIENT_UID}&client_secret=${process.env.CLIENT_SECRET}&code=${code}&redirect_uri=${process.env.REDIRECT_URI}`,
 			})
-	
+
 			if (!response.ok){
 				throw new HttpException('Unexpected HTTP error ', HttpStatus.INTERNAL_SERVER_ERROR);//check HttpStatus
 			}
@@ -40,7 +40,7 @@ export class AuthService {
 			const response = await fetch("https://api.intra.42.fr/v2/me", {
 				headers: {Authorization: `Bearer ${token.access_token}`}
 			});
-			
+
 			if (!response.ok)
 				throw new HttpException('Unexpected HTTP error ', HttpStatus.INTERNAL_SERVER_ERROR);//check HttpStatus
 
@@ -50,7 +50,7 @@ export class AuthService {
 		} catch(error)
 		{
 			throw error;
-		}	
+		}
 	};
 
 	async findUser(login :string, token :any){
@@ -95,12 +95,12 @@ export class AuthService {
 				sub: user.id,
 				login: user.name
 			};
-	
+
 			const signedJwt = await this.jwt.signAsync(payload);
 			const signrefreshToken = await this.jwt.signAsync(payload, {expireIn: '7h'});
-	
 
-			//recuperer 
+
+			//recuperer
 			const updateUser = await this.prisma.user.update({
 				where: {
 					id: user.id,
@@ -111,7 +111,7 @@ export class AuthService {
 					Log_in: true,
 				},
 			});
-	
+
 			return signedJwt;
 		}
 		catch(error){
@@ -124,7 +124,7 @@ export class AuthService {
 		try {
 			// console.log('bonjour', jwtoken);
 			const decode = this.jwt.decode(jwtoken);
-	
+
 			const updateUser = await this.prisma.user.update({
 				where: {
 					id: decode.sub,
@@ -141,11 +141,80 @@ export class AuthService {
 					jwt: { set: updatejwt},
 				},
 			});
-			  
-	
+
+
 		}
 		catch(error){
 			console.log('issu in deletokens');
+			throw error;
+		}
+	}
+
+	async refreshTheToken(jwtoken :String)
+	{
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					OR: [
+						{jwt : jwtoken},
+						{Ban_jwt : jwtoken},
+					],
+				},
+			});
+			if (!user)
+			{
+				//il demande un token alors qu'il n'en a pas
+				//il faut le logout
+				throw new Error('User not found');
+			}
+			else if (user.Ban_jwt.includes(jwtoken))
+			{
+				//il essaye de se log avec un token qui a deja servi, donc posisble leak
+				//il faut log out
+				//soit coter backend soit coter client a verifier
+				throw new Error('Token already used');
+			}
+			this.jwt.verify(user.refreshToken)
+			const payload = {
+				sub: user.id,
+				login: user.name
+			};
+
+			//il a un token
+			const signedJwt = await this.jwt.signAsync(payload);
+			// Première mise à jour pour supprimer l'ancien token
+			await this.prisma.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					jwt: {
+						pull: jwtoken,
+					},
+					Ban_jwt: {push: jwtoken,},
+				},
+			});
+
+			// Deuxième mise à jour pour ajouter le nouveau token
+			await this.prisma.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					jwt: {
+						push: signedJwt,
+					},
+					Log_in: true,
+				},
+			});
+
+			return signedJwt;
+
+		}
+		catch (error)
+		{
+			//le refresh token est finis
+			//logout
 			throw error;
 		}
 	}

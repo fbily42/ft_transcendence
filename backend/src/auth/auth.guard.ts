@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
 		const response = context.switchToHttp().getResponse();
-		
+
 		const encodedJwt: string = request.cookies.jwt;
 		// const encodedRefereshJwt: string = request.cookies.refresh_jwt;
 
@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
 		try {
 			//Verify if the JWT is valid
 			this.jwtService.verify(encodedJwt);
-			//que se passe t il si on a passe la date d'expiration ? envoie une erreur ? 
+			//que se passe t il si on a passe la date d'expiration ? envoie une erreur ?
 			// const decode = this.jwtService.decode(encodedJwt);
 			const decode = this.jwtService.decode(encodedJwt);
 
@@ -79,12 +79,12 @@ export class AuthGuard implements CanActivate {
 		}
 		catch (error)
 		{
-			response.clearCookie('jwt', { path: '/' });
+			// response.clearCookie('jwt', { path: '/' });//a supprimer ici si on ne fait pas de refresh token 
 			// console.log('NO PERMISSION : authorization incorrect');
 			return false;
 		}
 
 	}
 
-	
+
 }
