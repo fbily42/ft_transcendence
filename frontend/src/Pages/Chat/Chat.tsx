@@ -14,7 +14,9 @@ function Chat() {
 	}
 
 	useEffect(() => {
-		const newSocket=io('http://localhost:8081')
+		const newSocket=io('http://localhost:8081',{
+			withCredentials: true,
+		})
 		setSocket(newSocket)
 	},[setSocket])
 
