@@ -1,7 +1,7 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState  } from "react";
 import axios from 'axios';
-
+import instance from "@/axiosConfig";
 
 function ProtectedRoute() : JSX.Element {
 	const navigate = useNavigate();
