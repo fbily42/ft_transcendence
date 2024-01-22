@@ -35,6 +35,8 @@ export class AuthController{
 			// Create cookie for browser
 			res.cookie('jwt', jwt, {
 				sameSite: 'strict',
+				httpOnly : true,
+				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect("http://localhost:3000/");
@@ -51,20 +53,36 @@ export class AuthController{
 	isAuthentified(){
 	}
 
-	@Put('referesh-token')//faire un appelle a refresh token si le guard renvoie faux
+	@Get('refresh-token')//faire un appelle a refresh token si le guard renvoie faux
 	async refreshToken(@Req() req : Request, @Res() res : Response)
 	{
 
 		try{
+			console.log('JE SUIS LE GET DE REFRESHTOKEN');
 			const jwt = req.cookies['jwt'] as string;
 			//supprimer le cookie
-			res.clearCookie('jwt', {path: '/' });
 			const jwtsign: string = await this.authService.refreshTheToken(jwt);
-			res.cookie('jwt', jwtsign);
+			// res.clearCookie('jwt', {
+			// 	path: '/',
+			// 	sameSite: 'strict',
+			// 	httpOnly : true,
+			// 	secure : true,
+			// 	domain: process.env.FRONTEND_DOMAIN,
+			// });
+			console.log(jwtsign)
+			res.cookie('jwt', jwtsign, {
+				path: '/',
+				sameSite: 'strict',
+				httpOnly : true,
+				secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+			res.status(200);
+			// res.redirect("http://localhost:3000/")
 		}
 		catch(error)
 		{
-			res.clearCookie('jwt', {path: '/' });
+			// res.clearCookie('jwt', {path: '/' });
 			res.redirect("http://localhost:3000/auth")
 			throw error;
 		}

@@ -13,12 +13,7 @@ async function bootstrap() {
     credentials: true,
     origin: process.env.FRONTEND_URL,
   });
-  app.use(cookieParser({
-	httpOnly: true,
-	secure: true
-  }
-
-  ));
+  app.use(cookieParser());
   await app.listen(3000);
 }
 bootstrap();

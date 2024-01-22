@@ -97,7 +97,7 @@ export class AuthService {
 			};
 
 			const signedJwt = await this.jwt.signAsync(payload);
-			const signrefreshToken = await this.jwt.signAsync(payload, {expireIn: '7h'});
+			const signrefreshToken = await this.jwt.signAsync(payload, {expiresIn: '7h'});
 
 
 			//recuperer
@@ -106,7 +106,7 @@ export class AuthService {
 					id: user.id,
 				},
 				data: {
-					refreshToken : {push: signrefreshToken},
+					refreshToken : signrefreshToken,
 					jwt: {push: signedJwt},
 					Log_in: true,
 				},
@@ -150,14 +150,19 @@ export class AuthService {
 		}
 	}
 
-	async refreshTheToken(jwtoken :String)
+	async refreshTheToken(jwtoken :string)
 	{
 		try {
-			const user = await this.prisma.user.findUnique({
+			if(!jwtoken)
+			{
+				console.log('auth page');
+				return ;
+			}
+			const user = await this.prisma.user.findFirst({
 				where: {
 					OR: [
-						{jwt : jwtoken},
-						{Ban_jwt : jwtoken},
+						{jwt: { has: jwtoken } },
+						{Ban_jwt: { has: jwtoken } },
 					],
 				},
 			});
@@ -165,14 +170,16 @@ export class AuthService {
 			{
 				//il demande un token alors qu'il n'en a pas
 				//il faut le logout
-				throw new Error('User not found');
+				console.log("User n'existe pas");
+				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
-			else if (user.Ban_jwt.includes(jwtoken))
+			else if (user.Ban_jwt.find(jwtoken => jwtoken === jwtoken))
 			{
 				//il essaye de se log avec un token qui a deja servi, donc posisble leak
 				//il faut log out
 				//soit coter backend soit coter client a verifier
-				throw new Error('Token already used');
+				console.log("Token ban");
+				throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 			}
 			this.jwt.verify(user.refreshToken)
 			const payload = {
@@ -181,32 +188,33 @@ export class AuthService {
 			};
 
 			//il a un token
-			const signedJwt = await this.jwt.signAsync(payload);
+			const signedJwt: string = await this.jwt.signAsync(payload);
+			let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
+			updatedJwtArray.push(signedJwt);
+			console.log(updatedJwtArray);
 			// Première mise à jour pour supprimer l'ancien token
 			await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
-					jwt: {
-						pull: jwtoken,
-					},
+					jwt: updatedJwtArray,
 					Ban_jwt: {push: jwtoken,},
 				},
 			});
 
 			// Deuxième mise à jour pour ajouter le nouveau token
-			await this.prisma.user.update({
-				where: {
-					id: user.id,
-				},
-				data: {
-					jwt: {
-						push: signedJwt,
-					},
-					Log_in: true,
-				},
-			});
+			// await this.prisma.user.update({
+			// 	where: {
+			// 		id: user.id,
+			// 	},
+			// 	data: {
+			// 		jwt: {
+			// 			push: signedJwt,
+			// 		},
+			// 		Log_in: true,
+			// 	},
+			// });
 
 			return signedJwt;
 
