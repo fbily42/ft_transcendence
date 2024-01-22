@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
@@ -55,6 +55,43 @@ export class AuthController{
 	@UseGuards(AuthGuard)
 	@HttpCode(200)
 	isAuthentified(){
+	}
+
+	@Post('otp/generate')
+	async generateOtp(@Req() req : Request, @Res() res: Response) {
+		try {
+			//generate secret and url and stores it 
+			// const otp = await this.authService.generateOtp(req['userID']);
+			const otp = await this.authService.generateOtp(1);
+
+			//send base32_secret and url
+			res.status(HttpStatus.OK).send(otp);
+		}
+		catch(error) {
+			throw new HttpException(error.message , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Post('otp/verify')
+	async verifyOtp(@Req() req: Request, @Res() res: Response) {
+		try {
+			//retrieve token
+			const token = req.query?.token as string;
+
+			//verify token
+			const isTokValid = await this.authService.verifyOtp(req['userID'], token);
+
+			if (!isTokValid)
+				return res.status(HttpStatus.FORBIDDEN).json({error: "Token is invalid"});
+
+			//updates DB
+			await this.authService.setOtpAsVerified(req['userID']);
+
+			res.status(HttpStatus.OK).send();
+		}
+		catch(error) {
+			throw new HttpException(error.message , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
 /* 

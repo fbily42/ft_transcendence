@@ -20,10 +20,16 @@ model User {
 	avatar			String?
 	photo42			String
 	status 			Boolean?
-	twoFA			Boolean  @default(false)
 
+	//Auth
 	token42 		Json
 	jwt				String?
+
+	//2FA
+	otp_enabled		Boolean  @default(false)
+	otp_verified	Boolean  @default(false)
+	otp_secret		String?
+	otp_url			String?
 
 	channelsOwn		Channel[] @relation("channel_owner")
 	channelsAdmin	ChannelAdmin[]

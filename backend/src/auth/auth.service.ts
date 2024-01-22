@@ -3,6 +3,8 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import * as OTPAuth from "otpauth";
+import { encode, decode } from "hi-base32";
 
 
 @Injectable({})
@@ -116,4 +118,100 @@ export class AuthService {
 			throw error;
 		}
 	}
+
+	generateOtpSecret() : string {
+		try {
+			const keyLength = 15;
+			const buffer = new Uint8Array(keyLength);
+			crypto.getRandomValues(buffer);
+			const secret = encode(buffer);
+			return secret ;
+		}
+		catch (error) {
+			throw error;
+		}
+	}
+
+	async generateOtp(userID) {
+		try {
+
+			//Generates a key
+			const base32_secret : string = this.generateOtpSecret();
+			
+			//Instantiate a TOTP object
+			const TOTP = new OTPAuth.TOTP({
+				algorithm: "SHA256",
+				digits: 6,
+				issuer: "Pinguscendence",
+				issuerInLabel: true,
+				period: 30,
+				secret: base32_secret,
+			})
+			
+			//Generates the TOTP url
+			const url = TOTP.toString();
+
+			//Stores the generated secret and url in DB
+			const updateUser = await this.prisma.user.update({
+				where: {
+					id: userID,
+				},
+				data: {
+					otp_secret: base32_secret,
+					otp_url: url,
+				},
+			});
+
+			return {otp_secret: base32_secret, otp_url: url};
+		}
+		catch (error) {
+			throw error;
+		}
+	}
+
+	async verifyOtp(userID, token) : Promise<boolean> {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where : {
+					id: userID,
+				}
+			});
+
+			const TOTP = new OTPAuth.TOTP({
+				algorithm: "SHA256",
+				digits: 6,
+				issuer: "Pinguscendence",
+				issuerInLabel: true,
+				period: 30,
+				secret: user.otp_secret,
+			});
+
+			const delta = TOTP.validate({token});
+
+			if (delta === null)
+				return false
+
+			return true;
+		}
+		catch (error) {
+			throw error;
+		}
+	}
+
+	async setOtpAsVerified(userID) {
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userID,
+				},
+				data: {
+					otp_enabled: true,
+					otp_verified: true,
+				},
+			});
+		}
+		catch(error) {
+			throw error;
+		}
+	}  
 }
