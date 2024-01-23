@@ -213,5 +213,55 @@ export class AuthService {
 		catch(error) {
 			throw error;
 		}
-	}  
+	}
+
+	async disableOtp(userID) {
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userID,
+				},
+				data: {
+					otp_enabled: false,
+				},
+			});
+		}
+		catch(error) {
+			throw error;
+		}
+	}
+
+	async isOtpVerified(userID) : Promise<boolean> {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userID,
+				},
+			});
+
+			if (user.otp_verified) {
+				return true
+			}
+			return false;
+		}
+		catch(error) {
+			throw error;
+		}
+	}
+
+	async enableOtp(userID) {
+		try {
+			await this.prisma.user.update({
+				where: {
+					id: userID,
+				},
+				data: {
+					otp_enabled: true,
+				},
+			});
+		}
+		catch (error) {
+			error
+		}
+	}
 }
