@@ -98,7 +98,9 @@ export class AuthService {
 		try {
 			const payload = {
 				sub: user.id,
-				login: user.name
+				login: user.name,
+				otp_enabled: user.otp_enabled,
+				otp_provided: false,
 			};
 	
 			const signedJwt = await this.jwt.signAsync(payload);

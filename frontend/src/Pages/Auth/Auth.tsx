@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Login from '@/components/Auth/Login';
+import Modal from '@/components/Chat/ChannelPanel/Modal';
+
 
 function Auth() : JSX.Element {
 
 	const [isAuth, setIsAuth] = useState<boolean>(false);
+	const [open2FA, setOpen2FA] = useState<boolean>(false);
 
 	useEffect(() => {
 		async function checkIsAuth() : Promise<void> {
@@ -17,6 +21,10 @@ function Auth() : JSX.Element {
 				setIsAuth(true);
 			}
 			catch (error){
+				if (error.response.status === 401
+						&& error.response.data.status === "2FA-fail"){
+					setOpen2FA(true);
+				}
 				setIsAuth(false);
 			}
 		}
@@ -25,11 +33,11 @@ function Auth() : JSX.Element {
 
 	if (!isAuth){
 		return (
-			<div className='w-full h-[100vh] flex justify-center items-center'>
-				<Link to={import.meta.env.VITE_REDIRECT_URI}>
-					<Button variant='destructive'>Login 42</Button>
-				</Link>
-			</div>
+			<Login>
+				<Modal open={open2FA} onClose={() => setOpen2FA(false)}>
+						<form>Form</form>
+				</Modal>
+			</Login>
 		  );
 	}
 	return (<Navigate to="/"/>);
