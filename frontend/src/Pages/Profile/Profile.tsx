@@ -10,10 +10,10 @@ function Profile(){
                   <Button variant={'default'}>Change Avatar</Button>
                   <Button variant={'outlineBlue'} className=''>Setup 2FA</Button>
                 </div>
-                <div className="flex w-full h-[50%] justify-between bg-blue-200 rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]"></div>
+                <div className="flex w-full h-[50%] justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]"></div>
             </div>
             <div className="flex flex-col w-[40%] sm:w-[40%] md:w-[30%] lg:w-[30%] h-full bg-white rounded-[26px] md:rounded-[30px] lg:rounded-[36px] gap-[36px] shadow-drop">
-                <div className="bg-blue-200 flex justify-start items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                <div className="bg-[#C1E2F7] flex justify-start items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
                     <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
                         Noot Friends
                     </h1>
