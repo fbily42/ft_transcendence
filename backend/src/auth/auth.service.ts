@@ -99,15 +99,13 @@ export class AuthService {
 			const signedJwt = await this.jwt.signAsync(payload);
 			const signrefreshToken = await this.jwt.signAsync(payload, {expiresIn: '7h'});
 
-
-			//recuperer
 			const updateUser = await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
 					refreshToken : signrefreshToken,
-					jwt: {push: signedJwt},
+					// jwt: {push: signedJwt},
 					Log_in: true,
 				},
 			});
@@ -122,7 +120,6 @@ export class AuthService {
 	async deleteTokens(jwtoken : string){
 
 		try {
-			// console.log('bonjour', jwtoken);
 			const decode = this.jwt.decode(jwtoken);
 
 			const updateUser = await this.prisma.user.update({
@@ -134,19 +131,19 @@ export class AuthService {
 					Log_in : false,
 				},
 			});
-			const updatejwt = updateUser.jwt.filter(item => item !== jwtoken);
-			const updateUser2 = await this.prisma.user.update({
-				where: { id: decode.sub },
-				data: {
-					jwt: { set: updatejwt},
-				},
-			});
+			// const updatejwt = updateUser.jwt.filter(item => item !== jwtoken);
+			// const updateUser2 = await this.prisma.user.update({
+			// 	where: { id: decode.sub },
+			// 	data: {
+			// 		jwt: { set: updatejwt},
+			// 	},
+			// });
 
 
 		}
 		catch(error){
-			console.log('issu in deletokens');
-			throw error;
+			// console.log('issu in deletokens');
+			throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 		}
 	}
 
@@ -155,31 +152,31 @@ export class AuthService {
 		try {
 			if(!jwtoken)
 			{
-				console.log('auth page');
-				return ;
+				// console.log('auth page');
+				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
 			const user = await this.prisma.user.findFirst({
 				where: {
-					OR: [
-						{jwt: { has: jwtoken } },
-						{Ban_jwt: { has: jwtoken } },
-					],
+						Ban_jwt: { has: jwtoken },
 				},
 			});
-			if (!user)
+			if (!user)//no user found
 			{
-				//il demande un token alors qu'il n'en a pas
-				//il faut le logout
-				console.log("User n'existe pas");
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
-			else if (user.Ban_jwt.find(token => token === jwtoken))
+			else if (user.Ban_jwt.find(token => token === jwtoken))//token already use
 			{
-				//il essaye de se log avec un token qui a deja servi, donc posisble leak
-				//il faut log out
-				//soit coter backend soit coter client a verifier
-				console.log(jwtoken);
-				console.log("Token ban de ouf ");
+				await this.prisma.user.update({
+					where :{
+						id : user.id
+					},
+					data: {
+						// jwt: [],
+						Ban_jwt: [],
+						Log_in: false,
+						refreshToken: null,					}
+
+				});
 				throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 			}
 			this.jwt.verify(user.refreshToken)
@@ -188,42 +185,25 @@ export class AuthService {
 				login: user.name
 			};
 
-			//il a un token
 			const signedJwt: string = await this.jwt.signAsync(payload);
-			let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
-			updatedJwtArray.push(signedJwt);
-			console.log(updatedJwtArray);
-			// Première mise à jour pour supprimer l'ancien token
+			// let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
+			// updatedJwtArray.push(signedJwt);
+			// console.log(updatedJwtArray);
 			await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
-					jwt: updatedJwtArray,
+					// jwt: updatedJwtArray,
 					Ban_jwt: {push: jwtoken,},
 				},
 			});
-
-			// Deuxième mise à jour pour ajouter le nouveau token
-			// await this.prisma.user.update({
-			// 	where: {
-			// 		id: user.id,
-			// 	},
-			// 	data: {
-			// 		jwt: {
-			// 			push: signedJwt,
-			// 		},
-			// 		Log_in: true,
-			// 	},
-			// });
 
 			return signedJwt;
 
 		}
 		catch (error)
 		{
-			//le refresh token est finis
-			//logout
 			throw error;
 		}
 	}
