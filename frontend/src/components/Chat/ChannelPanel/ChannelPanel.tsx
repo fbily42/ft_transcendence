@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { IoAddCircleOutline } from "react-icons/io5";
 import React, { useState } from "react";
-import Modal from "./Modal";
+import Modal from "../../Modal";
 import TabsChannel from "./TabsChannel/TabsChannel";
 
 function ChannelPanel() {
