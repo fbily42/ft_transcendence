@@ -35,6 +35,7 @@ const buttonVariants = cva(
 				sm: "h-8 rounded-md px-3 text-xs",
 				lg: "h-10 rounded-md px-8",
 				icon: "h-[48px] w-[48px]",
+				smIcon: "h-[32px] w-[32px]",
 				secondNavIconSize: "h-[24px] w-[24px]",
 				openedTabSize: "w-[68px] h-[42px]",
 			},
