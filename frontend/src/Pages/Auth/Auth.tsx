@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Login from '@/components/Auth/Login';
 import Modal from '@/components/Chat/ChannelPanel/Modal';
+import OtpForm from '@/components/Auth/OtpForm';
 
 
 function Auth() : JSX.Element {
@@ -28,19 +29,21 @@ function Auth() : JSX.Element {
 				setIsAuth(false);
 			}
 		}
+
 		checkIsAuth();
 	}, []);
 
-	if (!isAuth){
+	if (isAuth)
+		return (<Navigate to="/"/>);
+	else {
 		return (
 			<Login>
 				<Modal open={open2FA} onClose={() => setOpen2FA(false)}>
-						<form>Form</form>
+					<OtpForm></OtpForm>
 				</Modal>
 			</Login>
 		  );
 	}
-	return (<Navigate to="/"/>);
 }
 
 export default Auth
