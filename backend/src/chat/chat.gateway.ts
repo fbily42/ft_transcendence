@@ -12,14 +12,15 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from './chat.service';
-import { NewChannelDto } from './dto';
-import { Channel } from '@prisma/client';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { MessageDto } from './dto/message.dto';
+import { WsExceptionFilter } from './filter/ws-exception.filter';
 
 @UsePipes(new ValidationPipe())
+@UseFilters(new WsExceptionFilter())
 @WebSocketGateway(8081, {
 	cors: {
-		origin: "http://localhost:3000",
+		origin: `${process.env.FRONTEND_URL}`,
 		credentials: true,
 	},
 	transports: ['websocket', 'polling'],
@@ -56,18 +57,10 @@ export class ChatGateway implements OnGatewayConnection {
 		this.server.emit('message', message);
 	}
 
-	@SubscribeMessage('createChannel')
-	async create(@ConnectedSocket() client: Socket, @MessageBody() dto: NewChannelDto){
-		console.log(dto);
-		const channel: Channel =  await this.chatService.createChannel(client.data.userId, dto);
-		console.log(channel)
-		this.server.emit('Channel created', {name: channel.name, id: channel.id})
-	}
-
 	@SubscribeMessage('joinChannel')
 	join(@ConnectedSocket() client: Socket, @MessageBody() name: string){
 		client.join(name);
-		this.server.to(name).emit('message', `${client.data.userName} joined channel`);
+		this.server.to(name).emit('message', `${client.data.userName} joined channel ${name}`);
 	}
 
 }

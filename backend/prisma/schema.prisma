@@ -24,7 +24,6 @@ model User {
 	token42 		Json
 	jwt				String?
 
-	channelsOwn		Channel[] @relation("channel_owner")
 	channels		ChannelUser[]
 	messages		Message[]
 
@@ -48,9 +47,6 @@ model	Channel {
 	name			String	@unique
 	hash			String?
 	private			Boolean @default(false)
-
-	owner			User @relation(name: "channel_owner", fields: [ownerId], references: [id])
-	ownerId			Int
 
 	users			ChannelUser[]
 	messages		Message[]
@@ -97,6 +93,7 @@ model ChannelUser {
 	userId		Int
 	user		User @relation(fields: [userId], references: [id])
 
+	owner		Boolean @default(false)
 	admin		Boolean @default(false)
 	member		Boolean @default(false)
 	banned		Boolean @default(false)

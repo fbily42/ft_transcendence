@@ -11,7 +11,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Post('add')
-	async addChannel(@Req() req: Request, @Body() dto: NewChannelDto): Promise<Channel> {
+	async addChannel(@Req() req: Request, @Body() dto: NewChannelDto): Promise<string> {
 		return await this.chatService.createChannel(req['userID'], dto);
 	}
 

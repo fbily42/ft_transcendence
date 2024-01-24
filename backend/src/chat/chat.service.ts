@@ -15,7 +15,7 @@ type ChannelWithRelation = Prisma.ChannelGetPayload<{
 export class ChatService {
 	constructor(private prisma: PrismaService) {}
 
-	async createChannel(userId: number, dto: NewChannelDto): Promise<Channel> {
+	async createChannel(userId: number, dto: NewChannelDto): Promise<string> {
 		try {
 			let hash: string = null;
 			if (dto.password)
@@ -25,15 +25,16 @@ export class ChatService {
 					name: dto.name,
 					private: dto.private,
 					hash: hash,
-					owner: {
-						connect: {
-							id: userId,
-						},
-					},
 				},
 			});
-			delete channel.hash;
-			return channel;
+			await this.prisma.channelUser.create({
+				data: {
+					userId: userId,
+					channelId: channel.id,
+					owner: true,
+				}
+			})
+			return channel.name;
 		} catch(error) {
 			if (error instanceof PrismaClientKnownRequestError){
 				if (error.code === 'P2002')
@@ -45,19 +46,19 @@ export class ChatService {
 		}
 	}
 
+	// Find the good user + check if he exists
 	async joinChannel(userId :number, dto: JoinChannelDto): Promise<void>{
 		try {
 			const channel: ChannelWithRelation = await this.prisma.channel.findUnique({
-				where: {name: dto.name},
+				where: {
+					name: dto.name
+				},
 				include:{
-					owner:true,
 					users: true,
 					},
 			})
 			if (!channel)
 				throw new HttpException('Channel does not exists', HttpStatus.BAD_REQUEST);
-			if (channel.private && !channel.users[0])
-				throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
 			if (channel.hash)
 			{
 				if (!dto.password || !await argon.verify(channel.hash, dto.password))
@@ -65,7 +66,7 @@ export class ChatService {
 			}
 			if (channel.users[0]) {
 				const user: ChannelUser = channel.users.find(user => user.userId === userId);
-				if (channel.ownerId === userId || user.member || user.muted || user.admin)
+				if (user.owner || user.member || user.muted || user.admin)
 					throw new HttpException('Channel already joined', HttpStatus.CONFLICT);
 				if (user.banned)
 					throw new HttpException('You are banned from this channel', HttpStatus.BAD_REQUEST);

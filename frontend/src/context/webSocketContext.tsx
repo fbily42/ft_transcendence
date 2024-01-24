@@ -11,7 +11,7 @@ export const WebSocketProvider: React.FC = () => {
   const [webSocket, setWebSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const ws: Socket = io('http://localhost:8081',{
+    const ws: Socket = io(`${import.meta.env.VITE_WSCHAT_URL}`,{
 		withCredentials: true,
 	});
     setWebSocket(ws);

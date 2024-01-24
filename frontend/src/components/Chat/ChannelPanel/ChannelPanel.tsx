@@ -1,11 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { IoAddCircleOutline } from "react-icons/io5";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import TabsChannel from "./TabsChannel/TabsChannel";
+import Groups from "./Groups";
+import axios from "axios";
+
+type Channel = {
+	id: number
+	ownerId: number
+	name: string
+}
 
 function ChannelPanel() {
 	const [open, setOpen] = useState<boolean>(false);
+
+	useEffect(() => {
+
+		const getChannels = async () => {
+			try {
+				const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
+					withCredentials: true,
+				})
+				console.log(response.data);		
+			} catch (error) {
+				console.log(error);
+			}
+		};
+
+		getChannels();
+	}, []);
 
 	return (
 		<div className="bg-blue-100 h-full w-1/5 rounded-md border">
@@ -22,7 +46,7 @@ function ChannelPanel() {
 				<span className="ml-4">Private Messages</span>
 			</div>
 			<div className="overflow-y-auto">
-				<span className="ml-4">Groups</span>
+				<Groups></Groups>
 			</div>
 		</div>
 	);

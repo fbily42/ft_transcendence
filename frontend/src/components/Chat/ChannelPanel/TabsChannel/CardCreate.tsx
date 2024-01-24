@@ -37,11 +37,14 @@ function CardCreate({onClose}: CardCreateProps) {
 			try {
 				if (data.password === '')
 					delete data.password;
-				socket?.emit('createChannel', data);
+				const response = await axios.post("http://localhost:3333/chat/add", data, {
+					withCredentials: true,
+				})
+				socket?.emit('joinChannel', response.data);
 				onClose();
 			} catch (error) {
 				console.log(error)
-				//setErrorMessage(error.response.data.message)
+				setErrorMessage(error.response.data.message)
 				throw error
 			}
 		}

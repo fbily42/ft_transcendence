@@ -3,6 +3,12 @@ import Messages from './Messages'
 import { useWebSocket } from '@/context/webSocketContext';
 import { Socket } from 'socket.io-client';
 
+interface messageData{
+	user: string
+	target: string
+	message: string
+}
+
 function ChatWindow() {
 
 	const [value, setValue] = useState<string>("")
