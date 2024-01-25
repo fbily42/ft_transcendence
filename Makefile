@@ -110,12 +110,15 @@ clean: remove_containers remove_volumes remove_images removes_network prune
 	fi
 	@echo "\n$(BOLD)$(GREEN)Cleaned [ ✔ ]\n$(RESET)"
 
+studio:
+	docker exec -it nest-api npx prisma studio
+
 re:
 	make clean
 	make all
 
 .PHONY: all re clean removes_network remove_images remove_volumes remove_containers \
-	status restart start stop logs_nest logs_db
+	status restart start stop logs_nest logs_db studio
 
 # COLORS
 RESET = \033[0m

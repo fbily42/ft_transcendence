@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { LeaderboardData, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
+import instance from "@/axiosConfig";
 
 export default function LeaderBoard(): JSX.Element {
 	const [data, setData] = useState<LeaderboardData[]>([]);
@@ -66,6 +67,7 @@ export default function LeaderBoard(): JSX.Element {
 
 		//Launch the loop
 		return pollData();
+ 
 	}, []);
 
 	console.log(data);

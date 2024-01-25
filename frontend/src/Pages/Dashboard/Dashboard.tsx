@@ -1,9 +1,9 @@
-// import { Button } from "@/components/ui/button";
-import React, { useEffect } from 'react'
-import LeaderBoard from '../../components/Dashboard/Leaderboard/Leaderboard'
-import CardsDashboard from '@/components/Dashboard/Cards/CardsDashboard'
-import { useState } from 'react'
-import axios from 'axios'
+import React, { useEffect } from "react";
+import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
+import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
+import { useState } from "react";
+import axios from "axios";
+import instance from "@/axiosConfig";
 
 interface UserData {
     rank: number
