@@ -1,7 +1,7 @@
 import axios from "axios";
-import { UserData } from "./dashboard.types";
+import { LeaderboardData, UserData } from "./dashboard.types";
 
-export async function getUserMe() {
+export async function getUserMe():Promise<UserData> {
 	try {
 		//api call with jwt as authorization
 		const response = await axios.get(
@@ -10,23 +10,13 @@ export async function getUserMe() {
 				withCredentials: true,
 			}
 		)
-
-		const user: UserData = {
-			name: response.data?.name || '',
-			score: response.data?.score || 0,
-			rank: response.data?.rank || 0,
-			games: response.data?.games || 0,
-			wins: response.data?.wins || 0
-		}
-
-		return (user)
-
+		return response.data
 	} catch (error) {
 		throw error
 	}
 }
 
-export async function getLeaderboard() {
+export async function getLeaderboard(): Promise<LeaderboardData> {
 	try {
 
 		const response = await axios.get(

@@ -108,7 +108,7 @@ export class ChatService {
 
 	async getChannels(userId: number): Promise<any> {
 		try {
-			const channels: any = await this.prisma.channel.findMany({
+			const channels = await this.prisma.channel.findMany({
 				where: {
 					users: {
 						every: {
@@ -117,7 +117,6 @@ export class ChatService {
 					},
 				},
 				select:{
-					id: true,
 					name: true,
 				},
 			})
