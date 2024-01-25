@@ -18,18 +18,27 @@ export class AuthGuard implements CanActivate {
 		//check if JWT exists in the cookies
 		if (!encodedJwt)
 		{
-			// console.log('NO PERMISSION : jwt cookie doesn\'t exist');
 			return false;
 		}
 
 		try {
 			//Verify if the JWT is valid
-			this.jwtService.verify(encodedJwt);
-			//que se passe t il si on a passe la date d'expiration ? envoie une erreur ?
-			// const decode = this.jwtService.decode(encodedJwt);
-			const decode = this.jwtService.decode(encodedJwt);
-
-			const user = await this.prisma.user.findFirst({
+			const decode = this.jwtService.verify(encodedJwt);
+			const user = await this.prisma.user.findUnique({
+				where:{
+					name: decode.login,
+					id: decode.sub,
+				}
+			})
+			if (!user){
+				response.status(403).json({
+					status: "fail",
+					message: "User does not exist",
+				}).send();
+				return false;
+			}
+      
+      const user = await this.prisma.user.findFirst({
 				where: {
 					OR: [
 						{
@@ -50,37 +59,28 @@ export class AuthGuard implements CanActivate {
 				return false;
 			}
 
+			//Verify 2FA
+			if (decode.otp_enabled && !decode.otp_provided)
+			{
+				response.status(401).json({
+					status: "2FA-fail",
+					message: "2FA required",
+				}).send();
+				return false
+			}
+
 			request['userLogin'] = decode.login;
 			request['userID'] = decode.sub;
-			// const user = await this.prisma.user.findUnique({
-			// 	where:{
-			// 		name: decode.login,
-			// 		id: decode.sub,
-			// 	}
-			// });
-			// if (!user)
-			// 	return false;
-			// const user1 = await this.prisma.user.findFirst({
-			// 	where:{
-			// 		Ban_jwt: {
-			// 			has: encodedJwt,
-			// 		},
-			// 	}
-			// });
-			// if (user1)
-			// {
-			// 	//faire un redirect vers le logout, car si une personne fait un appel a un token blacklist c'est qu'il l'a vole ou que la personne est deconnecte
-			// 	console.log('jwt banned')
-			// 	return false
-			// }
-			// request['userLogin'] = decode.login;
-			// request['userID'] = decode.sub;
+
 			return true;
 		}
+    
 		catch (error)
 		{
-			// response.clearCookie('jwt', { path: '/' });//a supprimer ici si on ne fait pas de refresh token 
-			// console.log('NO PERMISSION : authorization incorrect');
+			response.status(403).json({
+				status: "fail",
+				message: "Unvalid jwt",
+			}).send();
 			return false;
 		}
 

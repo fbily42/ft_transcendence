@@ -18,13 +18,19 @@ model User {
 	name			String @unique // 42 login
 	pseudo 			String? @unique // by default == name ?
 	avatar			String?
-	twoFA			Boolean  @default(false)
-	Log_in			Boolean  @default(true)
+	photo42			String
 
+	//Auth
 	token42 		Json
 	jwt				String[]
 	Ban_jwt			String[]
 	refreshToken	String?
+
+	//2FA
+	otp_enabled		Boolean  @default(false)
+	otp_verified	Boolean  @default(false)
+	otp_secret		String?
+	otp_url			String?
 
 	channelsOwn		Channel[] @relation("channel_owner")
 	channelsAdmin	ChannelAdmin[]
