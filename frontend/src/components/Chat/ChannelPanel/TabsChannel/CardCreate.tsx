@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
 import { useForm, SubmitHandler } from 'react-hook-form'
+import { useWebSocket } from '@/context/webSocketContext'
+import { Socket } from 'socket.io-client'
 
 type FormValues = {
 	name: string
@@ -23,12 +25,13 @@ interface CardCreateProps {
 	onClose: () => void;
 }
 
-// TODO : Check if error exists + Find a way to clear error when modal closed
+// TODO : Check if error exists
 
 function CardCreate({onClose}: CardCreateProps) {
 
-	const { register, handleSubmit} = useForm<FormValues>()
-	const [ errorMessage, setErrorMessage ] = useState<string>('')
+	const { register, handleSubmit} = useForm<FormValues>();
+	const [ errorMessage, setErrorMessage ] = useState<string>('');
+	const socket = useWebSocket() as Socket;
 
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 			try {
@@ -36,9 +39,11 @@ function CardCreate({onClose}: CardCreateProps) {
 					delete data.password;
 				const response = await axios.post("http://localhost:3333/chat/add", data, {
 					withCredentials: true,
-				});
+				})
+				socket?.emit('joinChannel', response.data);
 				onClose();
 			} catch (error) {
+				console.log(error)
 				setErrorMessage(error.response.data.message)
 				throw error
 			}

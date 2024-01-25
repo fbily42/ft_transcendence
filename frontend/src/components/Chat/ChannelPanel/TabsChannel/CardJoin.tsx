@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SubmitHandler, useForm } from 'react-hook-form'
 import axios from 'axios'
+import { useWebSocket } from '@/context/webSocketContext'
+import { Socket } from 'socket.io-client'
 
 interface CardJoinProps {
 	onClose: () => void;
@@ -26,6 +28,7 @@ function CardJoin({onClose}: CardJoinProps) {
 
 	const { register, handleSubmit} = useForm<FormValues>()
 	const [ errorMessage, setErrorMessage] = useState<string>('')
+	const socket = useWebSocket() as Socket;
 
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 		try {
@@ -34,6 +37,7 @@ function CardJoin({onClose}: CardJoinProps) {
 			const response = await axios.post("http://localhost:3333/chat/join", data, {
 				withCredentials: true,
 			});
+			socket?.emit('joinChannel', data.name);
 			onClose();
 		} catch (error) {
 			setErrorMessage(error.response.data.message)
