@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BellRing } from "lucide-react";
 import { Music2 } from "lucide-react";
 
-function SecondNavbar() {
+export default function SecondNavbar(): JSX.Element {
 	return (
 		<div className="flex justify-between align-center pl-[122px] pr-[36px] gap-[50px] h-[10vh]">
 			<div className="flex w-[300px] items-center">
@@ -41,5 +41,3 @@ function SecondNavbar() {
 		</div>
 	);
 }
-
-export default SecondNavbar;

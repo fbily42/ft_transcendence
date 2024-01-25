@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { LeaderboardDTO } from './dto/leaderboard.dto';
 
 @Injectable()
 export class UserService {
@@ -34,22 +35,22 @@ export class UserService {
 				score: true,
 			},
 		});
-		console.log('Leaderboard Data:', leaderboardData);
+		//console.log('Leaderboard Data:', leaderboardData);
 
 		return leaderboardData;
 	}
 
-	async updateRanks(data: any) {
+	async updateRanks(dto: LeaderboardDTO[]) {
 		try {
-			for (const user of data) {
+			for (const user of dto) {
 				await this.prisma.user.update({
 					where: { name: user.name },
 					data: { rank: user.rank },
 				});
 			}
 		}
-		catch (error) { // TODO: catch error
-			console.error(error);
+		catch (error) {
+			throw new HttpException("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);;
 		}
 	}
 }
