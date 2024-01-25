@@ -1,11 +1,11 @@
 import LeaderBoard from '../../components/Dashboard/Leaderboard/Leaderboard'
 import CardsDashboard from '@/components/Dashboard/Cards/CardsDashboard'
 import { useQuery } from '@tanstack/react-query'
-import { getUserMe } from '@/lib/api'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
 function Dashboard(): JSX.Element {
     const { data } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
- 
+
     return (
         <>
             <div className="flex flex-col justify-between pl-[122px] pb-[36px] pr-[36px] h-[90vh] bg-red-100 gap-[36px]">

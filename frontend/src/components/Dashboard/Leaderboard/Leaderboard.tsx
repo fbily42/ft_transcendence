@@ -1,9 +1,8 @@
-import { LeaderboardData, columns } from './columns'
+import { columns } from './columns'
 import { DataTable } from './data-table'
-import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
-import { getLeaderboard } from '@/lib/api'
-
+import { getLeaderboard } from '@/lib/Dashboard/dashboard.requests'
+import { LeaderboardData } from '@/lib/Dashboard/dashboard.types'
 
 export default function LeaderBoard(): JSX.Element {
     const { data } = useQuery<LeaderboardData[]>({

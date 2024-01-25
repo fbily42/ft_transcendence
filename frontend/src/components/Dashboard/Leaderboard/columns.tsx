@@ -1,12 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import PinguAvatar from "../../../assets/empty-state/pingu-face.svg";
-
-export type LeaderboardData = {
-	score: number;
-	rank: number;
-	name: string;
-};
+import { LeaderboardData } from "@/lib/Dashboard/dashboard.types";
 
 export const columns: ColumnDef<LeaderboardData>[] = [
 	{

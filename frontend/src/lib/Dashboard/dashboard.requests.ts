@@ -1,12 +1,5 @@
 import axios from "axios";
-
-type UserData = {
-	name: string;
-	score: number;
-    rank: number
-    games: number
-    wins: number
-}
+import { UserData } from "./dashboard.types";
 
 export async function getUserMe() {
 	try {
@@ -29,19 +22,22 @@ export async function getUserMe() {
 		return (user)
 
 	} catch (error) {
-		console.log('Error getdata', error)
+		throw error
 	}
 }
 
 export async function getLeaderboard() {
-    const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/user/leaderboard`,
-        {
-            withCredentials: true,
-        }
-    )
-    if (response.status !== 200) {
-        throw new Error(response.statusText)
-    }
-    return response.data
+	try {
+
+		const response = await axios.get(
+			`${import.meta.env.VITE_BACKEND_URL}/user/leaderboard`,
+			{
+				withCredentials: true,
+			}
+		)
+		return response.data
+	}
+	catch(error){
+		throw error
+	}
 }
