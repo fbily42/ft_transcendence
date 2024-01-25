@@ -56,17 +56,19 @@ const OtpForm : React.FC<OtpFormProps> = () => {
         <p id="helper-text-explanation" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           Please introduce the 6-digit token provided by your authenticator app.
         </p>
-        <div className="flex mb-2 space-x-2 rtl:space-x-reverse">
+        <div className="flex mb-2 space-x-2 rtl:space-x-reverse justify-center">
           {inputRefs.map((inputRef, index) => (
             <div key={index}>
-              <label htmlFor={`code-${index + 1}`} className="sr-only"></label>
-              <input
+              <Label htmlFor={`code-${index + 1}`} className="sr-only"></Label>
+              <Input
                 type="text"
                 maxLength={1}
                 onKeyUp={(event) => handleKeyUp(event, index)}
                 id={`code-${index + 1}`}
                 ref={inputRef}
-                className="block w-9 h-9 py-3 text-sm font-extrabold text-center text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                pattern="[0-9]*"
+                className="w-9 text-center font-extrabold"
+                // className="block w-9 h-9 py-3 text-sm font-extrabold text-center text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 required
               />
             </div>
