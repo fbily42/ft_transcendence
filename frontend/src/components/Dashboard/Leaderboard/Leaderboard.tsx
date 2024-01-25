@@ -17,34 +17,38 @@ export default function LeaderBoard(): JSX.Element {
 						withCredentials: true,
 					}
 				);
-
-				// Sort the data by score in descending order
-				const sortedData = response.data.sort(
-					(a: LeaderboardData, b: LeaderboardData) =>
-						b.score - a.score
-				);
-
-				// Assign ranks based on the position in the sorted array
-				const rankedData = sortedData.map(
-					(user: LeaderboardData, index: number) => ({
-						...user,
-						rank: index + 1,
-					})
-				);
-
-				//Update the user data
-				// setData(response.data);
-				setData(rankedData);
-				// Update the ranks in the backend
-				await axios.post(
-					"http://localhost:3333/user/updateRanks",
-					rankedData,
-					{
-						withCredentials: true,
-					}
-				);
+				
+				if (response.status === 200) {
+					// Sort the data by score in descending order
+					const sortedData = response.data.sort(
+						(a: LeaderboardData, b: LeaderboardData) =>
+							b.score - a.score
+					);
+	
+					// Assign ranks based on the position in the sorted array
+					const rankedData = sortedData.map(
+						(user: LeaderboardData, index: number) => ({
+							...user,
+							rank: index + 1,
+						})
+					);
+					
+					//Update the user data
+					setData(rankedData);
+					
+					// Update the ranks in the backend
+					await axios.post(
+						"http://localhost:3333/user/updateRanks",
+						rankedData,
+						{
+							withCredentials: true,
+						}
+					);
+				} else {
+					console.error("API request failed with status:", response.status);
+				}
 			} catch (error) {
-				console.log("Error getdata", error);
+				console.log("Error fetching data:", error);
 			}
 		};
 
@@ -63,7 +67,7 @@ export default function LeaderBoard(): JSX.Element {
 
 		//Launch the loop
 		return pollData();
-
+ 
 	}, []);
 
 	console.log(data);

@@ -17,9 +17,20 @@ module.exports = {
 		},
 		extend: {
 			colors: {
+				fontSize: {
+					'xs': '0.75rem',  // Extra Small
+					'sm': '0.875rem', // Small
+					'base': '1rem',   // Medium (Base)
+					'lg': '1.125rem', // Large
+					'xl': '1.25rem',  // Extra Large
+					'2xl': '1.5rem',  // 2X Large
+					'3xl': '1.875rem',  // 3X Large
+					'4xl': '2.25rem',   // 4X Large
+					'5xl': '3rem',      // 5X Large
+				  },
 				customLightBlue: "#F1F8FD",
-        customDarkBlue: "#45A0E3",
-        customYellow: "#F5BC41",
+        		customDarkBlue: "#45A0E3",
+        		customYellow: "#F5BC41",
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",

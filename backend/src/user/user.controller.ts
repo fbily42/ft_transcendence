@@ -1,7 +1,8 @@
 import { UserService } from './user.service';
-import { Body, Controller, Post, Get, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Req, ParseArrayPipe } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
+import { LeaderboardDTO } from './dto/leaderboard.dto';
 
 @Controller('user')
 @UseGuards(AuthGuard)
@@ -22,10 +23,9 @@ export class UserController {
 		return this.userService.getLeaderboard();
 	}
 
-	// TODO: DTO pour la data pour etre sure de ce qu'on envoi
 	@Post('updateRanks')
 	@UseGuards(AuthGuard)
-	async updateRanks(@Body() data: any) {
-		return this.userService.updateRanks(data);
+	async updateRanks(@Body(new ParseArrayPipe({items: LeaderboardDTO, whitelist: true})) dto: LeaderboardDTO[]) {
+		return this.userService.updateRanks(dto);
 	}
 }
