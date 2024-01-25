@@ -26,37 +26,41 @@ import {
 // }
 
 import React, { useRef, KeyboardEvent } from 'react';
+import OtpInput from "./OtpInput";
 
 
 const OtpForm : React.FC<OtpFormProps> = () => {
+  const [otp, setOtp] = useState('');
+  const onChange = (value: string) => setOtp(value);
 
-  const inputRefs = Array.from({ length: 6 }, (_, index) => useRef<HTMLInputElement>(null)!);
+  // const inputRefs = Array.from({ length: 6 }, (_, index) => useRef<HTMLInputElement>(null)!);
 
-  const focusNextInput = (currentIdx: number) => {
-    const nextIdx = currentIdx + 1;
-    if (nextIdx < inputRefs.length && inputRefs[nextIdx].current) {
-      inputRefs[nextIdx].current.focus();
-    }
-  };
+  // const focusNextInput = (currentIdx: number) => {
+  //   const nextIdx = currentIdx + 1;
+  //   if (nextIdx < inputRefs.length && inputRefs[nextIdx].current) {
+  //     inputRefs[nextIdx].current.focus();
+  //   }
+  // };
 
-  const handleKeyUp = (event: KeyboardEvent<HTMLInputElement>, currentIdx: number) => {
-    if (event.currentTarget.value.length === 0) {
-      const prevIdx = currentIdx - 1;
-      if (prevIdx >= 0 && inputRefs[prevIdx].current) {
-        inputRefs[prevIdx].current.focus();
-      }
-    } else {
-      focusNextInput(currentIdx);
-    }
-  };
+  // const handleKeyUp = (event: KeyboardEvent<HTMLInputElement>, currentIdx: number) => {
+  //   if (event.currentTarget.value.length === 0) {
+  //     const prevIdx = currentIdx - 1;
+  //     if (prevIdx >= 0 && inputRefs[prevIdx].current) {
+  //       inputRefs[prevIdx].current.focus();
+  //     }
+  //   } else {
+  //     focusNextInput(currentIdx);
+  //   }
+  // };
 
   return (
     <div>
       <form className="max-w-sm mx-auto">
-        <p id="helper-text-explanation" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <p id="helper-text-explanation" className="mt-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
           Please introduce the 6-digit token provided by your authenticator app.
         </p>
-        <div className="flex mb-2 space-x-2 rtl:space-x-reverse justify-center">
+        <OtpInput value={otp} valueLength={6} onChange={onChange}></OtpInput>
+        {/* <div className="flex mt-6 mb-2 space-x-2 rtl:space-x-reverse justify-center">
           {inputRefs.map((inputRef, index) => (
             <div key={index}>
               <Label htmlFor={`code-${index + 1}`} className="sr-only"></Label>
@@ -73,7 +77,7 @@ const OtpForm : React.FC<OtpFormProps> = () => {
               />
             </div>
           ))}
-        </div>
+        </div> */}
       </form>
     </div>
   );

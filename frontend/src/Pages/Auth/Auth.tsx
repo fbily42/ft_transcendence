@@ -39,7 +39,9 @@ function Auth() : JSX.Element {
 		return (
 			<Login>
 				<Modal open={open2FA} onClose={() => setOpen2FA(false)}>
+					<p className="mb-4 text-base text-center font-bold">Verify code</p>
 					<OtpForm></OtpForm>
+					{/* 2 buttons cancel and submit */}
 				</Modal>
 			</Login>
 		  );
