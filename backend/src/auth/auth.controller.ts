@@ -36,13 +36,13 @@ export class AuthController{
 			res.cookie('jwt', jwt, {
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
-			res.redirect("http://localhost:3000/");
+			res.redirect(`${process.env.FRONTEND_URL}`);
 
 		} catch(error) {
-			res.redirect("http://localhost:3000/auth");
+			res.redirect(`${process.env.FRONTEND_URL}/auth`);
 			throw error;
 		}
 	}
@@ -166,8 +166,8 @@ export class AuthController{
 
 
 
+	@UseGuards(AuthGuard)
 	@Get('logout')//Change Get into put
-	//@UseGuards(AuthGuard)
 	async logout(@Req() req : Request, @Res() res : Response): Promise<void> {
 
 		try {

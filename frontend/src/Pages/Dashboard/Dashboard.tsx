@@ -20,7 +20,7 @@ function Dashboard(): JSX.Element {
             try {
                 //api call with jwt as authorization
                 const response = await axios.get<UserData>(
-                    'http://localhost:3333/user/me',
+                    `${import.meta.env.VITE_BACKEND_URL}/user/me`,
                     {
                         withCredentials: true,
                     }

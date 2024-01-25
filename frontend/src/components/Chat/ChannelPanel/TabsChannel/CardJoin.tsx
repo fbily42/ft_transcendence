@@ -34,7 +34,7 @@ function CardJoin({onClose}: CardJoinProps) {
 		try {
 			if (data.password === '')
 				delete data.password
-			const response = await axios.post("http://localhost:3333/chat/join", data, {
+			const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/chat/join`, data, {
 				withCredentials: true,
 			});
 			socket?.emit('joinChannel', data.name);

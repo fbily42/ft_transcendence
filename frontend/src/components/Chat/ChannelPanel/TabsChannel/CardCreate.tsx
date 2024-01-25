@@ -37,7 +37,7 @@ function CardCreate({onClose}: CardCreateProps) {
 			try {
 				if (data.password === '')
 					delete data.password;
-				const response = await axios.post("http://localhost:3333/chat/add", data, {
+				const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/chat/add`, data, {
 					withCredentials: true,
 				})
 				socket?.emit('joinChannel', response.data);

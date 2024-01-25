@@ -12,7 +12,7 @@ export default function LeaderBoard(): JSX.Element {
 			try {
 				//api call with jwt as authorization
 				const response = await axios.get(
-					"http://localhost:3333/user/leaderboard",
+					`${import.meta.env.VITE_BACKEND_URL}/user/leaderboard`,
 					{
 						withCredentials: true,
 					}
@@ -38,7 +38,7 @@ export default function LeaderBoard(): JSX.Element {
 					
 					// Update the ranks in the backend
 					await axios.post(
-						"http://localhost:3333/user/updateRanks",
+						`${import.meta.env.VITE_BACKEND_URL}/user/updateRanks`,
 						rankedData,
 						{
 							withCredentials: true,

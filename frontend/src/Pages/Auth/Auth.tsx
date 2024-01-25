@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Navigate, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Login from '@/components/Auth/Login';
-import Modal from '@/components/Chat/ChannelPanel/Modal';
+import Modal from '@/components/Modal';
 import OtpForm from '@/components/Auth/OtpForm';
 
 
@@ -16,7 +16,7 @@ function Auth() : JSX.Element {
 	useEffect(() => {
 		async function checkIsAuth() : Promise<void> {
 			try {
-				const response = await axios.get("http://localhost:3333/auth/isAuth", {
+				const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/isAuth`, {
 					withCredentials: true
 				});
 				setIsAuth(true);

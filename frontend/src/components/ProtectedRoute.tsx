@@ -11,7 +11,7 @@ function ProtectedRoute() : JSX.Element {
 	useEffect(() => {
 		async function checkIsAuth() : Promise<void> {
 			try {
-				const response = await instance.get("http://localhost:3333/auth/isAuth", {
+				const response = await instance.get(`${import.meta.env.VITE_BACKEND_URL}/auth/isAuth`, {
 					withCredentials: true
 				});
 				setAuth(true);

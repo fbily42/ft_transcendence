@@ -59,7 +59,7 @@ const VerticalNavbar: React.FC = () => {
 	const handleLogout = async () => {
 		try {
 			await axios.get(
-				"http://localhost:3333/auth/logout",
+				`${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
 				{
 					withCredentials: true,
 				}
