@@ -1,55 +1,11 @@
-import React, { useEffect } from "react";
-import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
-import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
-import { useState } from "react";
-import axios from "axios";
-import instance from "@/axiosConfig";
-
-interface UserData {
-    rank: number
-    games: number
-    wins: number
-}
+import LeaderBoard from '../../components/Dashboard/Leaderboard/Leaderboard'
+import CardsDashboard from '@/components/Dashboard/Cards/CardsDashboard'
+import { useQuery } from '@tanstack/react-query'
+import { getUserMe } from '@/lib/api'
 
 function Dashboard(): JSX.Element {
-    const [user, setUser] = useState<UserData | null>(null)
-
-    //UseEffect mandatory for async user data update
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                //api call with jwt as authorization
-                const response = await axios.get<UserData>(
-                    `${import.meta.env.VITE_BACKEND_URL}/user/me`,
-                    {
-                        withCredentials: true,
-                    }
-                )
-
-                //Update the user data
-                setUser(response.data)
-            } catch (error) {
-                console.log('Error getdata', error)
-            }
-        }
-
-        const pollData = () => {
-            //First api call
-            fetchData()
-
-            //Set the interval between each api call
-            const pollingInterval = setInterval(async () => {
-                fetchData()
-            }, 5000)
-
-            //Clear when the component is unmount
-            return () => clearInterval(pollingInterval)
-        }
-
-        //Launch the loop
-        return pollData()
-    }, [])
-
+    const { data } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
+ 
     return (
         <>
             <div className="flex flex-col justify-between pl-[122px] pb-[36px] pr-[36px] h-[90vh] bg-red-100 gap-[36px]">
@@ -59,19 +15,22 @@ function Dashboard(): JSX.Element {
                         <div className="bg-yellow-100 h-[30%]">
                             <CardsDashboard
                                 title="My Rank"
-                                content={user ? user.rank : 0}
+                                //content={user ? user.rank : 0}
+                                content={data?.rank || 0}
                             ></CardsDashboard>
                         </div>
                         <div className="bg-yellow-100 h-[30%]">
                             <CardsDashboard
                                 title="Game Played"
-                                content={user ? user.games : 0}
+                                // content={user ? user.games : 0}
+                                content={data?.games || 0}
                             ></CardsDashboard>
                         </div>
                         <div className="bg-yellow-100 h-[30%]">
                             <CardsDashboard
                                 title="Game Won"
-                                content={user ? user.wins : 0}
+                                // content={user ? user.wins : 0}
+                                content={data?.wins || 0}
                             ></CardsDashboard>
                         </div>
                     </div>
