@@ -149,7 +149,6 @@ export class AuthController{
 			const jwt = req.cookies['jwt'] as string;
 			res.clearCookie('jwt', {path: '/' });
 			const jwtsign: string = await this.authService.refreshTheToken(jwt);
-			// console.log(jwtsign)
 			res.cookie('jwt', jwtsign, {
 				path: '/',
 				sameSite: 'strict',
@@ -161,11 +160,9 @@ export class AuthController{
 		}
 		catch(error)
 		{
-			// res.clearCookie('jwt', {path: '/' });
 			res.status(403).send('forbidden');
 		}
 	}
-
 
 
 
@@ -177,16 +174,14 @@ export class AuthController{
 
 			const jwt = req.cookies['jwt'] as string;
 			//supprimer le cookie
-			console.log('valeur', jwt);
 
 			//gerer la mise a jour de mon token
-			await this.authService.deleteTokens(jwt);
 			res.clearCookie('jwt', {path: '/' });
-			res.status(200).send('Déconnexion réussie');
+			await this.authService.deleteTokens(jwt);
+			res.status(200).send('Successfully logged out');
 
 		} catch (error) {
-			console.log('issu in logout ');
-			// throw error;
+			res.status(500).send('Error during log out');
 		}
 	}
 }

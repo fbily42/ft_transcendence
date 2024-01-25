@@ -11,7 +11,7 @@ export default function LeaderBoard(): JSX.Element {
 		const fetchData = async () => {
 			try {
 				//api call with jwt as authorization
-				const response = await instance.get(
+				const response = await axios.get(
 					"http://localhost:3333/user/leaderboard",
 					{
 						withCredentials: true,

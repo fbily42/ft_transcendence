@@ -18,27 +18,18 @@ export class AuthGuard implements CanActivate {
 		//check if JWT exists in the cookies
 		if (!encodedJwt)
 		{
+			response.status(403).json({
+				status: "fail",
+				message: "No jwt",
+			}).send()
 			return false;
 		}
 
 		try {
 			//Verify if the JWT is valid
 			const decode = this.jwtService.verify(encodedJwt);
-			const user = await this.prisma.user.findUnique({
-				where:{
-					name: decode.login,
-					id: decode.sub,
-				}
-			})
-			if (!user){
-				response.status(403).json({
-					status: "fail",
-					message: "User does not exist",
-				}).send();
-				return false;
-			}
-      
-      const user = await this.prisma.user.findFirst({
+			
+			const user = await this.prisma.user.findFirst({
 				where: {
 					OR: [
 						{
@@ -53,9 +44,20 @@ export class AuthGuard implements CanActivate {
 					],
 				},
 			});
+			
+			if (!user){
+				response.status(403).json({
+					status: "fail",
+					message: "User does not exist",
+				}).send();
+				return false;
+			}
 
-			if (!user || user.Ban_jwt.includes(encodedJwt)) {
-				console.log('jwt banned or user not found')
+			if (user.Ban_jwt.includes(encodedJwt)) {
+				response.status(403).json({
+					status: "fail",
+					message: "Jwt is banned",
+				}).send();
 				return false;
 			}
 

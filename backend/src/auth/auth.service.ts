@@ -112,8 +112,7 @@ export class AuthService {
 				},
 				data: {
 					refreshToken : signrefreshToken,
-					// jwt: {push: signedJwt},
-					Log_in: true,
+					jwt: {push: signedJwt},
 				},
 			});
 
@@ -281,21 +280,10 @@ export class AuthService {
 				},
 				data: {
 					Ban_jwt: {push: jwtoken},
-					Log_in : false,
 				},
 			});
-			// const updatejwt = updateUser.jwt.filter(item => item !== jwtoken);
-			// const updateUser2 = await this.prisma.user.update({
-			// 	where: { id: decode.sub },
-			// 	data: {
-			// 		jwt: { set: updatejwt},
-			// 	},
-			// });
-
-
 		}
 		catch(error){
-			// console.log('issu in deletokens');
 			throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 		}
 	}
@@ -305,7 +293,6 @@ export class AuthService {
 		try {
 			if(!jwtoken)
 			{
-				// console.log('auth page');
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
 			const user = await this.prisma.user.findFirst({
@@ -313,11 +300,11 @@ export class AuthService {
 						Ban_jwt: { has: jwtoken },
 				},
 			});
-			if (!user)//no user found
+			if (!user)
 			{
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
-			else if (user.Ban_jwt.find(token => token === jwtoken))//token already use
+			else if (user.Ban_jwt.find(token => token === jwtoken))
 			{
 				await this.prisma.user.update({
 					where :{
@@ -326,7 +313,6 @@ export class AuthService {
 					data: {
 						// jwt: [],
 						Ban_jwt: [],
-						Log_in: false,
 						refreshToken: null,					}
 
 				});
@@ -341,7 +327,6 @@ export class AuthService {
 			const signedJwt: string = await this.jwt.signAsync(payload);
 			// let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
 			// updatedJwtArray.push(signedJwt);
-			// console.log(updatedJwtArray);
 			await this.prisma.user.update({
 				where: {
 					id: user.id,

@@ -14,7 +14,7 @@ function Dashboard() {
 		const fetchData = async () => {
 		  try {
 			//api call with jwt as authorization
-			const response = await instance.get("http://localhost:3333/user/me", {
+			const response = await axios.get("http://localhost:3333/user/me", {
 				withCredentials: true
 			});
 

@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 let isRefreshing = false;
@@ -29,7 +28,6 @@ instance.interceptors.response.use(
 				isRefreshing = true;
 				axios.get("http://localhost:3333/auth/refresh-token", {withCredentials: true})
 					.then(response => {
-						console.log("envoyer une erreur 5");
 						isRefreshing = false;
 						processQueue(null, response);
 					})
