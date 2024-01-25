@@ -119,7 +119,6 @@ export class ChatService {
 				select:{
 					id: true,
 					name: true,
-					ownerId: true,
 				},
 			})
 			return channels
@@ -139,7 +138,6 @@ export class ChatService {
 				select: {
 					id: true,
 					name:true,
-					ownerId: true,
 					users: {
 						select: {
 							userId: true,
