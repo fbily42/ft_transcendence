@@ -11,13 +11,13 @@ export class AuthGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
 		const response = context.switchToHttp().getResponse();
-		
+
 		const encodedJwt: string = request.cookies.jwt;
+		// const encodedRefereshJwt: string = request.cookies.refresh_jwt;
 
 		//check if JWT exists in the cookies
 		if (!encodedJwt)
 		{
-			// console.log('NO PERMISSION : jwt cookie doesn\'t exist');
 			return false;
 		}
 
@@ -37,6 +37,27 @@ export class AuthGuard implements CanActivate {
 				}).send();
 				return false;
 			}
+      
+      const user = await this.prisma.user.findFirst({
+				where: {
+					OR: [
+						{
+							name: decode.login,
+							id: decode.sub,
+						},
+						{
+							Ban_jwt: {
+								has: encodedJwt,
+							},
+						},
+					],
+				},
+			});
+
+			if (!user || user.Ban_jwt.includes(encodedJwt)) {
+				console.log('jwt banned or user not found')
+				return false;
+			}
 
 			//Verify 2FA
 			if (decode.otp_enabled && !decode.otp_provided)
@@ -47,21 +68,23 @@ export class AuthGuard implements CanActivate {
 				}).send();
 				return false
 			}
-			
+
 			request['userLogin'] = decode.login;
 			request['userID'] = decode.sub;
+
 			return true;
 		}
+    
 		catch (error)
 		{
 			response.status(403).json({
 				status: "fail",
-				message: "Unvalid token",
+				message: "Unvalid jwt",
 			}).send();
 			return false;
 		}
 
 	}
 
-	
+
 }

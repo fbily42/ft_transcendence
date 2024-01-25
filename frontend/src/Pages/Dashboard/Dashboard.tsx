@@ -4,6 +4,7 @@ import LeaderBoard from "../../components/Dashboard/Leaderboard/Leaderboard";
 import CardsDashboard from "@/components/Dashboard/Cards/CardsDashboard";
 import { useState } from "react";
 import axios from "axios";
+import instance from "@/axiosConfig";
 
 function Dashboard() {
 	const [user, setUser] = useState();
@@ -13,7 +14,7 @@ function Dashboard() {
 		const fetchData = async () => {
 		  try {
 			//api call with jwt as authorization
-			const response = await axios.get("http://localhost:3333/user/me", {
+			const response = await instance.get("http://localhost:3333/user/me", {
 				withCredentials: true
 			});
 

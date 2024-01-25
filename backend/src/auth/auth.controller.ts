@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
@@ -7,6 +7,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Controller ('auth')
 export class AuthController{
 	constructor(private authService: AuthService) {}
+
+
 
 	@Get('42')
 	async login(@Req() req : Request, @Res() res : Response) {
@@ -17,30 +19,24 @@ export class AuthController{
 			if (!code || req.query?.error) {
 				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
 			}
-			console.log("1. Retrieved code");
 
-			console.log("2. Fetch POST 42AuthServer for access_token");
+
 			// Get the token access from 42api
 			const token = await this.authService.getToken(code);
-			console.log("3. Retrieved access_token");
 
-			console.log("4. Fetch GET 42API for user");
 			// Get the login of the user from 42api
 			const {login, photo} = await this.authService.getUserLogin(token);
-			
-			console.log("5. Look for user in DB");
+
 			// Find if User exists, create if doesnt
 			const user = await this.authService.findUser(login, token, photo);
-			
-			console.log("6. Creates JWT and stores it in DB");
 			// Create JWT and add to the user in DB
 			const jwt = await this.authService.createJwt(user);
-		
+
 			// Create cookie for browser
 			res.cookie('jwt', jwt, {
-				httpOnly: true,
 				sameSite: 'strict',
-				secure: true,
+				httpOnly : true,
+				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect("http://localhost:3000/");
@@ -57,6 +53,7 @@ export class AuthController{
 	isAuthentified(){
 	}
 
+  
 	@UseGuards(AuthGuard)
 	@Post('otp/generate')
 	async generateOtp(@Req() req : Request, @Res() res: Response) {
@@ -141,10 +138,59 @@ export class AuthController{
 		}
 		catch(error) {
 			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+	@Get('refresh-token')//Mettre un put au lieu de Get 
+	async refreshToken(@Req() req : Request, @Res() res : Response)
+	{
+
+		try{
+			const jwt = req.cookies['jwt'] as string;
+			res.clearCookie('jwt', {path: '/' });
+			const jwtsign: string = await this.authService.refreshTheToken(jwt);
+			// console.log(jwtsign)
+			res.cookie('jwt', jwtsign, {
+				path: '/',
+				sameSite: 'strict',
+				httpOnly : true,
+				secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+			res.status(200).send('NewToken');
+		}
+		catch(error)
+		{
+			// res.clearCookie('jwt', {path: '/' });
+			res.status(403).send('forbidden');
+		}
+	}
+
+
+
+
+	@Get('logout')//Change Get into put
+	//@UseGuards(AuthGuard)
+	async logout(@Req() req : Request, @Res() res : Response): Promise<void> {
+
+		try {
+
+			const jwt = req.cookies['jwt'] as string;
+			//supprimer le cookie
+			console.log('valeur', jwt);
+
+			//gerer la mise a jour de mon token
+			await this.authService.deleteTokens(jwt);
+			res.clearCookie('jwt', {path: '/' });
+			res.status(200).send('Déconnexion réussie');
+
+		} catch (error) {
+			console.log('issu in logout ');
+			// throw error;
 		}
 	}
 }
-/* 
+/*
 
 To find Cookie in Chrome :
 

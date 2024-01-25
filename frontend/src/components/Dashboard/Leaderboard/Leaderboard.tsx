@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { LeaderboardData, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
+import instance from "@/axiosConfig";
 
 export default function LeaderBoard(): JSX.Element {
 	const [data, setData] = useState<LeaderboardData[]>([]);
@@ -10,7 +11,7 @@ export default function LeaderBoard(): JSX.Element {
 		const fetchData = async () => {
 			try {
 				//api call with jwt as authorization
-				const response = await axios.get(
+				const response = await instance.get(
 					"http://localhost:3333/user/leaderboard",
 					{
 						withCredentials: true,
@@ -47,12 +48,12 @@ export default function LeaderBoard(): JSX.Element {
 			}
 		};
 
-		const pollData = async () => {
+		const pollData = () => {
 			//First api call
 			fetchData();
 
 			//Set the interval between each api call
-			const pollingInterval = setInterval(() => {
+			const pollingInterval = setInterval(async () => {
 				fetchData();
 			}, 5000);
 
@@ -61,7 +62,8 @@ export default function LeaderBoard(): JSX.Element {
 		};
 
 		//Launch the loop
-		pollData();
+		return pollData();
+
 	}, []);
 
 	console.log(data);

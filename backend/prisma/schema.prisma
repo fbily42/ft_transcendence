@@ -19,11 +19,12 @@ model User {
 	pseudo 			String? @unique // by default == name ?
 	avatar			String?
 	photo42			String
-	status 			Boolean?
 
 	//Auth
 	token42 		Json
-	jwt				String?
+	jwt				String[]
+	Ban_jwt			String[]
+	refreshToken	String?
 
 	//2FA
 	otp_enabled		Boolean  @default(false)
@@ -40,7 +41,7 @@ model User {
 	messages		Message[]
 
 	wins			Int @default(0)
-	looses			Int @default(0) 
+	looses			Int @default(0)
 	games			Int @default(0)
 	score			Int @default(0)
 	level			Int @default(0)
@@ -99,7 +100,7 @@ model	Game {
 	looserId		Int?
 	scoreCreator	Int @default(0)
 	scoreGuest		Int	@default(0)
-	//socket ? 	
+	//socket ?
 	//theme			String ou Url ? (same avatar)
 	difficulty		Int @default(1)
 	matchmaking		Boolean
