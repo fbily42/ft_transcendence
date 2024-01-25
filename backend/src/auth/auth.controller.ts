@@ -33,10 +33,17 @@ export class AuthController{
 			const jwt = await this.authService.createJwt(user);
 
 			// Create cookie for browser
-			res.cookie('jwt', jwt, {
+			res.cookie('jwt', jwt.signedJwt, {
 				sameSite: 'strict',
 				httpOnly : true,
-				// secure : true,
+				secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+
+			res.cookie('jwt_refresh', jwt.signedrefreshToken, {
+				sameSite: 'strict',
+				httpOnly : true,
+				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect(`${process.env.FRONTEND_URL}`);
@@ -146,10 +153,10 @@ export class AuthController{
 	{
 
 		try{
-			const jwt = req.cookies['jwt'] as string;
+			const token_refresh = req.cookies['jwt_refresh'] as string;
 			res.clearCookie('jwt', {path: '/' });
-			const jwtsign: string = await this.authService.refreshTheToken(jwt);
-			res.cookie('jwt', jwtsign, {
+			const signNewToken: string = await this.authService.refreshTheToken(token_refresh);
+			res.cookie('jwt', signNewToken, {
 				path: '/',
 				sameSite: 'strict',
 				httpOnly : true,
@@ -172,12 +179,13 @@ export class AuthController{
 
 		try {
 
-			const jwt = req.cookies['jwt'] as string;
+			const jwt_refresh = req.cookies['jwt_refresh'] as string;
 			//supprimer le cookie
 
 			//gerer la mise a jour de mon token
 			res.clearCookie('jwt', {path: '/' });
-			await this.authService.deleteTokens(jwt);
+			res.clearCookie('jwt_refresh', {path: '/' });
+			await this.authService.deleteTokens(jwt_refresh);
 			res.status(200).send('Successfully logged out');
 
 		} catch (error) {

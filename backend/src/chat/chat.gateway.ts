@@ -40,8 +40,10 @@ export class ChatGateway implements OnGatewayConnection {
 		
 		try {
 			const cookie = client.handshake.headers.cookie;
+			console.log(cookie);
 			if (!cookie)
 				client.disconnect();
+			console.log(cookie);
 			const jwt = cookie.split('=');
 			const decode = this.jwtService.verify(jwt[1]);
 			client.data = { userId: decode.sub, userName: decode.login };

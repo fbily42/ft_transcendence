@@ -104,19 +104,20 @@ export class AuthService {
 			};
 
 			const signedJwt = await this.jwt.signAsync(payload);
-			const signrefreshToken = await this.jwt.signAsync(payload, {expiresIn: '7h'});
+			const signedrefreshToken = await this.jwt.signAsync(payload, {expiresIn: '7h'});
 
+			//Pas sur d'avoir besoin d'avoir ce call si on a plus de jwt a stocker et qu'on stocke plus non plus le refresh
 			const updateUser = await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
-					refreshToken : signrefreshToken,
+					refreshToken : signedrefreshToken,//pas besoin 
 					jwt: {push: signedJwt},
 				},
 			});
 
-			return signedJwt;
+			return {signedJwt, signedrefreshToken};
 		}
 		catch(error){
 			throw error;
@@ -269,17 +270,17 @@ export class AuthService {
 		}
 	}
 
-	async deleteTokens(jwtoken : string){
+	async deleteTokens(jwt_refresh : string){
 
 		try {
-			const decode = this.jwt.decode(jwtoken);
+			const decode = this.jwt.decode(jwt_refresh);
 
 			const updateUser = await this.prisma.user.update({
 				where: {
 					id: decode.sub,
 				},
 				data: {
-					Ban_jwt: {push: jwtoken},
+					Ban_jwt: {push: jwt_refresh},
 				},
 			});
 		}
@@ -288,37 +289,42 @@ export class AuthService {
 		}
 	}
 
-	async refreshTheToken(jwtoken :string)
+	async refreshTheToken(token_refresh :string)
 	{
 		try {
-			if(!jwtoken)
+			if(!token_refresh)//il faut log out
 			{
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
-			const user = await this.prisma.user.findFirst({
+			const client = this.jwt.verify(token_refresh)
+			const user = await this.prisma.user.findUnique({
 				where: {
-						Ban_jwt: { has: jwtoken },
+					id : client.id,
+						// Ban_jwt: { has: token_refresh },
 				},
 			});
+			
 			if (!user)
 			{
-				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
+				throw new HttpException("No user found", HttpStatus.NOT_FOUND);
 			}
-			else if (user.Ban_jwt.find(token => token === jwtoken))
+			else if (user.Ban_jwt.find(token => token === token_refresh))
 			{
-				await this.prisma.user.update({
-					where :{
-						id : user.id
-					},
-					data: {
-						// jwt: [],
-						Ban_jwt: [],
-						refreshToken: null,					}
+				//je crois ne plus avoir besoin 
+				// await this.prisma.user.update({
+				// 	where :{
+				// 		id : user.id
+				// 	},
+				// 	data: {
+				// 		// jwt: [],
+				// 		// Ban_jwt: [],
+				// 		refreshToken: null,					
+				// 	}
 
-				});
+				// });
 				throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 			}
-			this.jwt.verify(user.refreshToken)
+			
 			const payload = {
 				sub: user.id,
 				login: user.name
@@ -327,15 +333,15 @@ export class AuthService {
 			const signedJwt: string = await this.jwt.signAsync(payload);
 			// let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
 			// updatedJwtArray.push(signedJwt);
-			await this.prisma.user.update({
-				where: {
-					id: user.id,
-				},
-				data: {
-					// jwt: updatedJwtArray,
-					Ban_jwt: {push: jwtoken,},
-				},
-			});
+			// await this.prisma.user.update({
+			// 	where: {
+			// 		id: user.id,
+			// 	},
+			// 	data: {
+			// 		// jwt: updatedJwtArray,
+			// 		Ban_jwt: {push: jwtoken,},
+			// 	},
+			// });
 
 			return signedJwt;
 
