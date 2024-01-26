@@ -23,45 +23,34 @@ const OtpModal: React.FC<OtpModalProps> = ({open, id, onClose, redirect, verify 
 
 	const onSubmit = async (e) => {
 		e.preventDefault();
-
-		if (!verify){
-			console.log("verify false");
-			try {
-				const data: TokenData = {
-					token: token,
-					id: id
-				}
-				const response = await axios.post(
-					`${import.meta.env.VITE_BACKEND_URL}/auth/otp/validate`, data
-					);
-				if (response.status === 202)
-					alert("Valid token");
+		console.log("verify false");
+		try {
+			const data: TokenData = {
+				token: token,
+				id: id,
 			}
-			catch (error){
-				console.log("error")
-				console.log(error);
-				if (error.status === 401){
-					setIsTokValid(false);
-					alert("Invalid token");
+			console.log(data);
+			const response = await axios.post(
+				`${import.meta.env.VITE_BACKEND_URL}/auth/otp/validate`,
+				data,
+				{
+					headers: {
+						'Content-Type': 'application/json',
+					}
 				}
+			);
+			if (response.status === 202)
+				alert("Valid token");
+		}
+		catch (error){
+			console.log("error")
+			console.log(error);
+			if (error.status === 401){
+				setIsTokValid(false);
+				alert("Invalid token");
 			}
 		}
-		else {
-			try {
-				const response = await axios.post(
-					`${import.meta.env.VITE_BACKEND_URL}/auth/otp/verify`,
-					{token: token}
-				);
-
-				if (response.status === 202)
-					alert("Valid token");
-			}
-			catch (error){
-				if (error.status === 401)
-					alert("Invalid token");
-			}
-		}
-	}
+	};
 
 	return (
 	<Modal open={open} onClose={onClose}>

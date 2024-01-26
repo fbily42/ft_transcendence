@@ -1,16 +1,12 @@
-import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { IsInt, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { OtpDto } from './auth.dto';
 
-
-class GetOtpQuery{
-	token: string;
-	id: number;
-}
 
 @Controller ('auth')
 export class AuthController{
@@ -38,7 +34,6 @@ export class AuthController{
 			const user = await this.authService.findUser(login, token, photo);
 
 			if (user.otp_enabled) {
-				console.log("Coucou")
 				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${user.id}`);
 				return;
 			}
@@ -107,22 +102,22 @@ export class AuthController{
 	  
 
 	@Post('otp/validate')
-	async validateOtp(@Req() req: Request, @Res() res: Response, @Query() query : GetOtpQuery) {
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async validateOtp(@Res() res: Response, @Body() otpDto : OtpDto) {
 		try {
 			//retrieve token
-			console.log(query)
-			const token = query.token;
-			const userID = +query.id;
+			console.log(otpDto)
+			const {token, id} = otpDto;
 			console.log("token ", token);
-			console.log("userID ", userID);
+			console.log("userID ", id);
 
 			//verify token
-			const isTokValid = await this.authService.verifyOtp(userID, token);
+			const isTokValid = await this.authService.verifyOtp(parseInt(id), token);
 
 			if (!isTokValid)
 				return res.status(HttpStatus.UNAUTHORIZED).json({error: "Token is invalid"});
 
-			const jwt = await this.authService.setJwt(userID);
+			const jwt = await this.authService.setJwt(parseInt(id));
 
 			res.cookie('jwt', jwt, {
 				sameSite: 'strict',
