@@ -15,6 +15,9 @@ import { ChatService } from './chat.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageDto } from './dto/message.dto';
 import { WsExceptionFilter } from './filter/ws-exception.filter';
+import * as cookie from 'cookie';
+import cookieParser from 'cookie-parser';
+
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -39,13 +42,12 @@ export class ChatGateway implements OnGatewayConnection {
 	async handleConnection(client: Socket) {
 		
 		try {
-			const cookie = client.handshake.headers.cookie;
-			console.log(cookie);
+			const cookiestr = client.handshake.headers.cookie;
 			if (!cookie)
 				client.disconnect();
-			console.log(cookie);
-			const jwt = cookie.split('=');
-			const decode = this.jwtService.verify(jwt[1]);
+			const parsedcookie = cookie.parse(cookiestr);
+			const jwt = parsedcookie['jwt'];
+			const decode = this.jwtService.verify(jwt);
 			client.data = { userId: decode.sub, userName: decode.login };
 		} catch (error) {
 			console.log(error);

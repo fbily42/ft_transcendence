@@ -289,7 +289,7 @@ export class AuthService {
 		}
 	}
 
-	async refreshTheToken(token_refresh :string)
+	async refreshTheToken(token_refresh: string)
 	{
 		try {
 			if(!token_refresh)//il faut log out
@@ -299,11 +299,11 @@ export class AuthService {
 			const client = this.jwt.verify(token_refresh)
 			const user = await this.prisma.user.findUnique({
 				where: {
-					id : client.id,
+					id : client.sub,
 						// Ban_jwt: { has: token_refresh },
 				},
 			});
-			
+
 			if (!user)
 			{
 				throw new HttpException("No user found", HttpStatus.NOT_FOUND);
@@ -330,7 +330,7 @@ export class AuthService {
 				login: user.name
 			};
 
-			const signedJwt: string = await this.jwt.signAsync(payload);
+			const signedJwt = await this.jwt.signAsync(payload);
 			// let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
 			// updatedJwtArray.push(signedJwt);
 			// await this.prisma.user.update({

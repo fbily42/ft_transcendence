@@ -22,7 +22,7 @@ function Auth() : JSX.Element {
 				setIsAuth(true);
 			}
 			catch (error){
-				if (error.response.status === 401
+				if (error.response && error.response.status === 401
 						&& error.response.data.status === "2FA-fail"){
 					setOpen2FA(true);
 				}

@@ -33,6 +33,7 @@
     "axios": "^1.6.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "cookie": "^0.6.0",
     "cookie-parser": "^1.4.6",
     "hi-base32": "^0.5.1",
     "otpauth": "^9.2.2",

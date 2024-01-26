@@ -57,7 +57,8 @@ export class AuthController{
 	@Get('isAuth')
 	@UseGuards(AuthGuard)
 	@HttpCode(200)
-	isAuthentified(){
+	async isAuthentified(@Res() res: Response){
+		res.status(200).send({ status: 'OK', message: 'User is authenticated' });
 	}
 
   
@@ -155,7 +156,7 @@ export class AuthController{
 		try{
 			const token_refresh = req.cookies['jwt_refresh'] as string;
 			res.clearCookie('jwt', {path: '/' });
-			const signNewToken: string = await this.authService.refreshTheToken(token_refresh);
+			const signNewToken = await this.authService.refreshTheToken(token_refresh);
 			res.cookie('jwt', signNewToken, {
 				path: '/',
 				sameSite: 'strict',
@@ -163,6 +164,7 @@ export class AuthController{
 				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
+
 			res.status(200).send('NewToken');
 		}
 		catch(error)
