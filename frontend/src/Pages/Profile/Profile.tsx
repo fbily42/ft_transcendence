@@ -1,5 +1,6 @@
 import UserCards from '@/components/User/userCards/UserCards'
 import { Button } from '@/components/ui/button'
+import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 
 function Profile() {
     return (
@@ -54,7 +55,7 @@ function Profile() {
                 <div className="bg-white w-full h-full rounded-[26px] md:rounded-[30px] lg:rounded-[36px] gap-[36px]">
                     <UserCards
                         userName="Dupont"
-                        userPicture=""
+                        userPicture={PinguAvatar}
                         userStatus="Online"
                         variant="USER_PROFILE"
                     />
