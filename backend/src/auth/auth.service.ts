@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as OTPAuth from "otpauth";
 import { encode, decode } from "hi-base32";
+import { PayloadToResult } from '@prisma/client/runtime/library';
 
+export interface Payload_type {
+	sub: number;
+	login: string;
+  }
 
 @Injectable({})
 export class AuthService {
@@ -60,7 +65,7 @@ export class AuthService {
 	async findUser(login :string, token :any, photo :string){
 
 		try {
-			const user = await this.prisma.user.findUnique({
+			const user: User = await this.prisma.user.findUnique({
 				where:{
 					name: login,
 				}
@@ -79,7 +84,7 @@ export class AuthService {
 	async createUser(login: string, token :any, photo: string) {
 
 		try {
-			const user = await this.prisma.user.create({
+			const user: User = await this.prisma.user.create({
 				data: {
 					name: login,
 					token42: token,
@@ -96,23 +101,20 @@ export class AuthService {
 	async createJwt(user: any){
 
 		try {
-			const payload = {
+			const payload: Payload_type = {
 				sub: user.id,
 				login: user.name,
-				otp_enabled: user.otp_enabled,
-				otp_provided: false,
 			};
 
-			const signedJwt = await this.jwt.signAsync(payload);
-			const signedrefreshToken = await this.jwt.signAsync(payload, {expiresIn: '7h'});
+			const signedJwt: string  = await this.jwt.signAsync(payload);
+			const signedrefreshToken: string = await this.jwt.signAsync(payload, {expiresIn: '7h'});
 
 			//Pas sur d'avoir besoin d'avoir ce call si on a plus de jwt a stocker et qu'on stocke plus non plus le refresh
-			const updateUser = await this.prisma.user.update({
+			const updateUser: User= await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
 				data: {
-					refreshToken : signedrefreshToken,//pas besoin 
 					jwt: {push: signedJwt},
 				},
 			});
@@ -273,9 +275,9 @@ export class AuthService {
 	async deleteTokens(jwt_refresh : string){
 
 		try {
-			const decode = this.jwt.decode(jwt_refresh);
+			const decode: Payload_type = this.jwt.verify(jwt_refresh);
 
-			const updateUser = await this.prisma.user.update({
+			await this.prisma.user.update({
 				where: {
 					id: decode.sub,
 				},
@@ -296,11 +298,10 @@ export class AuthService {
 			{
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);
 			}
-			const client = this.jwt.verify(token_refresh)
-			const user = await this.prisma.user.findUnique({
+			const client: Payload_type = this.jwt.verify(token_refresh);
+			const user: User= await this.prisma.user.findUnique({
 				where: {
 					id : client.sub,
-						// Ban_jwt: { has: token_refresh },
 				},
 			});
 
@@ -310,38 +311,15 @@ export class AuthService {
 			}
 			else if (user.Ban_jwt.find(token => token === token_refresh))
 			{
-				//je crois ne plus avoir besoin 
-				// await this.prisma.user.update({
-				// 	where :{
-				// 		id : user.id
-				// 	},
-				// 	data: {
-				// 		// jwt: [],
-				// 		// Ban_jwt: [],
-				// 		refreshToken: null,					
-				// 	}
-
-				// });
 				throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 			}
 			
-			const payload = {
+			const payload: Payload_type = {
 				sub: user.id,
 				login: user.name
 			};
 
-			const signedJwt = await this.jwt.signAsync(payload);
-			// let updatedJwtArray = user.jwt.filter(token => token !== jwtoken);
-			// updatedJwtArray.push(signedJwt);
-			// await this.prisma.user.update({
-			// 	where: {
-			// 		id: user.id,
-			// 	},
-			// 	data: {
-			// 		// jwt: updatedJwtArray,
-			// 		Ban_jwt: {push: jwtoken,},
-			// 	},
-			// });
+			const signedJwt: string = await this.jwt.signAsync(payload);
 
 			return signedJwt;
 
