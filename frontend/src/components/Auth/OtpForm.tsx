@@ -1,83 +1,23 @@
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { useState } from "react";
-import { SubmitHandler, useForm } from 'react-hook-form'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-  } from "@/components/ui/card"
-
-// type OtpFormProps = {
-// 	onClose: () => void;
-// }
-
-// type OtpFormValues = {
-// 	otp1 : number,
-// 	otp2 : number,
-// 	otp3 : number,
-// 	otp4 : number,
-// 	otp5 : number,
-// 	otp6 : number,
-// }
-
-import React, { useRef, KeyboardEvent } from 'react';
+import React from 'react';
 import OtpInput from "./OtpInput";
 
+type OtpFormProps = {
+  value: string,
+  onChange: (value: string) => void,
+	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void,
+}
 
-const OtpForm : React.FC<OtpFormProps> = () => {
-  const [otp, setOtp] = useState('');
-  const onChange = (value: string) => setOtp(value);
 
-  // const inputRefs = Array.from({ length: 6 }, (_, index) => useRef<HTMLInputElement>(null)!);
-
-  // const focusNextInput = (currentIdx: number) => {
-  //   const nextIdx = currentIdx + 1;
-  //   if (nextIdx < inputRefs.length && inputRefs[nextIdx].current) {
-  //     inputRefs[nextIdx].current.focus();
-  //   }
-  // };
-
-  // const handleKeyUp = (event: KeyboardEvent<HTMLInputElement>, currentIdx: number) => {
-  //   if (event.currentTarget.value.length === 0) {
-  //     const prevIdx = currentIdx - 1;
-  //     if (prevIdx >= 0 && inputRefs[prevIdx].current) {
-  //       inputRefs[prevIdx].current.focus();
-  //     }
-  //   } else {
-  //     focusNextInput(currentIdx);
-  //   }
-  // };
-
+const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit}) => {
   return (
     <div>
-      <form className="max-w-sm mx-auto">
+      <form className="max-w-sm mx-auto" onSubmit={onSubmit}>
         <p id="helper-text-explanation" className="mt-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
           Please introduce the 6-digit token provided by your authenticator app.
         </p>
-        <OtpInput value={otp} valueLength={6} onChange={onChange}></OtpInput>
-        {/* <div className="flex mt-6 mb-2 space-x-2 rtl:space-x-reverse justify-center">
-          {inputRefs.map((inputRef, index) => (
-            <div key={index}>
-              <Label htmlFor={`code-${index + 1}`} className="sr-only"></Label>
-              <Input
-                type="text"
-                maxLength={1}
-                onKeyUp={(event) => handleKeyUp(event, index)}
-                id={`code-${index + 1}`}
-                ref={inputRef}
-                pattern="[0-9]*"
-                className="w-9 text-center font-extrabold"
-                // className="block w-9 h-9 py-3 text-sm font-extrabold text-center text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                required
-              />
-            </div>
-          ))}
-        </div> */}
+        <OtpInput value={value} valueLength={6} onChange={onChange}></OtpInput>
+        <Input type="submit" value="Validate"></Input>
       </form>
     </div>
   );

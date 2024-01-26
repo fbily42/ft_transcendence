@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { SyntheticEvent, forwardRef, useMemo } from "react";
 import { Input } from "../ui/input"
 
 type OtpInputProps = {
@@ -100,6 +100,6 @@ const OtpInput : React.FC<OtpInputProps> = ({value, valueLength, onChange} : Otp
 			))}
 		</div>
 	)
-}
+};
 
 export default OtpInput;

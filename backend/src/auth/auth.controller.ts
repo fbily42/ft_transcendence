@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { IsInt, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+
+
+class GetOtpQuery{
+	token: string;
+	id: number;
+}
 
 @Controller ('auth')
 export class AuthController{
@@ -20,7 +28,6 @@ export class AuthController{
 				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
 			}
 
-
 			// Get the token access from 42api
 			const token = await this.authService.getToken(code);
 
@@ -29,6 +36,12 @@ export class AuthController{
 
 			// Find if User exists, create if doesnt
 			const user = await this.authService.findUser(login, token, photo);
+
+			if (user.otp_enabled) {
+				console.log("Coucou")
+				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${user.id}`);
+				return;
+			}
 			// Create JWT and add to the user in DB
 			const jwt = await this.authService.createJwt(user);
 
@@ -91,24 +104,39 @@ export class AuthController{
 			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	  
 
-	@UseGuards(AuthGuard)
 	@Post('otp/validate')
-	async validateOtp(@Req() req: Request, @Res() res: Response) {
+	async validateOtp(@Req() req: Request, @Res() res: Response, @Query() query : GetOtpQuery) {
 		try {
 			//retrieve token
-			const token = req.query?.token as string;
+			console.log(query)
+			const token = query.token;
+			const userID = +query.id;
+			console.log("token ", token);
+			console.log("userID ", userID);
 
 			//verify token
-			const isTokValid = await this.authService.verifyOtp(req['userID'], token);
+			const isTokValid = await this.authService.verifyOtp(userID, token);
 
 			if (!isTokValid)
 				return res.status(HttpStatus.UNAUTHORIZED).json({error: "Token is invalid"});
 
-			res.status(HttpStatus.ACCEPTED).send({message: "2FA token successfully validated"});
+			const jwt = await this.authService.setJwt(userID);
+
+			res.cookie('jwt', jwt, {
+				sameSite: 'strict',
+				httpOnly : true,
+				// secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+			// res.status(HttpStatus.ACCEPTED);
+			res.redirect(`${process.env.FRONTEND_URL}`);
+			// res.send({message: "2FA token successfully validated"});
 		}
 		catch(error) {
-			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+			throw error
+			//throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

@@ -8,12 +8,15 @@ import Layout from "./components/Layout";
 import Auth from "./Pages/Auth/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { WebSocketProvider } from "./context/webSocketContext";
+import TwoFA from "./Pages/TwoFA/TwoFA";
 
 function App() {
 	return (
 		<>
 			<Routes>
-				<Route path="/auth" element={<Auth />}></Route>
+				<Route path="/auth" element={<Auth />}>
+					<Route path="twofa/:id" element={<TwoFA />}></Route>
+				</Route>
 				<Route element= {<ProtectedRoute />}>
 					<Route element={<WebSocketProvider />}>
 						<Route element={<Layout />}>

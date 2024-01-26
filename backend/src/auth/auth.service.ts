@@ -99,8 +99,6 @@ export class AuthService {
 			const payload = {
 				sub: user.id,
 				login: user.name,
-				otp_enabled: user.otp_enabled,
-				otp_provided: false,
 			};
 
 			const signedJwt = await this.jwt.signAsync(payload);
@@ -121,6 +119,27 @@ export class AuthService {
 		catch(error){
 			throw error;
 		}
+	}
+
+	async setJwt(userID: number){
+		try {
+			//Find user
+			const user = await this.prisma.user.findUnique({
+				where:{
+					id: userID,
+				}
+			})
+			if (!user)
+				throw new Error();
+			
+			//Creates jwt
+			return this.createJwt(user);
+			
+		}
+		catch (error) {
+			throw error;
+		}
+
 	}
 
 	generateOtpSecret() : string {
