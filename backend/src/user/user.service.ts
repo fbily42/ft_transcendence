@@ -30,6 +30,7 @@ export class UserService {
 				score: 'desc',
 			},
 			select: {
+				photo42: true,
 				name: true, // ajouter le pseudo plus tard
 				rank: true,
 				score: true,

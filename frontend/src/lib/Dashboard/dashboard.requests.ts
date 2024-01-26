@@ -16,7 +16,7 @@ export async function getUserMe():Promise<UserData> {
 	}
 }
 
-export async function getLeaderboard(): Promise<LeaderboardData> {
+export async function getLeaderboard(): Promise<LeaderboardData[]> {
 	try {
 
 		const response = await axios.get(

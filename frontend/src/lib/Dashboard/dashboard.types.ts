@@ -7,6 +7,7 @@ export type UserData = {
 }
 
 export type LeaderboardData = {
+	photo42: string;
 	score: number;
 	rank: number;
 	name: string;
