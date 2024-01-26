@@ -42,6 +42,9 @@ model User {
 	level			Int @default(0)
 	rank			Int @default(0)
 
+	friendship		FriendShip[] @relation(name: "UserFriends")
+	friends			FriendShip[] @relation(name: "FriendUsers")
+
 	//history		Game[] -> TO IMPROVE
 	//friendship 	Friendship[] -> TODO
 	//notifs		String [] or NotificationModel[] -> TODO
@@ -111,5 +114,16 @@ model ChannelUser {
 	@@id([channelId, userId])
 }
 
+model FriendShip {
+	userId		Int
+	user		User @relation(name: "UserFriends", fields: [userId], references: [id])
+
+	friendId	Int
+	friend		User @relation(name: "FriendUsers", fields: [friendId], references: [id])
+
+	accepted	Boolean @default(false)
+
+	@@id([userId, friendId])
+}
 // Use "npx prisma generate" = create TSClass from Schema for our code.
 // => import { User } from '@prisma/client';
