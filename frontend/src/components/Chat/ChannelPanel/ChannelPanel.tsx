@@ -4,9 +4,10 @@ import Modal from '../../Modal'
 import TabsChannel from './TabsChannel/TabsChannel'
 import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Cog, Plus } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
+import UserList from './UserList'
 
 function ChannelPanel() {
     const [open, setOpen] = useState<boolean>(false)
@@ -14,7 +15,8 @@ function ChannelPanel() {
 
     const [hide, setHide] = useState<boolean>(true)
     const [currentChannel, setCurrentChannel] = useState<string>('')
-	const [color, setColor] = useState<string>('')
+    const [color, setColor] = useState<string>('')
+    const queryClient = useQueryClient()
 
     const { data: channels } = useQuery({
         queryKey: ['channels'],
@@ -24,7 +26,10 @@ function ChannelPanel() {
     function handleClick(name: string) {
         setHide(false)
         setCurrentChannel(name)
-		setColor('[#C1E2F7]')
+        queryClient.invalidateQueries({
+            queryKey: ['channelUsers', currentChannel],
+        })
+        setColor('[#C1E2F7]')
     }
 
     if (!hide) {
@@ -58,10 +63,14 @@ function ChannelPanel() {
                                 <div
                                     key={index}
                                     onClick={() => handleClick(channel.name)}
-									className="hover:cursor-pointer"
+                                    className="hover:cursor-pointer"
                                 >
                                     <UserCards
-										bgColor={channel.name === currentChannel ? color : 'white'}
+                                        bgColor={
+                                            channel.name === currentChannel
+                                                ? color
+                                                : 'white'
+                                        }
                                         userName={channel.name}
                                         userPicture={PinguFamily}
                                         userStatus=""
@@ -85,10 +94,11 @@ function ChannelPanel() {
                             <Cog></Cog>
                         </Button>
                         <Modal open={open2} onClose={() => setOpen2(false)}>
-                            <div>Coucou</div>
+                            <div>Channel Options Modal</div>
                             {/* PUT HERE THE CHANNEL PARAM PANEL */}
                         </Modal>
                     </div>
+                    <UserList channel={currentChannel}></UserList>
                 </div>
             </div>
         )
@@ -125,7 +135,7 @@ function ChannelPanel() {
                                     onClick={() => handleClick(channel.name)}
                                 >
                                     <UserCards
-										bgColor='white'
+                                        bgColor="white"
                                         userName={channel.name}
                                         userPicture={PinguFamily}
                                         userStatus=""

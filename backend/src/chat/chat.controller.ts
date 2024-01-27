@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { ChatService } from './chat.service';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { ChannelName, UserInChannel } from './chat.types';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { NewChannelDto, JoinChannelDto } from './dto';
-import { Channel } from '@prisma/client';
+import { ChatService } from './chat.service';
 
 @Controller('chat')
 export class ChatController {
@@ -23,13 +23,13 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('channel/all')
-	async getAllChannels(@Req() req: Request): Promise<any> {
+	async getAllChannels(@Req() req: Request): Promise<ChannelName[]> {
 		return await this.chatService.getChannels(req['userID']);
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('channel/users')
-	async getChannelUsers(@Body() id: number): Promise<any> {
-		return await this.chatService.getChannelUsers(2);
+	@Get('channel/:name/users')
+	async getChannelUsers(@Param('name') name: string): Promise<UserInChannel[]> {
+		return await this.chatService.getChannelUsers(name);
 	}
 }

@@ -41,14 +41,13 @@ export class ChatGateway implements OnGatewayConnection {
 		try {
 			const cookie = client.handshake.headers.cookie;
 			if (!cookie)
-				return client.disconnect();
+				throw new Error('JWT is missing')
 			const jwt = cookie.split('=');
 			const decode = this.jwtService.verify(jwt[1]);
 			client.data = { userId: decode.sub, userName: decode.login };
 		} catch (error) {
-			console.log(error);
+			client.emit('exception', error.message);
 			client.disconnect();
-			throw new WsException('Bad credentials');
 		}
 	}
 
