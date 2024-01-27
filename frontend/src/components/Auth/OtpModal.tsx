@@ -18,12 +18,13 @@ type TokenData = {
 }
 
 const OtpModal: React.FC<OtpModalProps> = ({open, id, onClose, redirect, verify = false}) => {
+	const navigate = useNavigate();
 	const [token, setToken] = useState<string>('      ');
 	const [isTokValid, setIsTokValid] = useState<boolean>(true);
 
 	const onSubmit = async (e) => {
+
 		e.preventDefault();
-		console.log("verify false");
 		try {
 			const data: TokenData = {
 				token: token,
@@ -34,29 +35,40 @@ const OtpModal: React.FC<OtpModalProps> = ({open, id, onClose, redirect, verify 
 				`${import.meta.env.VITE_BACKEND_URL}/auth/otp/validate`,
 				data,
 				{
+					withCredentials: true,
 					headers: {
 						'Content-Type': 'application/json',
 					}
 				}
 			);
+			console.log("Valid token");
 			if (response.status === 202)
-				alert("Valid token");
+			{
+				console.log("status 202");
+				onClose();
+				navigate('/');
+			}
 		}
 		catch (error){
 			console.log("error")
 			console.log(error);
-			if (error.status === 401){
+			if (error.response.status === 401){
 				setIsTokValid(false);
-				alert("Invalid token");
+				console.log("error 401, isTokenValid : ", isTokValid);
 			}
 		}
 	};
 
 	return (
 	<Modal open={open} onClose={onClose}>
-		<p className="mb-4 text-base text-center font-bold">Verify code</p>
-		<OtpForm value={token} onChange={setToken} onSubmit={onSubmit}></OtpForm>
-		{isTokValid ? null : <p className="text-sm">Token is invalid</p>}
+		<div className="grid gap-y-6">
+			<div>
+				<p className="text-base text-center font-bold">Verify code</p>
+			</div>
+			<div>
+				<OtpForm value={token} onChange={setToken} onSubmit={onSubmit} isTokenValid={isTokValid}></OtpForm>
+			</div>
+		</div>
 	</Modal>
 	);
 }

@@ -82,7 +82,7 @@ const OtpInput : React.FC<OtpInputProps> = ({value, valueLength, onChange} : Otp
 	};
 
 	return (
-		<div className="flex mt-6 mb-2 space-x-2 rtl:space-x-reverse justify-center">
+		<div className="flex space-x-2 rtl:space-x-reverse justify-center">
 			{valueItems.map((digit, idx) => (
 				<Input
 				key={idx}

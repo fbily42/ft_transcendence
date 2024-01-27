@@ -122,16 +122,15 @@ export class AuthController{
 			res.cookie('jwt', jwt, {
 				sameSite: 'strict',
 				httpOnly : true,
-				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
+				path: "/",
 			});
-			// res.status(HttpStatus.ACCEPTED);
-			res.redirect(`${process.env.FRONTEND_URL}`);
-			// res.send({message: "2FA token successfully validated"});
+			res.status(HttpStatus.ACCEPTED);
+			res.send({message: "2FA token successfully validated"});
 		}
 		catch(error) {
-			throw error
-			//throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+			// throw error
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
