@@ -25,7 +25,7 @@ const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit, isTokenVal
             <OtpInput value={value} valueLength={6} onChange={onChange}></OtpInput>
           </div>
             {isTokenValid ? null : <div>
-              <p className="text-xs text-center">Token is invalid.</p>
+              <p className="text-xs text-red-600 text-center">Token is not valid</p>
           </div>}
         </div>
         <div>

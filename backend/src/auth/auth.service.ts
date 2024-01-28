@@ -209,10 +209,13 @@ export class AuthService {
 				secret: user.otp_secret,
 			});
 
-			const delta = TOTP.validate({token});
+			const delta = TOTP.validate({token, window: 2});
 
 			if (delta === null)
+			{
+				console.log("Invalid token, delta null")
 				return false
+			}
 
 			return true;
 		}
