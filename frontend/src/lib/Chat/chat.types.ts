@@ -1,25 +1,25 @@
 import { Dispatch, SetStateAction } from 'react'
 
-type UserChannel = {
-	id: number
-	name: string
-	owner: boolean
-	admin: boolean
-	member: boolean
-	muted: boolean
-	invited: boolean
-}
+// type UserChannel = {
+// 	id: number
+// 	name: string
+// 	owner: boolean
+// 	admin: boolean
+// 	member: boolean
+// 	muted: boolean
+// 	invited: boolean
+// }
 
-export type Message = {
-	sendAt: Date
-	sendBy: number
-	content: string
-}
+// export type Message = {
+// 	sendAt: Date
+// 	sendBy: number
+// 	content: string
+// }
 
 export type Channel = {
 	name: string
-	users?: UserChannel[]
-	messages?: Message[]
+	//users?: UserChannel[]
+	// messages?: Message[]
 }
 
 export type CreateFormValues = {
@@ -51,6 +51,7 @@ export type UserInChannel = {
 	pseudo: string,
 	avatar: string,
 	photo42: string,
+	owner: boolean,
 	admin: boolean,
 	member: boolean,
 	banned: boolean,

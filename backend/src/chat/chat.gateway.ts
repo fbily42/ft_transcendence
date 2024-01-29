@@ -51,15 +51,25 @@ export class ChatGateway implements OnGatewayConnection {
 		}
 	}
 
-	@SubscribeMessage('message')
-	handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: string): void {
-		this.server.emit('message', message);
+	@SubscribeMessage('messageToRoom')
+	handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: MessageDto): void {
+		console.log(message)
+		this.server.to(message.target).emit('messageToRoom', message);
 	}
 
 	@SubscribeMessage('joinChannel')
 	join(@ConnectedSocket() client: Socket, @MessageBody() name: string){
+		// Check if client is already in the room before join
 		client.join(name);
-		this.server.to(name).emit('message', `${client.data.userName} joined channel ${name}`);
+		console.log(client.rooms)
+		console.log(`${client.data.userName} joined channel ${name}`)
+	}
+
+	@SubscribeMessage('leaveChannel')
+	leave(@ConnectedSocket() client: Socket, @MessageBody() name: string){
+		// Check if client is in the room before leave
+		client.leave(name);
+		console.log(`${client.data.userName} leaved channel ${name}`)
 	}
 
 }

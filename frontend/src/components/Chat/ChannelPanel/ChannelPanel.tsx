@@ -8,15 +8,26 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Cog, Plus } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 import UserList from './UserList'
+import { useWebSocket } from '@/context/webSocketContext'
+import { Socket } from 'socket.io-client'
 
-function ChannelPanel() {
+interface ChannelPanelProps {
+    setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
+    currentChannel: string
+}
+
+const ChannelPanel: React.FC<ChannelPanelProps> = ({
+    setCurrentChannel,
+    currentChannel,
+}) => {
     const [open, setOpen] = useState<boolean>(false)
     const [open2, setOpen2] = useState<boolean>(false)
 
     const [hide, setHide] = useState<boolean>(true)
-    const [currentChannel, setCurrentChannel] = useState<string>('')
+    // const [currentChannel, setCurrentChannel] = useState<string>('')
     const [color, setColor] = useState<string>('')
     const queryClient = useQueryClient()
+    const socket = useWebSocket() as Socket
 
     const { data: channels } = useQuery({
         queryKey: ['channels'],
@@ -24,12 +35,15 @@ function ChannelPanel() {
     })
 
     function handleClick(name: string) {
+        const previousChannel = currentChannel
         setHide(false)
         setCurrentChannel(name)
         queryClient.invalidateQueries({
-            queryKey: ['channelUsers', currentChannel],
+            queryKey: ['channelUsers', previousChannel],
         })
         setColor('[#C1E2F7]')
+        socket?.emit('leaveChannel', previousChannel)
+        socket?.emit('joinChannel', name)
     }
 
     if (!hide) {

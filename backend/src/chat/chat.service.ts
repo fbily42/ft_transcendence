@@ -142,6 +142,7 @@ export class ChatService {
 								}
 							},
 							userId: true,
+							owner: true,
 							admin: true,
 							member: true,
 							banned: true,
@@ -159,6 +160,7 @@ export class ChatService {
 				pseudo: channelUser.user.pseudo,
 				avatar: channelUser.user.avatar,
 				photo42: channelUser.user.photo42,
+				owner: channelUser.owner,
 				admin: channelUser.admin,
 				member: channelUser.member,
 				banned: channelUser.banned,

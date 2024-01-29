@@ -28,7 +28,7 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('channel/:name/users')
+	@Get('channel/users/:name')
 	async getChannelUsers(@Param('name') name: string): Promise<UserInChannel[]> {
 		return await this.chatService.getChannelUsers(name);
 	}

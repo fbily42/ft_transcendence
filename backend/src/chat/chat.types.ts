@@ -12,6 +12,7 @@ export type UserInChannel = {
 	pseudo: string,
 	avatar: string,
 	photo42: string,
+	owner: boolean,
 	admin: boolean,
 	member: boolean,
 	banned: boolean,

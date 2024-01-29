@@ -56,12 +56,11 @@ export async function joinChannel(
 export async function getChannelUsers(name: string): Promise<UserInChannel[]> {
     try {
         const response = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/${name}/users`,
+            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/users/${name}`,
             {
                 withCredentials: true,
             }
         )
-        console.log(response.data)
         return response.data
     } catch (error) {
         throw error
