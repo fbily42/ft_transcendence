@@ -5,6 +5,7 @@ import Dashboard from '../Dashboard/Dashboard'
 import Chat from '../Chat/Chat';
 import Modal from '@/components/Modal';
 import axios from 'axios';
+import GameForm from '@/components/Pong/GameForm';
 
 
 // il y a 2 boutons, un qui permet de chercher un amis, un autre qui permet d'affronter quelqu'un aleatoirement
@@ -53,11 +54,11 @@ function Pong() {
 
   return (
     <div className='flex justify-center items-center'>
+		<Button onClick={() => setOpen(true)}>PLAY</Button>
 		<Modal open={open} onClose={() => setOpen(false)}>
-					<GameForm></GameForm>
+					<GameForm onClose={() => setOpen(false)}></GameForm>
 				</Modal>
 		<Link to="/dashboard" >
-			<Button>PLAY</Button>
 		</Link>
 	</div>
   )
