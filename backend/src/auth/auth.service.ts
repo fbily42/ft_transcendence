@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as OTPAuth from "otpauth";
 import { encode, decode } from "hi-base32";
+import { v1 as uuidv1 } from 'uuid';
 
 
 @Injectable({})
@@ -64,7 +65,7 @@ export class AuthService {
 				where:{
 					name: login,
 				}
-			})
+			});
 			if (!user)
 			{
 				return this.createUser(login, token, photo);
@@ -140,6 +141,61 @@ export class AuthService {
 			throw error;
 		}
 
+	}
+
+	async setRequestUuid(user: any) {
+		try {
+			//Generate UUID
+			const uuid = uuidv1();
+			const updateUser = await this.prisma.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					request_uuid : uuid,
+				},
+			});
+			return (uuid);
+		}
+		catch(error){
+			throw error;
+		}
+
+	}
+
+	async requestExists(uuid: string) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					request_uuid : uuid,
+				}
+			})
+			return (user);
+		}
+		catch(error) {
+			throw error;
+		}
+	}
+
+	async removeUuid(uuid: string) {
+		try {
+			const user = await this.requestExists(uuid);
+			console.log("found user");
+			if (user) {
+				const updated = await this.prisma.user.update({
+					where: {
+						id: user.id,
+					},
+					data: {
+						request_uuid: null,
+					},
+				})
+				console.log("updated user");
+			}
+		}
+		catch(error) {
+			throw (error);
+		}
 	}
 
 	generateOtpSecret() : string {

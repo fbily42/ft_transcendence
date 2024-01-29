@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 type OtpModalProps = {
 	open: boolean,
-	id: number,
+	uuid: string,
 	onClose: () => void,
 	redirect: string,
 	verify: boolean,
@@ -14,10 +14,10 @@ type OtpModalProps = {
 
 type TokenData = {
 	token: string
-	id: number
+	uuid: string
 }
 
-const OtpModal: React.FC<OtpModalProps> = ({open, id, onClose, redirect, verify = false}) => {
+const OtpModal: React.FC<OtpModalProps> = ({open, uuid, onClose, redirect, verify = false}) => {
 	const navigate = useNavigate();
 	const [token, setToken] = useState<string>('      ');
 	const [isTokValid, setIsTokValid] = useState<boolean>(true);
@@ -28,7 +28,7 @@ const OtpModal: React.FC<OtpModalProps> = ({open, id, onClose, redirect, verify 
 		try {
 			const data: TokenData = {
 				token: token,
-				id: id,
+				uuid: uuid,
 			}
 			console.log(data);
 			const response = await axios.post(
@@ -45,7 +45,7 @@ const OtpModal: React.FC<OtpModalProps> = ({open, id, onClose, redirect, verify 
 			if (response.status === 202)
 			{
 				console.log("status 202");
-				onClose();
+				// onClose();
 				navigate('/');
 			}
 		}

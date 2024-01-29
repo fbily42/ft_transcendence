@@ -4,6 +4,11 @@ export class OtpDto {
 	@IsString()
 	token: string;
 
-	@IsNumberString()
-	id: string;
-  }
+	@IsString()
+	uuid: string;
+}
+
+export class UuidDto {
+	@IsString()
+	uuid: string;
+}

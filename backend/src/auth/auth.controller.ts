@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body, UsePipes, ValidationPipe, ParseUUIDPipe, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { IsInt, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OtpDto } from './auth.dto';
+import { OtpDto, UuidDto } from './auth.dto';
 
 
 @Controller ('auth')
@@ -34,7 +34,8 @@ export class AuthController{
 			const user = await this.authService.findUser(login, token, photo);
 
 			if (user.otp_enabled) {
-				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${user.id}`);
+				const uuid = await this.authService.setRequestUuid(user);
+				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${uuid}`);
 				return;
 			}
 			// Create JWT and add to the user in DB
@@ -99,7 +100,38 @@ export class AuthController{
 			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	  
+
+	@Post('otp/removeUuid')
+	async removeUuid(@Res() res: Response, @Body() uuidDto: UuidDto){
+		try {
+			console.log("entered back route with uuid = ", uuidDto.uuid);
+			const result = await this.authService.removeUuid(uuidDto.uuid);
+			res.status(HttpStatus.OK);
+		}
+		catch (error) {
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Get('otp/uuidExists/:uuid')
+	async uuidExists(@Res() res: Response, @Param('uuid', ParseUUIDPipe) uuid: string){
+		try {
+			const result = await this.authService.requestExists(uuid);
+			let msg;
+			if (result){
+				res.status(HttpStatus.OK);
+				msg = "Request exists";
+			}
+			else {
+				res.status(HttpStatus.FORBIDDEN);
+				msg = "Request does not exist";
+			}
+			res.send({message: msg});
+		}
+		catch (error) {
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@Post('otp/validate')
 	@UsePipes(new ValidationPipe({ transform: true }))
@@ -107,17 +139,27 @@ export class AuthController{
 		try {
 			//retrieve token
 			console.log(otpDto)
-			const {token, id} = otpDto;
+			const {token, uuid} = otpDto;
 			console.log("token ", token);
-			console.log("userID ", id);
+			console.log("uuid ", uuid);
+
+			//retrieve user corresponding to request uuid
+			const user = await this.authService.requestExists(uuid);
+
+			if (!user)
+				return res.status(HttpStatus.UNAUTHORIZED).json({error: "Token is invalid"});
 
 			//verify token
-			const isTokValid = await this.authService.verifyOtp(parseInt(id), token);
+			const isTokValid = await this.authService.verifyOtp(user.id, token);
 
 			if (!isTokValid)
 				return res.status(HttpStatus.UNAUTHORIZED).json({error: "Token is invalid"});
 
-			const jwt = await this.authService.setJwt(parseInt(id));
+			//removes request uuid from DB
+			// const remove = await this.authService.removeUuid(uuid);
+
+			//creates and sets jwt cookie
+			const jwt = await this.authService.setJwt(user.id);
 
 			res.cookie('jwt', jwt, {
 				sameSite: 'strict',
