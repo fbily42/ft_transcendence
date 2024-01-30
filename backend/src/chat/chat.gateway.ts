@@ -52,7 +52,7 @@ export class ChatGateway implements OnGatewayConnection {
 	}
 
 	@SubscribeMessage('messageToRoom')
-	handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: MessageDto): void {
+	handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: MessageDto){
 		console.log(message)
 		this.server.to(message.target).emit('messageToRoom', message);
 	}

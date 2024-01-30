@@ -24,7 +24,6 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     const [open2, setOpen2] = useState<boolean>(false)
 
     const [hide, setHide] = useState<boolean>(true)
-    // const [currentChannel, setCurrentChannel] = useState<string>('')
     const [color, setColor] = useState<string>('')
     const queryClient = useQueryClient()
     const socket = useWebSocket() as Socket

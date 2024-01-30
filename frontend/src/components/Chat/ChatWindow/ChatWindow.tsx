@@ -8,6 +8,7 @@ import { Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
 type MessageFormValues = {
     userId: number
@@ -33,10 +34,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     const socket = useWebSocket() as Socket
     const [messages, setMessages] = useState<Message[]>([])
     const queryClient = useQueryClient()
-    const user = queryClient.getQueryData<UserData>(['me'])
     //Send an event 'message' to WebSocket with value as argument
-    const send = (value: string) => {
-        socket?.emit('message', value)
+    const send = (data: MessageFormValues) => {
+        socket?.emit('messageToRoom', data)
     }
 
     //Save the message in a string array
@@ -49,13 +49,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     useEffect(() => {
         socket?.on('messageToRoom', messageListener)
         return () => {
-            socket?.off('message', messageListener)
+            socket?.off('messageToRoom', messageListener)
         }
     }, [socket, messageListener])
 
-    function onSubmit(data: MessageFormValues) {
-        data.target = currentChannel
+    async function onSubmit(data: MessageFormValues) {
+		const user = await queryClient.ensureQueryData({queryKey: ['me'], queryFn: getUserMe})
+
+		data.target = currentChannel
         data.userName = user?.name || ''
+        data.userId = user?.id || 0
+		console.log(data)
+        send(data)
     }
 
     return (
@@ -64,8 +69,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                 <div className=" w-full h-full overflow-hidden">
                     {/* <Messages messages={messages}></Messages> */}
                 </div>
-                <div className="flex w-full items-center space-x-2 border-t-[#E5E5EA] border-t-[1px] pt-[20px]">
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="flex w-full items-center space-x-2 border-t-[#E5E5EA] border-t-[1px] pt-[20px]">
                         <Input
                             className="shadow-none border-none focus-visible:ring-0"
                             type="text"
@@ -75,8 +80,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                         <Button variant={'ghost'} size={'smIcon'} type="submit">
                             <Send />
                         </Button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     )

@@ -1,9 +1,10 @@
 export type UserData = {
+	id: number;
 	name: string;
 	score: number;
-    rank: number
-    games: number
-    wins: number
+    rank: number;
+    games: number;
+    wins: number;
 }
 
 export type LeaderboardData = {
