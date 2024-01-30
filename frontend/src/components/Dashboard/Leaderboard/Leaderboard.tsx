@@ -1,80 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { LeaderboardData, columns } from "./columns";
-import { DataTable } from "./data-table";
-import axios from "axios";
-import instance from "@/axiosConfig";
+import { columns } from './columns'
+import { DataTable } from './data-table'
+import { useQuery } from '@tanstack/react-query'
+import { getLeaderboard } from '@/lib/Dashboard/dashboard.requests'
+import { LeaderboardData } from '@/lib/Dashboard/dashboard.types'
 
 export default function LeaderBoard(): JSX.Element {
-	const [data, setData] = useState<LeaderboardData[]>([]);
+    const { data } = useQuery<LeaderboardData[]>({
+        queryKey: [],
+        queryFn: getLeaderboard,
+        refetchInterval: 1000 * 10,
+    })
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				//api call with jwt as authorization
-				const response = await axios.get(
-					`${import.meta.env.VITE_BACKEND_URL}/user/leaderboard`,
-					{
-						withCredentials: true,
-					}
-				);
-				
-				if (response.status === 200) {
-					// Sort the data by score in descending order
-					const sortedData = response.data.sort(
-						(a: LeaderboardData, b: LeaderboardData) =>
-							b.score - a.score
-					);
-	
-					// Assign ranks based on the position in the sorted array
-					const rankedData = sortedData.map(
-						(user: LeaderboardData, index: number) => ({
-							...user,
-							rank: index + 1,
-						})
-					);
-					
-					//Update the user data
-					setData(rankedData);
-					
-					// Update the ranks in the backend
-					await axios.post(
-						`${import.meta.env.VITE_BACKEND_URL}/user/updateRanks`,
-						rankedData,
-						{
-							withCredentials: true,
-						}
-					);
-				} else {
-					console.error("API request failed with status:", response.status);
-				}
-			} catch (error) {
-				console.log("Error fetching data:", error);
-			}
-		};
-
-		const pollData = () => {
-			//First api call
-			fetchData();
-
-			//Set the interval between each api call
-			const pollingInterval = setInterval(async () => {
-				fetchData();
-			}, 5000);
-
-			//Clear when the component is unmount
-			return () => clearInterval(pollingInterval);
-		};
-
-		//Launch the loop
-		return pollData();
- 
-	}, []);
-
-	console.log(data);
-
-	return (
-		<div className="h-[100%]">
-			{data.length > 0 && <DataTable columns={columns} data={data} />}
-		</div>
-	);
+    if (!data) {
+        return <div className="h-full"></div>
+    }
+    return (
+        <div className="h-full">
+            {data.length > 0 && <DataTable columns={columns} data={data} />}
+        </div>
+    )
 }

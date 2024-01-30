@@ -11,7 +11,6 @@ export class NewChannelDto {
 	readonly private: boolean;
 
 	@IsString()
-	@IsNotEmpty()
 	@IsOptional()
 	readonly password: string;
 }

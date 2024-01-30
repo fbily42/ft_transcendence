@@ -14,6 +14,7 @@ interface UserCards {
     userPicture: string
     userName: string
     userStatus: string //change in boolean
+	bgColor: string
     variant: 'USER_PROFILE' | 'CHAT'
 }
 
@@ -22,25 +23,18 @@ const UserCards: React.FC<UserCards> = ({
     userPicture,
     userStatus,
     variant,
+	bgColor,
 }) => {
     return (
         <div className="h-full w-full">
             <Card
-                className="
-				flex items-center
-				px-[6px] sm:px-[16px] md:px-[26px]
-				h-[68px] w-full
-				bg-white
-				rounded-none
-				shadow-none
-				border-none
-				justify-between"
+                className={`flex items-center px-[6px] sm:px-[16px] md:px-[26px] h-[68px] bg-${bgColor} w-full rounded-none shadow-none border-none justify-between`}
             >
                 <div className="flex items-center h-full w-full gap-[10px] md:gap-[20px]">
                     <Avatar className="w-[48px] h-[48px]">
                         <AvatarImage
-                            className="w-[48px] h-[48px] rounded-full"
-                            src={PinguAvatar} //change whith userPicture when merged
+                            className="rounded-full object-cover w-[40px] h-[40px]"
+                            src={userPicture} //change whith userPicture when merged
                         />
                         <AvatarFallback>{PinguAvatar}</AvatarFallback>
                     </Avatar>
