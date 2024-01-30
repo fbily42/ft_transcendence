@@ -5,7 +5,7 @@ export default function UserActionsBtns() {
     const [flexDirection, setFlexDirection] = useState('flex-col')
 
     const handleResize = () => {
-        setFlexDirection(window.innerWidth < 900 ? 'flex-col' : 'flex-row')
+        setFlexDirection(window.innerWidth < 900 ? 'flex-row' : 'flex-row')
     }
 
     useEffect(() => {
