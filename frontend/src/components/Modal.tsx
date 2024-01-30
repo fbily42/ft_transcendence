@@ -7,7 +7,7 @@ type propTypes = {
 	children: React.ReactNode;
 }
 
-const Modal: React.FC<propTypes> = ({open, onClose, children}) => {
+export const Modal: React.FC<propTypes> = ({open, onClose, children}) => {
 
 	if (!open)
 		return null;
@@ -24,6 +24,23 @@ const Modal: React.FC<propTypes> = ({open, onClose, children}) => {
   )
 }
 
-export default Modal
+
+export const ModalGame: React.FC<propTypes> = ({open, onClose, children}) => {
+
+	if (!open)
+		return null;
+  return (
+	<div
+		className={'backdrop-blur fixed inset-0 flex justify-center items-center transition-colors'}
+		onClick={onClose}>
+		<div
+			className={'border-2 border-black rounded-xl bg-white roundd-lg shadow p-4 transition-all max-w-md border rounded-md'}
+			onClick={(e) => e.stopPropagation()}>
+			{children}
+		</div>
+	</div>
+  )
+}
+
 
 // https://www.youtube.com/watch?v=1CN7C6u31zA

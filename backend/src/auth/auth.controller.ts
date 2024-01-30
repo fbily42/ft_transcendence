@@ -50,7 +50,7 @@ export class AuthController{
 			res.cookie('jwt_refresh', all_token.signedrefreshToken, {
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect(`${process.env.FRONTEND_URL}`);
@@ -169,7 +169,7 @@ export class AuthController{
 				path: '/',
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 

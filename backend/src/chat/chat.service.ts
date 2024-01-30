@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as argon from "argon2";
 import { JoinChannelDto, NewChannelDto } from './dto';
 import { Channel, ChannelUser, Prisma } from '@prisma/client';

@@ -10,8 +10,11 @@ import {
 	CircleUserRound,
 } from "lucide-react";
 import axios from "axios";
+import Modal, { ModalGame } from "../Modal";
+import GameForm from "../Pong/GameForm";
 
 const VerticalNavbar: React.FC = () => {
+	const [open, setOpen] = useState<boolean>(false);
 	const [active, setActive] = useState<number>(0);
 	const location = useLocation();
 
@@ -54,6 +57,7 @@ const VerticalNavbar: React.FC = () => {
 
 	const handleNavTabs = (btnId: number) => {
 		if (active !== btnId) setActive(btnId);
+		if (btnId === 2 ) setOpen(true);
 	};
 
 	const navigate = useNavigate();
@@ -101,7 +105,7 @@ const VerticalNavbar: React.FC = () => {
 							</div>
 						</Button>
 					</Link>
-					<Link to="/pong" className="text-black">
+					{/* <Link className="text-black"> */}
 						<Button
 							variant={
 								active === 2
@@ -110,6 +114,7 @@ const VerticalNavbar: React.FC = () => {
 							}
 							size="icon"
 							onClick={() => handleNavTabs(2)}
+							// onClick={() => setOpen(true)}
 						>
 							<div
 								className={`${
@@ -119,7 +124,11 @@ const VerticalNavbar: React.FC = () => {
 								<Gamepad2 className="h-[24px] w-[24px]" />
 							</div>
 						</Button>
-					</Link>
+						
+						<ModalGame open={open} onClose={() => setOpen(false)}>
+					<GameForm onClose={() => setOpen(false)}></GameForm>
+				</ModalGame>
+					{/* </Link> */}
 					<Link to="/chat" className="text-black">
 						<Button
 							variant={
