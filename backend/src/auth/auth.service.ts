@@ -219,7 +219,7 @@ export class AuthService {
 			
 			//Instantiate a TOTP object
 			const TOTP = new OTPAuth.TOTP({
-				algorithm: "SHA256",
+				algorithm: "SHA1",
 				digits: 6,
 				issuer: "Pinguscendence",
 				issuerInLabel: true,
@@ -257,7 +257,7 @@ export class AuthService {
 			});
 
 			const TOTP = new OTPAuth.TOTP({
-				algorithm: "SHA256",
+				algorithm: "SHA1",
 				digits: 6,
 				issuer: "Pinguscendence",
 				issuerInLabel: true,

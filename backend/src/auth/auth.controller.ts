@@ -33,7 +33,7 @@ export class AuthController{
 			// Find if User exists, create if doesnt
 			const user = await this.authService.findUser(login, token, photo);
 
-			if (user.otp_enabled) {
+			if (user.otp_enabled && user.otp_verified) {
 				const uuid = await this.authService.setRequestUuid(user);
 				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${uuid}`);
 				return;

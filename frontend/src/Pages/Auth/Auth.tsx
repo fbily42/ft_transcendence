@@ -19,7 +19,7 @@ function Auth() : JSX.Element {
 				const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/isAuth`, {
 					withCredentials: true
 				});
-				// setIsAuth(true);
+				setIsAuth(true);
 			}
 			catch (error){
 				setIsAuth(false);

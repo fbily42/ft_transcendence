@@ -34,7 +34,7 @@ const OtpInput : React.FC<OtpInputProps> = ({value, valueLength, onChange} : Otp
 	  ) => {
 		const	target : EventTarget & HTMLInputElement = e.target;
 		let		targetValue : string = target.value;
-		const	isTargetValueDigit = RE_DIGIT.test(targetValue);
+		const	isTargetValueDigit : boolean = RE_DIGIT.test(targetValue);
 
 		if (!isTargetValueDigit && targetValue != '') {
 			return
@@ -42,9 +42,10 @@ const OtpInput : React.FC<OtpInputProps> = ({value, valueLength, onChange} : Otp
 
 		targetValue = isTargetValueDigit ? targetValue : ' '
 
-		const newValue : string = value.substring(0, idx) + targetValue + value.substring(idx + 1);
-
-		onChange(newValue);
+		const newValue : string = value.substring(0, idx) + targetValue + value.substring(idx + 1, valueLength);
+		
+		onChange(newValue.substring(0, valueLength));
+		// onChange(newValue);
 
 		if (!isTargetValueDigit)
 			return;

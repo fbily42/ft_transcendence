@@ -79,7 +79,7 @@ function TwoFA() : JSX.Element {
 			onClose={onOtpModalClose}
 			redirect={""}
 			verify={false}
-			uuid={id}>
+			uuid={id!}>
 		</OtpModal>
 	)
 
