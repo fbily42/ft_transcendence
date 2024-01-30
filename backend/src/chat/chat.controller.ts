@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { NewChannelDto, JoinChannelDto } from './dto';
 import { ChatService } from './chat.service';
+import { Message } from '@prisma/client';
 
 @Controller('chat')
 export class ChatController {
@@ -31,5 +32,11 @@ export class ChatController {
 	@Get('channel/users/:name')
 	async getChannelUsers(@Param('name') name: string): Promise<UserInChannel[]> {
 		return await this.chatService.getChannelUsers(name);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('channel/messages/:name')
+	async getChannelMessages(@Param('name') name: string): Promise<Message[]> {
+		return await this.chatService.getMessages(name);
 	}
 }

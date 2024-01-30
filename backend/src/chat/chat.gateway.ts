@@ -15,6 +15,7 @@ import { ChatService } from './chat.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageDto } from './dto/message.dto';
 import { WsExceptionFilter } from './filter/ws-exception.filter';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -52,24 +53,42 @@ export class ChatGateway implements OnGatewayConnection {
 	}
 
 	@SubscribeMessage('messageToRoom')
-	handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: MessageDto){
-		console.log(message)
-		this.server.to(message.target).emit('messageToRoom', message);
+	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: MessageDto){
+		try {
+			const messages = await this.prisma.message.create({
+				data: {
+					channelName: message.target,
+					content: message.message,
+					sentByName: message.userName,
+				}
+			})
+			console.log(messages)
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`);
+			throw new WsException('Internal Server Error');
+		}
+		this.server.to(message.target).emit('messageToRoom', 'newMessage');
 	}
 
 	@SubscribeMessage('joinChannel')
 	join(@ConnectedSocket() client: Socket, @MessageBody() name: string){
-		// Check if client is already in the room before join
-		client.join(name);
-		console.log(client.rooms)
-		console.log(`${client.data.userName} joined channel ${name}`)
+		const rooms = client.rooms;
+		if (name){
+			if (rooms.has(name))
+			return ;
+			client.join(name);
+			this.server.to(name).emit('update', client.data.userName)
+		}
 	}
 
 	@SubscribeMessage('leaveChannel')
 	leave(@ConnectedSocket() client: Socket, @MessageBody() name: string){
-		// Check if client is in the room before leave
-		client.leave(name);
-		console.log(`${client.data.userName} leaved channel ${name}`)
+		const rooms = client.rooms;
+		if (name){
+			if (rooms.has(name))
+				client.leave(name);
+		}
 	}
 
 }

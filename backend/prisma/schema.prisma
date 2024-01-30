@@ -66,13 +66,13 @@ model	Channel {
 // Maybe it will change
 model	Message {
 	id 				Int @id @default(autoincrement())
-	sendAt			DateTime @default(now())
+	sentAt			DateTime @default(now())
 
-	sendBy			User	@relation(fields: [sendById], references: [id])
-	sendById		Int
+	sentBy			User	@relation(fields: [sentByName], references: [name])
+	sentByName		String
 
-	channel			Channel @relation(fields: [channelId], references: [id])
-	channelId		Int
+	channel			Channel @relation(fields: [channelName], references: [name])
+	channelName		String
 
 	content			String
 }

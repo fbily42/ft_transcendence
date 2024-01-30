@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as argon from "argon2";
 import { JoinChannelDto, NewChannelDto } from './dto';
-import { Channel, ChannelUser } from '@prisma/client';
+import { Channel, ChannelUser, Message } from '@prisma/client';
 import { ChannelName, ChannelWithRelation, UserInChannel } from './chat.types';
 
 @Injectable()
@@ -168,6 +168,21 @@ export class ChatService {
 				invited: channelUser.invited,
 			}));
 			return users
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
+		throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	async getMessages(name: string): Promise<Message[]> {
+		try {
+			const messages: Message[] = await this.prisma.message.findMany({
+				where: {
+					channelName: name
+				}
+			})
+			return messages
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);

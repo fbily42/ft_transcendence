@@ -70,7 +70,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                         <h1 className="ml-4">Private Messages</h1>
                     </div>
                     <div className="bg-blue-200">
-                        <div className="justify-between overflow-auto-y">
+                        <div className="justify-between">
                             <h1 className="ml-4">Groups</h1>
                             {channels?.map((channel, index) => (
                                 <div

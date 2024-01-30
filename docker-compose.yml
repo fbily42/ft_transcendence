@@ -36,7 +36,6 @@ services:
       - ./backend/.env.local
     volumes:
       - ./backend/:/app
-      - ./backend/node_modules:/app/node_modules/
     networks:
       - transendence
 

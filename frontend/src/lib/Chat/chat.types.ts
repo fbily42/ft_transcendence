@@ -58,3 +58,11 @@ export type UserInChannel = {
 	muted: boolean,
 	invited: boolean,
 }
+
+export type Message = {
+    id: number
+    sentAt: Date
+    sentByName: string
+    channelName: string
+    content: string
+}
