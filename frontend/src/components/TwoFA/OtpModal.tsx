@@ -41,21 +41,12 @@ const OtpModal: React.FC<OtpModalProps> = ({open, uuid, onClose, redirect, verif
 					}
 				}
 			);
-			console.log("Valid token");
 			if (response.status === 202)
-			{
-				console.log("status 202");
-				// onClose();
 				navigate('/');
-			}
 		}
 		catch (error){
-			console.log("error")
-			console.log(error);
-			if (error.response.status === 401){
+			if (error.response.status === 401)
 				setIsTokValid(false);
-				console.log("error 401, isTokenValid : ", isTokValid);
-			}
 		}
 	};
 

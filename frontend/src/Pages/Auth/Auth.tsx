@@ -6,7 +6,7 @@ import axios from 'axios';
 import Login from '@/components/Auth/Login';
 import Modal from '@/components/Modal';
 import OtpForm from '@/components/Auth/OtpForm';
-import OtpModal from '@/components/Auth/OtpModal';
+import OtpModal from '@/components/TwoFA/OtpModal';
 
 
 function Auth() : JSX.Element {

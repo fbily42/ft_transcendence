@@ -1,4 +1,4 @@
-import OtpModal from "@/components/Auth/OtpModal";
+import OtpModal from "@/components/TwoFA/OtpModal";
 import axios from "axios";
 import { error } from "console";
 import React, { useEffect, useState } from "react";

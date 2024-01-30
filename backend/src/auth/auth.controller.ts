@@ -104,7 +104,6 @@ export class AuthController{
 	@Post('otp/removeUuid')
 	async removeUuid(@Res() res: Response, @Body() uuidDto: UuidDto){
 		try {
-			console.log("entered back route with uuid = ", uuidDto.uuid);
 			const result = await this.authService.removeUuid(uuidDto.uuid);
 			res.status(HttpStatus.OK);
 		}
@@ -138,10 +137,7 @@ export class AuthController{
 	async validateOtp(@Res() res: Response, @Body() otpDto : OtpDto) {
 		try {
 			//retrieve token
-			console.log(otpDto)
 			const {token, uuid} = otpDto;
-			console.log("token ", token);
-			console.log("uuid ", uuid);
 
 			//retrieve user corresponding to request uuid
 			const user = await this.authService.requestExists(uuid);

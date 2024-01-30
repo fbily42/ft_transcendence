@@ -180,7 +180,6 @@ export class AuthService {
 	async removeUuid(uuid: string) {
 		try {
 			const user = await this.requestExists(uuid);
-			console.log("found user");
 			if (user) {
 				const updated = await this.prisma.user.update({
 					where: {
@@ -190,7 +189,6 @@ export class AuthService {
 						request_uuid: null,
 					},
 				})
-				console.log("updated user");
 			}
 		}
 		catch(error) {
@@ -268,10 +266,7 @@ export class AuthService {
 			const delta = TOTP.validate({token, window: 2});
 
 			if (delta === null)
-			{
-				console.log("Invalid token, delta null")
 				return false
-			}
 
 			return true;
 		}

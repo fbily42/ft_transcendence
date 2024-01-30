@@ -14,13 +14,13 @@ type OtpFormProps = {
 const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit, isTokenValid}) => {
   return (
     <form className="max-w-sm mx-auto" onSubmit={onSubmit}>
-      <div className="grid gap-y-4">
+      <div className="flex flex-col items-center gap-y-4">
         <div>
-          <p id="helper-text-explanation" className="text-sm text-gray-500 dark:text-gray-400">
+          <p id="helper-text-explanation" className="text-center text-sm text-gray-500 dark:text-gray-400">
             Please introduce the 6-digit token provided by your authenticator app.
           </p>
         </div>
-        <div className="grid gap-y-2">
+        <div className="flex flex-col gap-y-2">
           <div>
             <OtpInput value={value} valueLength={6} onChange={onChange}></OtpInput>
           </div>
@@ -29,7 +29,7 @@ const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit, isTokenVal
           </div>}
         </div>
         <div>
-          <Button className="text-center" type="submit">Validate</Button>
+          <Button className="item-center" type="submit">Validate</Button>
         </div>
       </div>
     </form>
