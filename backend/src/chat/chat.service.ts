@@ -14,6 +14,7 @@ type ChannelWithRelation = Prisma.ChannelGetPayload<{
 @Injectable()
 export class ChatService {
 	constructor(private prisma: PrismaService) {}
+	public map: Map<string, any> = new Map();
 
 	async createChannel(userId: number, dto: NewChannelDto): Promise<string> {
 		try {

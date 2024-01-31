@@ -53,6 +53,10 @@ export class ChatGateway implements OnGatewayConnection {
 			const jwt = parsedcookie['jwt'];
 	
 			const decode = this.jwtService.verify(jwt);
+			console.log('Hello');
+
+			//pour l'instant pour une question de facilite je vais utiliser le login dans map mais il faudrait utiliser le decode.sub
+			this.chatService.map.set(decode.login, client.id);
       
 			client.data = { userId: decode.sub, userName: decode.login };
 		} catch (error) {
