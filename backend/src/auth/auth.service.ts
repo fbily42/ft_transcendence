@@ -211,6 +211,15 @@ export class AuthService {
 
 	async generateOtp(userID) {
 		try {
+			//Look for user in DB
+			const user = await this.prisma.user.findUnique({
+				where : {
+					id: userID,
+				}
+			});
+
+			if (user && user.otp_secret && user.otp_url)
+				return {otp_secret: user.otp_secret, otp_url: user.otp_url};
 
 			//Generates a key
 			const base32_secret : string = this.generateOtpSecret();
@@ -302,6 +311,24 @@ export class AuthService {
 					otp_enabled: false,
 				},
 			});
+		}
+		catch(error) {
+			throw error;
+		}
+	}
+
+	async isOtpEnabled(userID) : Promise<boolean> {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userID,
+				},
+			});
+
+			if (user.otp_verified && user.otp_enabled) {
+				return true
+			}
+			return false;
 		}
 		catch(error) {
 			throw error;

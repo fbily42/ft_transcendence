@@ -9,6 +9,7 @@ import Auth from "./Pages/Auth/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { WebSocketProvider } from "./context/webSocketContext";
 import TwoFA from "./Pages/TwoFA/TwoFA";
+import { TwoFAProvider } from "./context/twoFAEnableContext";
 
 function App() {
 	return (
@@ -19,11 +20,13 @@ function App() {
 				</Route>
 				<Route element= {<ProtectedRoute />}>
 					<Route element={<WebSocketProvider />}>
-						<Route element={<Layout />}>
-							<Route index path="/" element={<Dashboard />}></Route>
-							<Route path="/pong" element={<Pong />}></Route>
-							<Route path="/chat" element={<Chat />}></Route>
-							<Route path="/profile" element={<Profile />}></Route>
+						<Route element={<TwoFAProvider />}>
+							<Route element={<Layout />}>
+								<Route index path="/" element={<Dashboard />}></Route>
+								<Route path="/pong" element={<Pong />}></Route>
+								<Route path="/chat" element={<Chat />}></Route>
+								<Route path="/profile" element={<Profile />}></Route>
+							</Route>
 						</Route>
 					</Route>
 				</Route>

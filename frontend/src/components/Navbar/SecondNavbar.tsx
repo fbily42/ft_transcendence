@@ -1,12 +1,26 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { BellRing } from "lucide-react";
 import { Music2 } from "lucide-react";
+import { TwoFAContext } from "@/context/twoFAEnableContext";
 
 export default function SecondNavbar(): JSX.Element {
+	const {twoFAenabled, enableTwoFA, disableTwoFA, twoFAverified} = useContext(TwoFAContext)
+
+	const onCheckedChange = () => {
+		if (twoFAenabled){
+			//add call to otp disable
+			disableTwoFA();
+		}
+		else {
+			//add call to otp enable
+			enableTwoFA();
+		}
+	}
+
 	return (
 		<div className="flex justify-between align-center pl-[122px] pr-[36px] gap-[50px] h-[10vh]">
 			<div className="flex w-[300px] items-center">
@@ -15,8 +29,13 @@ export default function SecondNavbar(): JSX.Element {
 
 			<div className="flex justify-between gap-[50px]">
 				<div className="flex items-center space-x-2">
-					<Switch id="double-auth" />
-					<Label htmlFor="double-auth">Double Authentification</Label>
+					<Switch
+						id="double-auth"
+						checked={twoFAenabled}
+						onCheckedChange={onCheckedChange}
+						disabled={!twoFAverified}
+					/>
+					<Label htmlFor="double-auth">Two Factor Authentication</Label>
 				</div>
 
 				<div className="flex items-center gap-[10px]">

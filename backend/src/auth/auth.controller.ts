@@ -5,7 +5,7 @@ import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { IsInt, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OtpDto, UuidDto } from './auth.dto';
+import { OtpDto, UuidDto, TokenDto } from './auth.dto';
 
 
 @Controller ('auth')
@@ -64,7 +64,7 @@ export class AuthController{
 
   
 	@UseGuards(AuthGuard)
-	@Post('otp/generate')
+	@Get('otp/generate')
 	async generateOtp(@Req() req : Request, @Res() res: Response) {
 		try {
 			//generate secret and url and stores it 
@@ -80,10 +80,10 @@ export class AuthController{
 
 	@UseGuards(AuthGuard)
 	@Post('otp/verify')
-	async verifyOtp(@Req() req: Request, @Res() res: Response) {
+	async verifyOtp(@Req() req: Request, @Res() res: Response, @Body() tokenDto : TokenDto) {
 		try {
 			//retrieve token
-			const token = req.query?.token as string;
+			const {token} = tokenDto;
 
 			//verify token
 			const isTokValid = await this.authService.verifyOtp(req['userID'], token);
@@ -168,6 +168,18 @@ export class AuthController{
 		}
 		catch(error) {
 			// throw error
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('otp/isTwoFAEnabled')
+	async isTwoFAEnabled(@Req() req: Request, @Res() res: Response) {
+		try {
+			const isTwoFAEnabled = await this.authService.isOtpEnabled(req['userID']);
+			res.status(HttpStatus.OK).send({twoFAEnabled: isTwoFAEnabled});
+		}
+		catch (error) {
 			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

@@ -7,11 +7,12 @@ type OtpFormProps = {
   value: string,
   onChange: (value: string) => void,
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void,
-  isTokenValid: boolean,
+  onClose: () => void,
+  isTokenValid: string,
 }
 
 
-const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit, isTokenValid}) => {
+const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit, onClose, isTokenValid}) => {
   return (
     <form className="max-w-sm mx-auto" onSubmit={onSubmit}>
       <div className="flex flex-col items-center gap-y-4">
@@ -24,12 +25,17 @@ const OtpForm : React.FC<OtpFormProps> = ({value, onChange, onSubmit, isTokenVal
           <div>
             <OtpInput value={value} valueLength={6} onChange={onChange}></OtpInput>
           </div>
-            {isTokenValid ? null : <div>
-              <p className="text-xs text-red-600 text-center">Token is not valid</p>
+            {isTokenValid.length < 1 ? null : <div>
+              <p className="text-xs text-red-600 text-center">{isTokenValid}</p>
           </div>}
         </div>
-        <div>
-          <Button className="item-center" type="submit">Validate</Button>
+        <div className="w-full flex justify-between">
+          <div>
+            <Button variant={"outlineBlue"} type="button" onClick={onClose}>Cancel</Button>
+          </div>
+          <div>
+            <Button type="submit">Validate</Button>
+          </div>
         </div>
       </div>
     </form>

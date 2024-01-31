@@ -12,3 +12,8 @@ export class UuidDto {
 	@IsString()
 	uuid: string;
 }
+
+export class TokenDto {
+	@IsString()
+	token: string;
+}

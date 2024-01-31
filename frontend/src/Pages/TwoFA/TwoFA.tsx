@@ -14,18 +14,6 @@ function TwoFA() : JSX.Element {
 	const location = useLocation();
 	const [open2FA, setOpen2FA] = useState<boolean>(false);
 
-	// const onOtpModalClose = () => {
-
-	// 	setOpen2FA(false);
-	// 	navigate("/auth");
-	// }
-
-	// const observer = new PerformanceObserver((list) => {
-	// 	list.getEntries().forEach((entry) => {
-	// 		console.log(entry)
-	// 	})
-	// });
-
 	const data: uuidData = {
 		uuid: id,
 	};
