@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body, UsePipes, ValidationPipe, ParseUUIDPipe, Param } from '@nestjs/common';
 import { AuthService, Payload_type } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { IsInt, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { OtpDto, UuidDto, TokenDto } from './auth.dto';
 import { Payload } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 
@@ -10,6 +13,7 @@ interface all_token{
 	signedJwt: string;
 	signedrefreshToken: string;
 }
+
 
 @Controller ('auth')
 export class AuthController{
@@ -27,7 +31,6 @@ export class AuthController{
 				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
 			}
 
-
 			// Get the token access from 42api
 			const token = await this.authService.getToken(code);
 
@@ -35,7 +38,14 @@ export class AuthController{
 			const {login, photo} = await this.authService.getUserLogin(token);
 
 			// Find if User exists, create if doesnt
-			const user: User = await this.authService.findUser(login, token, photo);
+			const user : User = await this.authService.findUser(login, token, photo);
+
+			if (user.otp_enabled && user.otp_verified) {
+				const uuid = await this.authService.setRequestUuid(user);
+				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${uuid}`);
+				return;
+			}
+
 			// Create JWT and add to the user in DB
 			const all_token: all_token = await this.authService.createJwt(user);
 
@@ -43,14 +53,14 @@ export class AuthController{
 			res.cookie('jwt', all_token.signedJwt, {
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
 			res.cookie('jwt_refresh', all_token.signedrefreshToken, {
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect(`${process.env.FRONTEND_URL}`);
@@ -70,7 +80,7 @@ export class AuthController{
 
   
 	@UseGuards(AuthGuard)
-	@Post('otp/generate')
+	@Get('otp/generate')
 	async generateOtp(@Req() req : Request, @Res() res: Response) {
 		try {
 			//generate secret and url and stores it 
@@ -86,10 +96,10 @@ export class AuthController{
 
 	@UseGuards(AuthGuard)
 	@Post('otp/verify')
-	async verifyOtp(@Req() req: Request, @Res() res: Response) {
+	async verifyOtp(@Req() req: Request, @Res() res: Response, @Body() tokenDto : TokenDto) {
 		try {
 			//retrieve token
-			const token = req.query?.token as string;
+			const {token} = tokenDto;
 
 			//verify token
 			const isTokValid = await this.authService.verifyOtp(req['userID'], token);
@@ -107,22 +117,94 @@ export class AuthController{
 		}
 	}
 
-	@UseGuards(AuthGuard)
+	@Post('otp/removeUuid')
+	async removeUuid(@Res() res: Response, @Body() uuidDto: UuidDto){
+		try {
+			const result = await this.authService.removeUuid(uuidDto.uuid);
+			res.status(HttpStatus.OK);
+		}
+		catch (error) {
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Get('otp/uuidExists/:uuid')
+	async uuidExists(@Res() res: Response, @Param('uuid', ParseUUIDPipe) uuid: string){
+		try {
+			const result = await this.authService.requestExists(uuid);
+			let msg;
+			if (result){
+				res.status(HttpStatus.OK);
+				msg = "Request exists";
+			}
+			else {
+				res.status(HttpStatus.FORBIDDEN);
+				msg = "Request does not exist";
+			}
+			res.send({message: msg});
+		}
+		catch (error) {
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@Post('otp/validate')
-	async validateOtp(@Req() req: Request, @Res() res: Response) {
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async validateOtp(@Res() res: Response, @Body() otpDto : OtpDto) {
 		try {
 			//retrieve token
-			const token = req.query?.token as string;
+			const {token, uuid} = otpDto;
+
+			//retrieve user corresponding to request uuid
+			const user = await this.authService.requestExists(uuid);
+
+			if (!user)
+				return res.status(HttpStatus.UNAUTHORIZED).json({error: "Token is invalid"});
 
 			//verify token
-			const isTokValid = await this.authService.verifyOtp(req['userID'], token);
+			const isTokValid = await this.authService.verifyOtp(user.id, token);
 
 			if (!isTokValid)
 				return res.status(HttpStatus.UNAUTHORIZED).json({error: "Token is invalid"});
 
-			res.status(HttpStatus.ACCEPTED).send({message: "2FA token successfully validated"});
+			//removes request uuid from DB
+			// const remove = await this.authService.removeUuid(uuid);
+
+			//creates and sets jwt cookie
+			const tokens: all_token = await this.authService.setJwt(user.id);
+
+			res.cookie('jwt', tokens.signedJwt, {
+				sameSite: 'strict',
+				httpOnly : true,
+				// secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+
+			res.cookie('jwt_refresh', tokens.signedrefreshToken, {
+				sameSite: 'strict',
+				httpOnly : true,
+				// secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+
+			res.status(HttpStatus.ACCEPTED);
+			res.send({message: "2FA token successfully validated"});
 		}
 		catch(error) {
+			// throw error
+			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('otp/twoFAState')
+	async getTwoFAstate(@Req() req: Request, @Res() res: Response) {
+		try {
+			const isTwoFAEnabled = await this.authService.isOtpEnabled(req['userID']);
+			const isTwoFAVerified = await this.authService.isOtpVerified(req['userID']);
+			res.status(HttpStatus.OK).send({twoFAEnabled: isTwoFAEnabled, twoFAVerified: isTwoFAVerified});
+		}
+		catch (error) {
 			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

@@ -61,16 +61,6 @@ export class AuthGuard implements CanActivate {
 				return false;
 			}
 
-			//Verify 2FA
-			if (decode.otp_enabled && !decode.otp_provided)
-			{
-				response.status(401).json({
-					status: "2FA-fail",
-					message: "2FA required",
-				}).send();
-				return false
-			}
-
 			request['userLogin'] = decode.login;
 			request['userID'] = decode.sub;
 
