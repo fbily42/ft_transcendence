@@ -22,21 +22,21 @@ function App() {
                     <Route path="/auth" element={<Auth />}></Route>
                     <Route element={<ProtectedRoute />}>
                         <Route element={<WebSocketProvider />}>
-                        <Route element={<TwoFAProvider />}>
-                            <Route element={<Layout />}>
-                                <Route
-                                    index
-                                    path="/"
-                                    element={<Dashboard />}
-                                ></Route>
-                                <Route path="/pong" element={<Pong />}></Route>
-                                <Route path="/chat" element={<Chat />}></Route>
-                                <Route
-                                    path="/profile"
-                                    element={<Profile />}
-                                ></Route>
+                            <Route element={<TwoFAProvider />}>
+                                <Route element={<Layout />}>
+                                    <Route
+                                        index
+                                        path="/"
+                                        element={<Dashboard />}
+                                    ></Route>
+                                    <Route path="/pong" element={<Pong />}></Route>
+                                    <Route path="/chat" element={<Chat />}></Route>
+                                    <Route
+                                        path="/profile"
+                                        element={<Profile />}
+                                    ></Route>
+                                </Route>
                             </Route>
-                        </Route>
                         </Route>
                     </Route>
                 </Routes>
