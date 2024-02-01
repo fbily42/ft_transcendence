@@ -1,11 +1,18 @@
 import { Controller, Get, Post, Req, Res, UseGuards, HttpCode, Delete, Put, Query, Body, UsePipes, ValidationPipe, ParseUUIDPipe, Param } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService, Payload_type } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { IsInt, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OtpDto, UuidDto, TokenDto } from './auth.dto';
+import { Payload } from '@prisma/client/runtime/library';
+import { User } from '@prisma/client';
+
+interface all_token{
+	signedJwt: string;
+	signedrefreshToken: string;
+}
 
 
 @Controller ('auth')
@@ -31,21 +38,29 @@ export class AuthController{
 			const {login, photo} = await this.authService.getUserLogin(token);
 
 			// Find if User exists, create if doesnt
-			const user = await this.authService.findUser(login, token, photo);
+			const user : User = await this.authService.findUser(login, token, photo);
 
 			if (user.otp_enabled && user.otp_verified) {
 				const uuid = await this.authService.setRequestUuid(user);
 				res.redirect(`${process.env.FRONTEND_URL}/auth/twofa/${uuid}`);
 				return;
 			}
+
 			// Create JWT and add to the user in DB
-			const jwt = await this.authService.createJwt(user);
+			const all_token: all_token = await this.authService.createJwt(user);
 
 			// Create cookie for browser
-			res.cookie('jwt', jwt, {
+			res.cookie('jwt', all_token.signedJwt, {
 				sameSite: 'strict',
 				httpOnly : true,
-				// secure : true,
+				secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+
+			res.cookie('jwt_refresh', all_token.signedrefreshToken, {
+				sameSite: 'strict',
+				httpOnly : true,
+				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect(`${process.env.FRONTEND_URL}`);
@@ -59,7 +74,8 @@ export class AuthController{
 	@Get('isAuth')
 	@UseGuards(AuthGuard)
 	@HttpCode(200)
-	isAuthentified(){
+	async isAuthentified(@Res() res: Response){
+		res.status(200).send({ status: 'OK', message: 'User is authenticated' });
 	}
 
   
@@ -214,21 +230,23 @@ export class AuthController{
     }
   }
 
-	@Get('refresh-token')//Mettre un put au lieu de Get 
+	@Put('refresh-token')
 	async refreshToken(@Req() req : Request, @Res() res : Response)
 	{
 
 		try{
-			const jwt = req.cookies['jwt'] as string;
+			const token_refresh = req.cookies['jwt_refresh'] as string;
 			res.clearCookie('jwt', {path: '/' });
-			const jwtsign: string = await this.authService.refreshTheToken(jwt);
-			res.cookie('jwt', jwtsign, {
+
+			const signNewToken: string = await this.authService.refreshTheToken(token_refresh);
+			res.cookie('jwt', signNewToken, {
 				path: '/',
 				sameSite: 'strict',
 				httpOnly : true,
 				secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
+
 			res.status(200).send('NewToken');
 		}
 		catch(error)
@@ -239,18 +257,19 @@ export class AuthController{
 
 
 
+	@Put('logout')
 	@UseGuards(AuthGuard)
-	@Get('logout')//Change Get into put
 	async logout(@Req() req : Request, @Res() res : Response): Promise<void> {
 
 		try {
 
-			const jwt = req.cookies['jwt'] as string;
+			const jwt_refresh = req.cookies['jwt_refresh'] as string;
 			//supprimer le cookie
 
 			//gerer la mise a jour de mon token
 			res.clearCookie('jwt', {path: '/' });
-			await this.authService.deleteTokens(jwt);
+			res.clearCookie('jwt_refresh', {path: '/' });
+			await this.authService.deleteTokens(jwt_refresh);
 			res.status(200).send('Successfully logged out');
 
 		} catch (error) {

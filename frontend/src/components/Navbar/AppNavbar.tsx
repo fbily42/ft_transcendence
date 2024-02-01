@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
@@ -56,14 +56,17 @@ const VerticalNavbar: React.FC = () => {
 		if (active !== btnId) setActive(btnId);
 	};
 
+	const navigate = useNavigate();
 	const handleLogout = async () => {
 		try {
-			await axios.get(
-				`${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
+			await axios.put(
+				`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {},
 				{
 					withCredentials: true,
 				}
-			);
+				);
+				navigate('/auth');
+			
 
 		} catch (error) {
 			console.log("Error getdata", error);

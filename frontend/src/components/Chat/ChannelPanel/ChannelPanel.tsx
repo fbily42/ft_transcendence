@@ -1,58 +1,147 @@
-import { Button } from "@/components/ui/button";
-import { IoAddCircleOutline } from "react-icons/io5";
-import React, { useEffect, useState } from "react";
-import Modal from "../../Modal";
-import TabsChannel from "./TabsChannel/TabsChannel";
-import Groups from "./Groups";
-import axios from "axios";
-
-type Channel = {
-	id: number
-	ownerId: number
-	name: string
-}
+import { Button } from '@/components/ui/button'
+import React, { useState } from 'react'
+import Modal from '../../Modal'
+import TabsChannel from './TabsChannel/TabsChannel'
+import UserCards from '@/components/User/userCards/UserCards'
+import { getChannels } from '@/lib/Chat/chat.requests'
+import { useQuery } from '@tanstack/react-query'
+import { Cog, Plus } from 'lucide-react'
+import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 
 function ChannelPanel() {
-	const [open, setOpen] = useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false)
+    const [open2, setOpen2] = useState<boolean>(false)
 
-	useEffect(() => {
+    const [hide, setHide] = useState<boolean>(true)
+    const [currentChannel, setCurrentChannel] = useState<string>('')
+	const [color, setColor] = useState<string>('')
 
-		const getChannels = async () => {
-			try {
-				const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
-					withCredentials: true,
-				})
-				console.log(response.data);		
-			} catch (error) {
-				console.log(error);
-			}
-		};
+    const { data: channels } = useQuery({
+        queryKey: ['channels'],
+        queryFn: getChannels,
+    })
 
-		getChannels();
-	}, []);
+    function handleClick(name: string) {
+        setHide(false)
+        setCurrentChannel(name)
+		setColor('[#C1E2F7]')
+    }
 
-	return (
-		<div className="bg-blue-100 h-full w-1/5 rounded-md border">
-			<div className="flex justify-between">
-				<h1 className="flex overflow-hidden font-bold text-3xl ml-2">Channels</h1>
-				<Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
-					<IoAddCircleOutline className="h-4 w-4"></IoAddCircleOutline>
-				</Button>
-				<Modal open={open} onClose={() => setOpen(false)}>
-					<TabsChannel onClose={() => setOpen(false)}></TabsChannel>
-				</Modal>
-			</div>
-			<div className="overflow-y-auto">
-				<span className="ml-4">Private Messages</span>
-			</div>
-			<div className="overflow-y-auto">
-				<Groups></Groups>
-			</div>
-		</div>
-	);
+    if (!hide) {
+        return (
+            <div className="flex h-full inner-block">
+                <div className=" bg-white w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
+                    <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                        <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                            Channels
+                        </h1>
+                        <Button
+                            variant="ghost"
+                            size="smIcon"
+                            onClick={() => setOpen(true)}
+                        >
+                            <Plus></Plus>
+                        </Button>
+                        <Modal open={open} onClose={() => setOpen(false)}>
+                            <TabsChannel
+                                onClose={() => setOpen(false)}
+                            ></TabsChannel>
+                        </Modal>
+                    </div>
+                    <div className="bg-pink-200">
+                        <h1 className="ml-4">Private Messages</h1>
+                    </div>
+                    <div className="bg-blue-200">
+                        <div className="justify-between overflow-auto-y">
+                            <h1 className="ml-4">Groups</h1>
+                            {channels?.map((channel, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => handleClick(channel.name)}
+									className="hover:cursor-pointer"
+                                >
+                                    <UserCards
+										bgColor={channel.name === currentChannel ? color : 'white'}
+                                        userName={channel.name}
+                                        userPicture={PinguFamily}
+                                        userStatus=""
+                                        variant="CHAT"
+                                    ></UserCards>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-[#C1E2F7] w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
+                    <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                        <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                            {currentChannel}
+                        </h1>
+                        <Button
+                            variant="ghost"
+                            size="smIcon"
+                            onClick={() => setOpen2(true)}
+                        >
+                            <Cog></Cog>
+                        </Button>
+                        <Modal open={open2} onClose={() => setOpen2(false)}>
+                            <div>Coucou</div>
+                            {/* PUT HERE THE CHANNEL PARAM PANEL */}
+                        </Modal>
+                    </div>
+                </div>
+            </div>
+        )
+    } else {
+        return (
+            <div className="flex h-full inner-block">
+                <div className=" bg-white w-[290px] rounded-[36px] overflow-hidden ">
+                    <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                        <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                            Channels
+                        </h1>
+                        <Button
+                            variant="ghost"
+                            size="smIcon"
+                            onClick={() => setOpen(true)}
+                        >
+                            <Plus></Plus>
+                        </Button>
+                        <Modal open={open} onClose={() => setOpen(false)}>
+                            <TabsChannel
+                                onClose={() => setOpen(false)}
+                            ></TabsChannel>
+                        </Modal>
+                    </div>
+                    <div className="bg-pink-200">
+                        <h1 className="ml-4">Private Messages</h1>
+                    </div>
+                    <div className="bg-blue-200">
+                        <div className="justify-between overflow-auto-y">
+                            <h1 className="ml-4">Groups</h1>
+                            {channels?.map((channel, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => handleClick(channel.name)}
+                                >
+                                    <UserCards
+										bgColor='white'
+                                        userName={channel.name}
+                                        userPicture={PinguFamily}
+                                        userStatus=""
+                                        variant="CHAT"
+                                    ></UserCards>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 }
 
-export default ChannelPanel;
+export default ChannelPanel
 
 /* 
 

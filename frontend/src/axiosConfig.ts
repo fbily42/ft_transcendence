@@ -26,7 +26,7 @@ instance.interceptors.response.use(
 			const originalRequest = error.config;
 			if (!isRefreshing) {
 				isRefreshing = true;
-				axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`, {withCredentials: true})
+				axios.put(`${import.meta.env.VITE_BACKEND_URL}/auth/refresh-token`, {}, {withCredentials: true})
 					.then(response => {
 						isRefreshing = false;
 						processQueue(null, response);
