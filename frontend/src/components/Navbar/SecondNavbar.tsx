@@ -77,14 +77,14 @@ export default function SecondNavbar(): JSX.Element {
 				</div>
 
 				<div className="flex items-center gap-[10px]">
-					<Button
+					{/* <Button
 						variant="secondNavIconStyle"
 						size="secondNavIconSize"
 					>
 						<div className="text-black ">
 							<BellRing className="h-[24px] w-[24px]" />
 						</div>
-					</Button>
+					</Button> */}
 					<Button
 						variant="secondNavIconStyle"
 						size="secondNavIconSize"
