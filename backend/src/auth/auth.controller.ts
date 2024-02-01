@@ -53,14 +53,14 @@ export class AuthController{
 			res.cookie('jwt', all_token.signedJwt, {
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
 			res.cookie('jwt_refresh', all_token.signedrefreshToken, {
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			res.redirect(`${process.env.FRONTEND_URL}`);
@@ -171,14 +171,22 @@ export class AuthController{
 			// const remove = await this.authService.removeUuid(uuid);
 
 			//creates and sets jwt cookie
-			const jwt = await this.authService.setJwt(user.id);
+			const tokens: all_token = await this.authService.setJwt(user.id);
 
-			res.cookie('jwt', jwt, {
+			res.cookie('jwt', tokens.signedJwt, {
 				sameSite: 'strict',
 				httpOnly : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
-				path: "/",
 			});
+
+			res.cookie('jwt_refresh', tokens.signedrefreshToken, {
+				sameSite: 'strict',
+				httpOnly : true,
+				// secure : true,
+				domain: process.env.FRONTEND_DOMAIN,
+			});
+
 			res.status(HttpStatus.ACCEPTED);
 			res.send({message: "2FA token successfully validated"});
 		}

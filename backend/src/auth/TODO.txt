@@ -1,4 +1,0 @@
-Ne pas avoir de tableau de refresh token
-Mettre Uniquement les referesh token dans la Ban list quand ils sont ban
-
-est ce qu'on peut se connecter a un compte avec le refresh token de quelqu'un d'autre ?

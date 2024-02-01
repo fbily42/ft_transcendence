@@ -19,7 +19,9 @@ function App() {
         <>
             <QueryClientProvider client={queryClient}>
                 <Routes>
-                    <Route path="/auth" element={<Auth />}></Route>
+                    <Route path="/auth" element={<Auth />}>
+                        <Route path="twofa/:id" element={<TwoFA />}></Route>
+                    </Route>
                     <Route element={<ProtectedRoute />}>
                         <Route element={<WebSocketProvider />}>
                             <Route element={<TwoFAProvider />}>

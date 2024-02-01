@@ -15,8 +15,6 @@ export default function SecondNavbar(): JSX.Element {
 	const {twoFAenabled, enableTwoFA, disableTwoFA, twoFAverified} = useContext(TwoFAContext)
 
 	const onCheckedChange = async () => {
-		console.log("2fa_enabled", twoFAenabled);
-		console.log("2fa_verified", twoFAverified);
 
 		if (twoFAenabled){
 			//add call to otp disable
