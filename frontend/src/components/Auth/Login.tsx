@@ -7,12 +7,31 @@ type Loginprops = {
 
 const Login : React.FC<Loginprops> = ({children}) => {
 	return (
-	<div className='w-full h-[100vh] flex justify-center items-center'>
-		<Link to={import.meta.env.VITE_REDIRECT_URI}>
-			<Button variant='destructive'>Login 42</Button>
-		</Link>
-		{children}
-	</div>
+		<div className='flex h-[100vh]'>
+			<div className='flex-1 bg-blue-300 p-4'>
+				<div>
+					Image Pingu
+				</div>
+				<div>
+					Middle text
+					<div className='w-full h-full flex justify-center items-center'>
+						<Link to={import.meta.env.VITE_REDIRECT_URI}>
+							<Button className='bg-customYellow font-bold' >Login as 42 Student</Button>
+						</Link>
+						{children}
+					</div>
+				</div>
+				<div>
+					Footer image
+				</div>
+				<div>
+					Snow
+				</div>
+			</div>
+			<div className='hidden lg:flex lg:flex-1 bg-green-300 p-4'>
+				Div 2
+			</div>
+		</div>
 	);
 }
 
