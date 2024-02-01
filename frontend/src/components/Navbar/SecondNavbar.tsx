@@ -6,18 +6,58 @@ import { Button } from "@/components/ui/button";
 import { BellRing } from "lucide-react";
 import { Music2 } from "lucide-react";
 import { TwoFAContext } from "@/context/twoFAEnableContext";
+import axios from "axios";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function SecondNavbar(): JSX.Element {
+	const navigate = useNavigate();
 	const {twoFAenabled, enableTwoFA, disableTwoFA, twoFAverified} = useContext(TwoFAContext)
 
-	const onCheckedChange = () => {
+	const onCheckedChange = async () => {
+		console.log("2fa_enabled", twoFAenabled);
+		console.log("2fa_verified", twoFAverified);
+
 		if (twoFAenabled){
 			//add call to otp disable
-			disableTwoFA();
+			try {
+				const response = await axios.post(
+					`${import.meta.env.VITE_BACKEND_URL}/auth/otp/disable`,
+					{},
+					{withCredentials: true}
+				);
+				disableTwoFA();
+				toast.success(response.data.message);
+			}
+			catch (error) {
+				toast.error("Internal server error");
+			}
 		}
 		else {
-			//add call to otp enable
-			enableTwoFA();
+			if (twoFAverified){
+				try {
+					//add call to otp enable
+					const response = await axios.post(
+						`${import.meta.env.VITE_BACKEND_URL}/auth/otp/enable`,
+						{},
+						{withCredentials: true}
+					);
+					enableTwoFA();
+					toast.success(response.data.message);
+				}
+				catch (error) {
+					toast.error("Internal server error");
+				}
+			}
+			else {
+				toast('Impossible to enable 2FA. Please set up 2FA.', {
+					action: {
+					  label: 'Profile settings',
+					  onClick: () => navigate('/profile')
+					},
+				  })
+				// toast.error("Impossible to enable 2FA. Please set up 2FA.")
+			}
 		}
 	}
 
@@ -33,7 +73,7 @@ export default function SecondNavbar(): JSX.Element {
 						id="double-auth"
 						checked={twoFAenabled}
 						onCheckedChange={onCheckedChange}
-						disabled={!twoFAverified}
+						// disabled={!twoFAverified}
 					/>
 					<Label htmlFor="double-auth">Two Factor Authentication</Label>
 				</div>

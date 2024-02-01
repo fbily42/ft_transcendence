@@ -28,16 +28,17 @@ export const TwoFAProvider: React.FC = () => {
   useEffect(() => {
     const getTwoFA = async () => {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/auth/otp/isTwoFAEnabled`,
+        `${import.meta.env.VITE_BACKEND_URL}/auth/otp/twoFAState`,
         {withCredentials: true}
       )
   
+      console.log("response", response.data);
       setTwoFAenabled(response.data.twoFAEnabled);
-      //add set TwoFA verified
+      setTwoFAverified(response.data.twoFAVerified);
     }
 
     getTwoFA();
-  }, [twoFAenabled]);
+  }, []);
 
   const enableTwoFA = () => {
     setTwoFAenabled(true);

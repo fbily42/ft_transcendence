@@ -81,7 +81,7 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({open, onClose}) => {
 				setTwoFAVerified();
 				enableTwoFA();
 				onClose();
-				toast("Two factor authentication has successfully been verified and enabled.");
+				toast.success("2FA authentication has successfully been verified and enabled.");
 			}
 			//Open a success notif/message box
 			//Toggle the switch

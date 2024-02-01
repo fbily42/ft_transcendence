@@ -325,7 +325,7 @@ export class AuthService {
 				},
 			});
 
-			if (user.otp_verified && user.otp_enabled) {
+			if (user.otp_enabled) {
 				return true
 			}
 			return false;

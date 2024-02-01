@@ -173,11 +173,12 @@ export class AuthController{
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('otp/isTwoFAEnabled')
-	async isTwoFAEnabled(@Req() req: Request, @Res() res: Response) {
+	@Get('otp/twoFAState')
+	async getTwoFAstate(@Req() req: Request, @Res() res: Response) {
 		try {
 			const isTwoFAEnabled = await this.authService.isOtpEnabled(req['userID']);
-			res.status(HttpStatus.OK).send({twoFAEnabled: isTwoFAEnabled});
+			const isTwoFAVerified = await this.authService.isOtpVerified(req['userID']);
+			res.status(HttpStatus.OK).send({twoFAEnabled: isTwoFAEnabled, twoFAVerified: isTwoFAVerified});
 		}
 		catch (error) {
 			throw new HttpException("Internal server error" , HttpStatus.INTERNAL_SERVER_ERROR);
