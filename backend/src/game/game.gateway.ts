@@ -11,8 +11,7 @@ import { ChatService } from "src/chat/chat.service";
 })
 
 export class GameGateway {
-	constructor (private jwtService: JwtService, 
-		private chatService: ChatService,){}
+	constructor (private chatService: ChatService){}
 
 	// async handleConnection(client: any, ...args: any[]) {
 	// 	try {

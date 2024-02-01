@@ -125,7 +125,7 @@ const VerticalNavbar: React.FC = () => {
 							</div>
 						</Button>
 						
-						<ModalGame open={open} onClose={() => setOpen(false)}>
+						<ModalGame  open={open} onClose={() => setOpen(false)}>
 					<GameForm onClose={() => setOpen(false)}></GameForm>
 				</ModalGame>
 					{/* </Link> */}

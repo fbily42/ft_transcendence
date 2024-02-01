@@ -6,6 +6,7 @@ import Chat from '../Chat/Chat';
 import Modal from '@/components/Modal';
 import axios from 'axios';
 import GameForm from '@/components/Pong/GameForm';
+import Board from './Game';
 
 
 // il y a 2 boutons, un qui permet de chercher un amis, un autre qui permet d'affronter quelqu'un aleatoirement
@@ -13,22 +14,23 @@ function Pong() {
 		
 	const [open, setOpen] = useState<boolean>(false);
 	
-	useEffect(() => {
+	
+	// useEffect(() => {
 
-		const getChannels = async () => {
-			try {
+	// 	const getChannels = async () => {
+	// 		try {
 				
-				const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
-					withCredentials: true,
-				})
-				console.log(response.data);		
-			} catch (error) {
-				console.log(error);
-			}
-		};
+	// 			const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
+	// 				withCredentials: true,
+	// 			})
+	// 			console.log(response.data);		
+	// 		} catch (error) {
+	// 			console.log(error);
+	// 		}
+	// 	};
 
-		getChannels();
-	}, []);
+	// 	getChannels();
+	// }, []);
 	// useEffect(() => {
 	// 	const canvas = canvasRef.current;
 	// 	const context = canvas.getContext('2d');
@@ -54,12 +56,11 @@ function Pong() {
 
   return (
     <div className='flex justify-center items-center'>
-		<Button onClick={() => setOpen(true)}>PLAY</Button>
+		<Board></Board>
+		{/* <Button onClick={() => setOpen(true)}>PLAY</Button>
 		<Modal open={open} onClose={() => setOpen(false)}>
 					<GameForm onClose={() => setOpen(false)}></GameForm>
-				</Modal>
-		<Link to="/dashboard" >
-		</Link>
+				</Modal> */}
 	</div>
   )
   }
