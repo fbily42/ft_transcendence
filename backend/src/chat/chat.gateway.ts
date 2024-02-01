@@ -42,7 +42,6 @@ export class ChatGateway implements OnGatewayConnection {
 	async handleConnection(client: Socket) {
 		
 		try {
-
 			const cookiestr = client.handshake.headers.cookie;
 			if (!cookiestr)
 			{
@@ -53,7 +52,7 @@ export class ChatGateway implements OnGatewayConnection {
 			const jwt = parsedcookie['jwt'];
 	
 			const decode = this.jwtService.verify(jwt);
-      
+
 			client.data = { userId: decode.sub, userName: decode.login };
 		} catch (error) {
 			client.disconnect();

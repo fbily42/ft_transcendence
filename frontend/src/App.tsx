@@ -9,6 +9,8 @@ import Auth from './Pages/Auth/Auth'
 import ProtectedRoute from './components/ProtectedRoute'
 import { WebSocketProvider } from './context/webSocketContext'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import TwoFA from "./Pages/TwoFA/TwoFA";
+import { TwoFAProvider } from "./context/twoFAEnableContext";
 
 const queryClient = new QueryClient()
 
@@ -20,6 +22,7 @@ function App() {
                     <Route path="/auth" element={<Auth />}></Route>
                     <Route element={<ProtectedRoute />}>
                         <Route element={<WebSocketProvider />}>
+                        <Route element={<TwoFAProvider />}>
                             <Route element={<Layout />}>
                                 <Route
                                     index
@@ -33,6 +36,7 @@ function App() {
                                     element={<Profile />}
                                 ></Route>
                             </Route>
+                        </Route>
                         </Route>
                     </Route>
                 </Routes>
