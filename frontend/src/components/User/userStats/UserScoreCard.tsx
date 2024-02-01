@@ -11,7 +11,7 @@ export default function UserScoreCard() {
     return (
         <div
             id="My level"
-            className="w-full p-[10px] md:p-[20px] lg:p-[30px] border-2 border-[#C1E2F7] rounded-[30px]"
+            className="w-full p-[16px] md:p-[26px] lg:p-[36px] border-2 border-[#C1E2F7] rounded-[30px]"
         >
             <div className="w-full flex justify-between">
                 <div className="flex inline-block items-center">
@@ -24,7 +24,7 @@ export default function UserScoreCard() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-red-400">
+                <div className="border-2 border-[#C1E2F7] rounded-full">
                     <div className="w-[71px] h-[71px]"></div>
                 </div>
             </div>

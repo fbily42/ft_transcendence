@@ -30,7 +30,7 @@ export default function UserStatsCard() {
     return (
         <div
             id="My stats"
-            className="w-full bg-red-400 p-[10px] md:p-[20px] lg:p-[30px] flex justify-between"
+            className="w-full p-[10px] md:p-[20px] lg:p-[30px] flex justify-evenly items-center"
         >
             <div id="My rank" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">

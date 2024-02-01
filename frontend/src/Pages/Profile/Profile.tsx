@@ -40,25 +40,25 @@ function Profile() {
         >
             <div
                 id="User infos"
-                className={`${isMobile ? 'w-full ' : 'w-[60%] sm:w-[60%] md:w-[70%] lg:w-[80%]'} ${isMobile ? 'h-screen' : 'h-full'} flex  flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] shadow-drop`}
+                className={`${isMobile ? 'w-full ' : 'w-[60%] sm:w-[60%] md:w-[70%] lg:w-[80%]'} ${isMobile ? 'h-full' : 'h-full'} flex  flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] shadow-drop`}
             >
                 <div
                     id="User top info"
-                    className={`flex ${isMobile ? 'flex-col' : 'flex-row h-[50%]'} w-full items-center justify-center  bg-white rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]`}
+                    className={`flex ${isMobile ? 'flex-col ' : 'flex-row h-[50%] w-full items-center justify-center'} bg-white rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]`}
                 >
                     <div
                         id="User top info + padding"
-                        className={`flex ${isMobile ? 'flex-col items-center h-auto gap-[36px]' : 'flex-row h-full'} w-full p-[36px]`}
+                        className={`flex ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full'} w-full p-[36px]`}
                     >
                         <div
                             id="User avatar"
-                            className={`${isMobile ? 'w-full h-[40%] flex justify-center' : 'w-[50%] h-full'}  bg-red-200`}
+                            className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'}`}
                         >
                             <UserAvatar isMobile={isMobile} />
                         </div>
                         <div
                             id="User informations"
-                            className={`${isMobile ? 'w-full h-auto flex justify-end gap-[36px]' : 'w-[50%] h-full justify-between'} bg-red-300 flex flex-col `}
+                            className={`${isMobile ? 'w-full h-auto flex justify-end gap-[16px]' : 'w-[50%] h-full justify-between'} flex flex-col `}
                         >
                             <UserScoreCard />
                             <UserStatsCard />
@@ -68,7 +68,7 @@ function Profile() {
                 </div>
                 <div
                     id="User bottom info"
-                    className={`flex ${isMobile ? 'h-screen' : 'h-[50%]'} w-full justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
+                    className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
                 ></div>
             </div>
             <div
