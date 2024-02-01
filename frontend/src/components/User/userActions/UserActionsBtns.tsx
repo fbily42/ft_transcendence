@@ -12,9 +12,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import UserAvatar from '../userAvatar/UserAvatar'
+import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
+
 
 export default function UserActionsBtns() {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
+    const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false);
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -69,9 +72,18 @@ export default function UserActionsBtns() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            <Button variant={'outlineBlue'} className="w-full">
+            <Button
+                variant={'outlineBlue'}
+                className="w-full"
+                onClick={() => setOpenSetUp2FA(true)}>
                 Setup 2FA
             </Button>
+            <div>
+                <SetUp2FAModal
+                    open={openSetUp2FA}
+                    onClose={() => {setOpenSetUp2FA(false)}}
+                />
+            </div>
         </div>
     )
 }

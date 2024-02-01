@@ -32,7 +32,6 @@ export const TwoFAProvider: React.FC = () => {
         {withCredentials: true}
       )
   
-      console.log("response", response.data);
       setTwoFAenabled(response.data.twoFAEnabled);
       setTwoFAverified(response.data.twoFAVerified);
     }
