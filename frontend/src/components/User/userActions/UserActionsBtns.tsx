@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import UserAvatar from '../userAvatar/UserAvatar'
 import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
+import AvatarImg from '../userAvatar/AvatarImg'
 
 
 export default function UserActionsBtns() {
@@ -65,6 +66,7 @@ export default function UserActionsBtns() {
                                 placeholder="42login"
                                 className="col-span-3"
                             />
+                            <AvatarImg/>
                         </div>
                     </div>
                     <DialogFooter>

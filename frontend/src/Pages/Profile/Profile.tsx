@@ -55,7 +55,7 @@ function Profile() {
                             id="User avatar"
                             className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'}`}
                         >
-                            <UserAvatar isMobile={isMobile} />
+                            <UserAvatar />
                         </div>
                         <div
                             id="User informations"
@@ -110,9 +110,9 @@ function Profile() {
 
 export default Profile
 
-            // <div>
-            //     <SetUp2FAModal
-            //         open={openSetUp2FA}
-            //         onClose={() => {setOpenSetUp2FA(false)}}
-            //     />
-            // </div>
+// <div>
+//     <SetUp2FAModal
+//         open={openSetUp2FA}
+//         onClose={() => {setOpenSetUp2FA(false)}}
+//     />
+// </div>
