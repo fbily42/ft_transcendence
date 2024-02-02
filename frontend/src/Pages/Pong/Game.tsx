@@ -1,18 +1,49 @@
+import { BallMovement, WallCollision } from "@/components/Pong/Game utils/Ballmovement";
+import data from "@/components/Pong/Game utils/data";
 import React, { useEffect, useRef } from "react";
 
-
 export default function Board(){
-	const canvasRef = useRef(null);
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
 	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (canvas)
-		{
-			const ctx =  canvas.getContext("2d")
-			ctx.fillStyle = "green";
-			ctx.fillRect(10, 10, 150, 100);
+		const handleKeyDown = (event: KeyboardEvent) => {
+			switch(event.key) {
+				case 'ArrowLeft':
+					break;
+				case 'ArrowRight':
+					break;
+				case 'a':
+					break;
+				case 'd':
+					break;
+				
+			}
 		}
+		window.addEventListener('keydown', handleKeyDown);
+		const render = () => {
+			const canvas = canvasRef.current;
+			if (canvas)
+			{
+				const ctx =  canvas.getContext("2d")
+				if (!ctx)
+					return;
 
+				ctx?.clearRect(0, 0, canvas.width, canvas.height);
+				let {ballObj}= data;
+				BallMovement(ctx, ballObj);
+				WallCollision(ballObj, canvas);
+				
+				
+					// if (ballObj.y - ballObj.rad > 0)
+			}
+			// console.log("frame");
+			requestAnimationFrame(render);
+
+		}
+		render();
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		}
 	}, [])
 
 

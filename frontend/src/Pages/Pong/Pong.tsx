@@ -11,56 +11,10 @@ import Board from './Game';
 
 // il y a 2 boutons, un qui permet de chercher un amis, un autre qui permet d'affronter quelqu'un aleatoirement
 function Pong() {
-		
-	const [open, setOpen] = useState<boolean>(false);
-	
-	
-	// useEffect(() => {
-
-	// 	const getChannels = async () => {
-	// 		try {
-				
-	// 			const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
-	// 				withCredentials: true,
-	// 			})
-	// 			console.log(response.data);		
-	// 		} catch (error) {
-	// 			console.log(error);
-	// 		}
-	// 	};
-
-	// 	getChannels();
-	// }, []);
-	// useEffect(() => {
-	// 	const canvas = canvasRef.current;
-	// 	const context = canvas.getContext('2d');
-	
-	// 	function updateGame() {
-	// 		// Mettre à jour les positions de la raquette et de la balle
-	// 	}
-	
-	// 	function drawGame() {
-	// 		context.clearRect(0, 0, canvas.width, canvas.height);
-	// 		// Dessiner la raquette, la balle, le score, etc.
-	// 	}
-	
-	// 	function gameLoop() {
-	// 		updateGame();
-	// 		drawGame();
-	// 		requestAnimationFrame(gameLoop);
-	// 	}
-	
-	// 	gameLoop();
-	// }, []);
-	
-
   return (
     <div className='flex justify-center items-center'>
 		<Board></Board>
-		{/* <Button onClick={() => setOpen(true)}>PLAY</Button>
-		<Modal open={open} onClose={() => setOpen(false)}>
-					<GameForm onClose={() => setOpen(false)}></GameForm>
-				</Modal> */}
+		
 	</div>
   )
   }
