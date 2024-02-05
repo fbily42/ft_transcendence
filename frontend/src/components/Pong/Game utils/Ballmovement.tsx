@@ -1,4 +1,4 @@
-import { BallObj } from "./data";
+import { BallObj, PaddleObj } from "./data";
 
 
 
@@ -34,10 +34,22 @@ export function BallMovement(ctx: CanvasRenderingContext2D, ballObj: BallObj) {
 // 	}
 // }
 
-export function WallCollision(ballObj: BallObj, canvas: HTMLCanvasElement)
+export function WallCollision(ballObj: BallObj, canvas: HTMLCanvasElement, paddle: PaddleObj)
 {
+	//collision des murs 
 	if (ballObj.y - ballObj.rad <= 0 || ballObj.y + ballObj.rad >= canvas.height)
 		ballObj.dy *= -1;
 	if(ballObj.x - ballObj.rad <= 0 || ballObj.x + ballObj.rad >= canvas.width)
 		ballObj.dx *= -1
+	//collision avec le paddle 
+	if (ballObj.x - ballObj.rad === (paddle.x + paddle.width))
+	{
+		if (ballObj.y - ballObj.rad <= paddle.y + paddle.height && ballObj.y + ballObj.rad >= paddle.y)
+			ballObj.dx *= -1;
+	}
+
+	//Goal !
+	if (ballObj.x - ballObj.rad === 0)
+		return(1);//remettre la balle au milieu et l'envoyer une fois sur 2 a chaque coter 
+	return (0);
 }

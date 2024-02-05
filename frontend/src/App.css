@@ -78,7 +78,7 @@
 
 #canvas_pong{
 	background-color: #134959;
-	border-radius: 40px;
+	/* border-radius: 40px; */
 	width: 80%;
 	height: auto;
 	max-width: 600px;

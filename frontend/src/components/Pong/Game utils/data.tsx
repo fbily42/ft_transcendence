@@ -5,12 +5,19 @@ export default {
 		dx: 5,
 		dy: 5,
 		rad: 20,
-		speed: 10,
+		speed: 1,
 
 	},
 	player_one: {
 		name: "first",
 		score: 0,
+	},
+	paddle : {
+		x: 10,
+		y: 20,
+		height : 160,
+		width : 60,
+		color : '#FFA62b',
 	},
 	
 };
