@@ -43,6 +43,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         setColor('[#C1E2F7]')
         socket?.emit('leaveChannel', previousChannel)
         socket?.emit('joinChannel', name)
+		socket?.emit('privateMessage')
     }
 
     if (!hide) {

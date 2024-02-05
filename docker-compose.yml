@@ -79,8 +79,6 @@ services:
 volumes:
   postgres:
     name: nest-db
-  pgadmin-data:
-    name: pg-data
 
 networks:
   transendence:
