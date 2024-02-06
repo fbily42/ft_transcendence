@@ -12,6 +12,8 @@ export type UserData = {
     games: number;
     wins: number;
 	friends: FriendData[];
+	photo42: string;
+	avatar: string;
 }
 
 export type LeaderboardData = {

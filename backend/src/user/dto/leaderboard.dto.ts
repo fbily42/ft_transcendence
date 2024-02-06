@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class LeaderboardDTO {
-
 	@IsNotEmpty()
 	@IsString()
 	readonly name: string;
@@ -9,7 +8,7 @@ export class LeaderboardDTO {
 	@IsNotEmpty()
 	@IsNumber()
 	readonly score: number;
-	
+
 	@IsNotEmpty()
 	@IsNumber()
 	readonly rank: number;

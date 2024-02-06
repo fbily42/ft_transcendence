@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -9,15 +9,25 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
+import { Photo42 } from '@/assets/avatarAssociation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import UserAvatar from '../userAvatar/UserAvatar'
 import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
-
+import AvatarImg from '../userAvatar/AvatarImg'
 
 export default function UserActionsBtns() {
     const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
-    const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false);
+    const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
+
+    const [selectedAvatar, setSelectedAvatar] = useState<string>(
+        Photo42().imageBackground || ''
+    )
+   function handleChangeImage() {
+    return ''
+   }
+
+    console.log(selectedAvatar, 'Ici', Photo42)
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -52,8 +62,8 @@ export default function UserActionsBtns() {
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex items-center flex-col gap-4 py-4">
-                        <div className='w-[80%]'>
-                            <UserAvatar />
+                        <div className="w-[80%]">
+                            <UserAvatar selectedAvatar={selectedAvatar} />
                         </div>
                         <div className="flex flex-col w-full max-w-sm items-start gap-2">
                             <Label htmlFor="username" className="text-right">
@@ -65,23 +75,33 @@ export default function UserActionsBtns() {
                                 placeholder="42login"
                                 className="col-span-3"
                             />
+                            <AvatarImg
+                                onSelect={(selectedImage) =>
+                                    setSelectedAvatar(selectedImage)
+                                }
+                            />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Save changes</Button>
+                        <Button onClick={() => handleChangeImage()} type="submit">
+                            Save changes
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
             <Button
                 variant={'outlineBlue'}
                 className="w-full"
-                onClick={() => setOpenSetUp2FA(true)}>
+                onClick={() => setOpenSetUp2FA(true)}
+            >
                 Setup 2FA
             </Button>
             <div>
                 <SetUp2FAModal
                     open={openSetUp2FA}
-                    onClose={() => {setOpenSetUp2FA(false)}}
+                    onClose={() => {
+                        setOpenSetUp2FA(false)
+                    }}
                 />
             </div>
         </div>

@@ -26,11 +26,11 @@ export class AuthController{
 
 		try {
 			const code = req.query?.code as string ;
-
+			
 			if (!code || req.query?.error) {
 				throw new HttpException('Access denied', HttpStatus.UNAUTHORIZED);
 			}
-
+			
 			// Get the token access from 42api
 			const token = await this.authService.getToken(code);
 
