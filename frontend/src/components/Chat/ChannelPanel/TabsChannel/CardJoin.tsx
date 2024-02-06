@@ -10,41 +10,29 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import axios from 'axios'
-import { useWebSocket } from '@/context/webSocketContext'
-import { Socket } from 'socket.io-client'
+import { useForm } from 'react-hook-form'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { JoinChannelProps, JoinFormValues } from '@/lib/Chat/chat.types'
+import { joinChannel } from '@/lib/Chat/chat.requests'
 
 interface CardJoinProps {
     onClose: () => void
 }
 
-type FormValues = {
-    name: string
-    password?: string
-}
-
 function CardJoin({ onClose }: CardJoinProps) {
-    const { register, handleSubmit } = useForm<FormValues>()
+    const { register, handleSubmit } = useForm<JoinFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
-    const socket = useWebSocket() as Socket
+    const queryClient = useQueryClient()
+    const mutation = useMutation({
+        mutationFn: (data: JoinChannelProps) =>
+            joinChannel(data.data, data.setErrorMessage, data.onClose),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['channels'] })
+        },
+    })
 
-    const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        try {
-            if (data.password === '') delete data.password
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/chat/join`,
-                data,
-                {
-                    withCredentials: true,
-                }
-            )
-            socket?.emit('joinChannel', data.name)
-            onClose()
-        } catch (error: any) {
-            setErrorMessage(error.response.data.message)
-            throw error
-        }
+    function onSubmit(data: JoinFormValues) {
+        mutation.mutate({ data, setErrorMessage, onClose })
     }
 
     return (
