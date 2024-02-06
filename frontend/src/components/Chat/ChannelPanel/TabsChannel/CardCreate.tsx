@@ -38,7 +38,7 @@ function CardCreate({ onClose }: CardCreateProps) {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Card>
+                <Card className='border-none shadow-none'>
                     <CardHeader>
                         <CardTitle>Create</CardTitle>
                         <CardDescription>

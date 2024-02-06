@@ -1,15 +1,18 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Send } from 'lucide-react'
+import { Plus, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { getMessages } from '@/lib/Chat/chat.requests'
 import MessageBubble from './Message'
+import Placeholder from '../../../assets/empty-state/empty-chat.png'
+import Modal from '@/components/Modal'
+import TabsChannel from '../ChannelPanel/TabsChannel/TabsChannel'
 
 type MessageFormValues = {
     userId: number
@@ -23,6 +26,7 @@ interface ChatWindowProps {
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
+    const [open, setOpen] = useState<boolean>(false)
     const { register, handleSubmit, reset } = useForm<MessageFormValues>()
     const socket = useWebSocket() as Socket
     const queryClient = useQueryClient()
@@ -69,14 +73,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         reset({ message: '' })
     }
 
-    return (
+    return currentChannel ? (
         <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
             <div className="bg-white flex flex-col justify-between w-full h-full rounded-[16px] overflow-hidden p-[20px] shadow-drop">
-                <div className=" w-full h-full overflow-hidden">
+                <div className="flex flex-col justify-end w-full h-full overflow-hidden">
                     {messages?.map((message, index) => (
-                        <div
-                            key={index}
-                        >{`${message.sentByName}: ${message.content}`}</div>
+                        // <span
+                        //     key={index}
+                        // >{`${message.sentByName}: ${message.content}`}</span>
+						<MessageBubble key={index} message={message}></MessageBubble>
                     ))}
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -92,6 +97,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                         </Button>
                     </div>
                 </form>
+            </div>
+        </div>
+    ) : (
+        <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
+            <div className="bg-white flex flex-col justify-center items-center w-full h-full rounded-[16px] overflow-hidden p-[20px] shadow-drop">
+                <img className="w-[80%]" src={Placeholder}></img>
+                <Button
+                    className="w-[10%] justify-between bg-customYellow"
+                    onClick={() => setOpen(true)}
+                >
+                    <span>Noot chat</span>
+                    <Plus />
+                </Button>
+                <Modal open={open} onClose={() => setOpen(false)}>
+                    <TabsChannel onClose={() => setOpen(false)}></TabsChannel>
+                </Modal>
             </div>
         </div>
     )

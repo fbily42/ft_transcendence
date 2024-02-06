@@ -38,7 +38,7 @@ function CardJoin({ onClose }: CardJoinProps) {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Card>
+                <Card className='border-none shadow-none'>
                     <CardHeader>
                         <CardTitle>Join</CardTitle>
                         <CardDescription>
