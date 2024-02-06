@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
@@ -56,14 +56,17 @@ const VerticalNavbar: React.FC = () => {
 		if (active !== btnId) setActive(btnId);
 	};
 
+	const navigate = useNavigate();
 	const handleLogout = async () => {
 		try {
-			await axios.get(
-				`${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
+			await axios.put(
+				`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {},
 				{
 					withCredentials: true,
 				}
-			);
+				);
+				navigate('/auth');
+			
 
 		} catch (error) {
 			console.log("Error getdata", error);
@@ -153,24 +156,21 @@ const VerticalNavbar: React.FC = () => {
 							</div>
 						</Button>
 					</Link>
-
-					<Link to="/auth" className="text-black" onClick={handleLogout}>
-						<Button
-							variant={
-								active === 5 ? "tabBtnActive" : "tabBtnDefault"
-							}
-							size="openedTabSize"
-							onClick={() => handleNavTabs(5)}
+					<Button
+						variant={
+							active === 5 ? "tabBtnActive" : "tabBtnDefault"
+						}
+						size="openedTabSize"
+						onClick={handleLogout}
+					>
+						<div
+							className={`pr-[20px] ${
+								active === 5 ? "text-white" : "text-black"
+							}`}
 						>
-							<div
-								className={`pr-[20px] ${
-									active === 5 ? "text-white" : "text-black"
-								}`}
-							>
-								<LogOut className="h-[24px] w-[24px]" />
-							</div>
-						</Button>
-					</Link>
+							<LogOut className="h-[24px] w-[24px]" />
+						</div>
+					</Button>
 				</div>
 			</div>
 		</nav>

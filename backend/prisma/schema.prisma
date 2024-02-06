@@ -31,6 +31,7 @@ model User {
 	otp_verified	Boolean  @default(false)
 	otp_secret		String?
 	otp_url			String?
+	request_uuid	String? @unique
 
 	channels		ChannelUser[]
 	messages		Message[]

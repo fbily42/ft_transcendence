@@ -16,6 +16,8 @@ import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessageDto } from './dto/message.dto';
 import { WsExceptionFilter } from './filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
+import * as cookie from 'cookie';
+import cookieParser from 'cookie-parser';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -41,11 +43,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleConnection(client: Socket) {
 		
 		try {
-			const cookie = client.handshake.headers.cookie;
-			if (!cookie)
+			const cookiestr = client.handshake.headers.cookie;
+			if (!cookiestr)
 				throw new Error('JWT is missing')
-			const jwt = cookie.split('=');
-			const decode = this.jwtService.verify(jwt[1]);
+			const parsedcookie = cookie.parse(cookiestr);
+			const jwt = parsedcookie['jwt'];
+	
+			const decode = this.jwtService.verify(jwt);
+      
 			client.data = { userId: decode.sub, userName: decode.login };
 			const clientIds = this.clients.get(client.data.userName);
 			if (clientIds)

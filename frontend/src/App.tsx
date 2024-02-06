@@ -9,6 +9,8 @@ import Auth from './Pages/Auth/Auth'
 import ProtectedRoute from './components/ProtectedRoute'
 import { WebSocketProvider } from './context/webSocketContext'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import TwoFA from "./Pages/TwoFA/TwoFA";
+import { TwoFAProvider } from "./context/twoFAEnableContext";
 
 const queryClient = new QueryClient()
 
@@ -17,21 +19,25 @@ function App() {
         <>
             <QueryClientProvider client={queryClient}>
                 <Routes>
-                    <Route path="/auth" element={<Auth />}></Route>
+                    <Route path="/auth" element={<Auth />}>
+                        <Route path="twofa/:id" element={<TwoFA />}></Route>
+                    </Route>
                     <Route element={<ProtectedRoute />}>
                         <Route element={<WebSocketProvider />}>
-                            <Route element={<Layout />}>
-                                <Route
-                                    index
-                                    path="/"
-                                    element={<Dashboard />}
-                                ></Route>
-                                <Route path="/pong" element={<Pong />}></Route>
-                                <Route path="/chat" element={<Chat />}></Route>
-                                <Route
-                                    path="/profile"
-                                    element={<Profile />}
-                                ></Route>
+                            <Route element={<TwoFAProvider />}>
+                                <Route element={<Layout />}>
+                                    <Route
+                                        index
+                                        path="/"
+                                        element={<Dashboard />}
+                                    ></Route>
+                                    <Route path="/pong" element={<Pong />}></Route>
+                                    <Route path="/chat" element={<Chat />}></Route>
+                                    <Route
+                                        path="/profile"
+                                        element={<Profile />}
+                                    ></Route>
+                                </Route>
                             </Route>
                         </Route>
                     </Route>
