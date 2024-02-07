@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import Modal from '../../Modal'
-import TabsChannel from './TabsChannel/TabsChannel'
+import TabsChannel from './Channels/TabsChannel'
 import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Cog, Plus } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
-import UserList from './UserList'
+import UserList from './Channels/UserList'
 import { useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
 
@@ -43,7 +43,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         setColor('[#C1E2F7]')
         socket?.emit('leaveChannel', previousChannel)
         socket?.emit('joinChannel', name)
-		socket?.emit('privateMessage')
+        socket?.emit('privateMessage')
     }
 
     if (!hide) {
