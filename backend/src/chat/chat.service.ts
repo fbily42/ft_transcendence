@@ -3,8 +3,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as argon from "argon2";
 import { JoinChannelDto, NewChannelDto } from './dto';
-import { Channel, ChannelUser, Message } from '@prisma/client';
+import { Channel, ChannelUser, Message, User } from '@prisma/client';
 import { ChannelName, ChannelWithRelation, UserInChannel } from './chat.types';
+import { InviteChannelDto } from './dto/inviteChannel.dto';
 
 @Injectable()
 export class ChatService {
@@ -188,5 +189,52 @@ export class ChatService {
 				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
 		throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	async inviteUser(userId: number, dto: InviteChannelDto) {
+		try {
+			const user: User = await this.prisma.user.findUnique({
+				where: {
+					name: dto.name,
+				}
+			});
+			if (!user)
+				throw new HttpException('This user does not exists', HttpStatus.BAD_REQUEST);
+			const channel: ChannelWithRelation = await this.prisma.channel.findUnique({
+				where: {
+					name: dto.channel,
+				},
+				include: {
+					users: true,
+				}
+			})
+			if (!channel)
+				throw new HttpException('This channel does not exists', HttpStatus.BAD_REQUEST)
+			const invited: ChannelUser = channel.users.find(toFind => toFind.userId === user.id);
+			if (invited)
+			{
+				if (invited.banned)
+					throw new HttpException('This user is banned form this channel', HttpStatus.BAD_REQUEST)
+				if (invited.invited)
+					throw new HttpException('This user is already invited in this channel', HttpStatus.BAD_REQUEST)
+				else
+					throw new HttpException('This user is already in this channel', HttpStatus.BAD_REQUEST)
+			}
+			await this.prisma.channelUser.create({
+				data:{
+					channelId: channel.id,
+					userId: user.id,
+					invited: true,
+				}
+			})
+			return;
+		} catch (error) {
+			if (error instanceof HttpException)
+				throw error;
+			else if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 }

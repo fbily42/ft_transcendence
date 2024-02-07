@@ -5,11 +5,12 @@ import TabsChannel from './Channels/TabsChannel'
 import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Cog, Plus } from 'lucide-react'
+import { Plus, Share } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 import UserList from './Channels/UserList'
 import { useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
+import CardInvite from './Channels/CardInvite'
 
 interface ChannelPanelProps {
     setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
@@ -105,11 +106,10 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                             size="smIcon"
                             onClick={() => setOpen2(true)}
                         >
-                            <Cog></Cog>
+                            <Share></Share>
                         </Button>
                         <Modal open={open2} onClose={() => setOpen2(false)}>
-                            <div>Channel Options Modal</div>
-                            {/* PUT HERE THE CHANNEL PARAM PANEL */}
+                            <CardInvite channel={currentChannel} onClose={() => setOpen2(false)}></CardInvite>
                         </Modal>
                     </div>
                     <UserList channel={currentChannel}></UserList>
