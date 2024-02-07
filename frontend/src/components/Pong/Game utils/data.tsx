@@ -4,8 +4,9 @@ export default {
 		y: 200,
 		dx: 1,
 		dy: 1,
-		rad: 20,
-		speed: 10,
+		rad: 40,
+		speed: 15,
+		last : 0,
 
 	},
 	player_one: {
@@ -19,6 +20,8 @@ export default {
 	Game_stat:{
 		score_1: 0,
 		score_2: 0,
+		Gamestate: 'playing',
+		img: 'not ready',
 	},
 	paddle_1 : {
 		x: 10,
@@ -44,6 +47,7 @@ export interface BallObj {
 	dy: any;
 	rad: number;
 	speed: number;
+	last: number;
   }
 
   export interface PaddleObj {
