@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import PinguLogo from '../../assets/welcome-assets/PinguLogo.svg'
 import PinguFamily from '../../assets/welcome-assets/PinguFamily.svg'
-
+import Snow from './Snow'
 
 type Loginprops = {
 	children : React.ReactNode
@@ -11,7 +11,8 @@ type Loginprops = {
 const Login : React.FC<Loginprops> = ({children}) => {
 	return (
 		<div className='flex h-[100vh]'>
-			<div className='flex-1 flex flex-col justify-between items-center bg-blue-300 p-[36px]'>
+			<Snow/>
+			<div className='flex-1 flex flex-col justify-between items-center p-[36px]'>
 				<div className='bg-red-500'>
 					<img src={PinguLogo}></img>
 				</div>

@@ -16,6 +16,9 @@ module.exports = {
 			},
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Fredoka', 'sans-serif'],
+			},
 			colors: {
 				fontSize: {
 					'xs': '0.75rem',  // Extra Small
