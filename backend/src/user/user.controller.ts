@@ -7,6 +7,7 @@ import {
 	UseGuards,
 	Req,
 	ParseArrayPipe,
+	Param,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
@@ -24,14 +25,19 @@ export class UserController {
 		return await this.userService.getInfo(jwt);
 	}
 
+	@Get(':pseudo')
+	async getOtherUserInfo(@Req() req: Request, @Param('pseudo') pseudo: String) {
+		//To access userLogin and userID in req, see example below
+		const currentUser = req['userLogin'];
+		return this.userService.getOtherInfo(pseudo, currentUser);
+	}
+
 	@Get('leaderboard')
-	@UseGuards(AuthGuard)
 	async getLeaderboard() {
 		return this.userService.getLeaderboard();
 	}
 
 	@Post('updateRanks')
-	@UseGuards(AuthGuard)
 	async updateRanks(
 		@Body(new ParseArrayPipe({ items: LeaderboardDTO, whitelist: true }))
 		dto: LeaderboardDTO[],

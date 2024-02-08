@@ -17,6 +17,21 @@ export async function getUserMe(): Promise<UserData> {
     // }
 }
 
+export async function getOtherUser(pseudo: string): Promise<UserData> {
+    // try {
+        //api call with jwt as authorization
+        const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/user/${pseudo}`,
+            {
+                withCredentials: true,
+            }
+        )
+        return response.data
+    // } catch (error) {
+    //     throw error
+    // }
+}
+
 export async function getLeaderboard(): Promise<LeaderboardData[]> {
     // try {
         const response = await axios.get(
