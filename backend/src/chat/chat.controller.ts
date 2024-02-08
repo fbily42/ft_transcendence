@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { ChannelName, UserInChannel } from './chat.types';
+import { ChannelList, UserInChannel } from './chat.types';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { NewChannelDto, JoinChannelDto } from './dto';
@@ -25,7 +25,7 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('channel/all')
-	async getAllChannels(@Req() req: Request): Promise<ChannelName[]> {
+	async getAllChannels(@Req() req: Request): Promise<ChannelList[]> {
 		return await this.chatService.getChannels(req['userID']);
 	}
 

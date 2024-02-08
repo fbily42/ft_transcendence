@@ -20,6 +20,8 @@ export type UserInChannel = {
 	invited: boolean,
 }
 
-export type ChannelName = {
+export type ChannelList = {
 	name: string
+	invited: boolean
+	banned: boolean
 }

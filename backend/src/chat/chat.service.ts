@@ -4,7 +4,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js
 import * as argon from "argon2";
 import { JoinChannelDto, NewChannelDto } from './dto';
 import { Channel, ChannelUser, Message, User } from '@prisma/client';
-import { ChannelName, ChannelWithRelation, UserInChannel } from './chat.types';
+import { ChannelList, ChannelWithRelation, UserInChannel } from './chat.types';
 import { InviteChannelDto } from './dto/inviteChannel.dto';
 
 @Injectable()
@@ -67,24 +67,22 @@ export class ChatService {
 					throw new HttpException('Channel already joined', HttpStatus.CONFLICT);
 				if (user.banned)
 					throw new HttpException('You are banned from this channel', HttpStatus.BAD_REQUEST);
-				if (channel.private)
-				{
-					if (!user.invited)
-						throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
-					await this.prisma.channelUser.update({
-						where: {
-							channelId_userId: {
-								channelId: user.channelId,
-								userId: userId,
-							},
+				if (channel.private && !user.invited)
+					throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
+				console.log('Goin to update')
+				await this.prisma.channelUser.update({
+					where: {
+						channelId_userId: {
+							channelId: user.channelId,
+							userId: userId,
 						},
-						data: {
-								invited: false,
-								member: true,
-							}
-					})
-					return;
-				}
+					},
+					data: {
+							invited: false,
+							member: true,
+						}
+				})
+				return;
 			}
 			await this.prisma.channelUser.create({
 				data:{
@@ -103,9 +101,9 @@ export class ChatService {
 		}
 	}
 
-	async getChannels(userId: number): Promise<ChannelName[]> {
+	async getChannels(userId: number): Promise<ChannelList[]> {
 		try {
-			const channels: ChannelName[] = await this.prisma.channel.findMany({
+			const channels = await this.prisma.channel.findMany({
 				where: {
 					users: {
 						some: {
@@ -113,11 +111,27 @@ export class ChatService {
 						},
 					},
 				},
-				select:{
-					name: true,
-				},
+				include: {
+					users: {
+						select: {
+							userId: true,
+							banned: true,
+							invited: true,
+						}
+					}
+				}
 			})
-			return channels
+
+			const channelList: ChannelList[] = channels.map(channel => {
+				const user = channel.users.find(user => user.userId === userId);
+				return {
+					name: channel.name,
+					invited: user?.invited,
+					banned: user?.banned
+				};
+			});
+			console.log(channelList)
+			return channelList
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);

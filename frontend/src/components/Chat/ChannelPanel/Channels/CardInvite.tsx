@@ -8,12 +8,17 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { useWebSocket } from '@/context/webSocketContext'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { Label } from '@radix-ui/react-label'
+import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Socket } from 'socket.io-client'
 
-type InviteFormValues = {
+export type InviteFormValues = {
+    sentBy: string
     name: string
     channel: string
 }
@@ -26,10 +31,12 @@ interface CardInviteProps {
 const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
     const { register, handleSubmit } = useForm<InviteFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
+    const socket = useWebSocket() as Socket
+    const { data: me } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
 
     async function onSubmit(data: InviteFormValues) {
         data.channel = channel
-		//call to back to change user status in db
+        data.sentBy = me?.name || ''
         try {
             const response = await axios.patch(
                 `${import.meta.env.VITE_BACKEND_URL}/chat/channel/invite`,
@@ -38,12 +45,12 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
                     withCredentials: true,
                 }
             )
-			//socket event with name+channel to toast the user
-			onClose()
+            socket?.emit('channelInvite', data)
+            onClose()
         } catch (error: any) {
-			setErrorMessage(error.response.data.message)
-			throw error
-		}
+            setErrorMessage(error.response.data.message)
+            throw error
+        }
     }
 
     return (
