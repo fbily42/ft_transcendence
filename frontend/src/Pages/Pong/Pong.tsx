@@ -12,9 +12,8 @@ import Board from './Game';
 // il y a 2 boutons, un qui permet de chercher un amis, un autre qui permet d'affronter quelqu'un aleatoirement
 function Pong() {
   return (
-    <div className='flex justify-center items-center'>
+    <div className='flex flex-col justify-between pl-[122px] pb-[36px] pr-[36px] h-[90vh] bg-red-100 gap-[36px]'>
 		<Board></Board>
-		
 	</div>
   )
   }

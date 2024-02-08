@@ -13,11 +13,11 @@ export  function Paddle_2(ctx: CanvasRenderingContext2D , canvas: HTMLCanvasElem
 
 	// }
 	// console.log('jkg');
-	if (keys['ArrowLeft']) {
+	if (keys['ArrowUp']) {
 		if ((paddle_2.y - 10) > 0 )
 			paddle_2.y -= 10;
 		}
-	else if (keys['ArrowRight']) {
+	else if (keys['ArrowDown']) {
 		if ((paddle_2.y + 10 + 60) < canvas.height )
 		{
 			paddle_2.y += 10;

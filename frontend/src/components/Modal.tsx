@@ -31,10 +31,10 @@ export const ModalGame: React.FC<propTypes> = ({open, onClose, children}) => {
 		return null;
   return (
 	<div
-		className={' z-20 fixed inset-0 flex justify-center items-center transition-colors bg-inherit backdrop-blur-md'}
+		className={' bg-black/50 backdrop-blur-sm fixed inset-0 flex justify-center items-center transition-colors'}
 		onClick={onClose}>
 		<div
-			className={'border-2 border-black rounded-xl bg-white roundd-lg shadow p-4 transition-all max-w-md border rounded-md'}
+			className={'bg-white roundd-lg shadow p-4 transition-all max-w-md border rounded-md'}
 			onClick={(e) => e.stopPropagation()}>
 			{children}
 		</div>

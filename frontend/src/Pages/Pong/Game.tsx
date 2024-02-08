@@ -3,16 +3,21 @@ import { Paddle_1, Paddle_2 } from "@/components/Pong/Game utils/Paddle";
 // import Paddle_2 from "@/components/Pong/Game utils/Paddle";
 import data from "@/components/Pong/Game utils/data";
 import React, { useEffect, useRef, useState } from "react";
-import fish from './../../assets/fish.svg'
-import filet from './../../assets/filet.svg'
-import grey from './../../assets/grey.svg'
-import pingu from './../../assets/pingu.svg'
+import fish from './../../assets/Game/fish.svg'
+import filet from './../../assets/Game/filet.svg'
+import grey from './../../assets/Game/grey.svg'
+import pingu from './../../assets/Game/pingu.svg'
 import Static_image from "@/components/Pong/Game utils/design";
+import pingu_score from './../../assets/Game/pingu_score.svg'
+import grey_score from './../../assets/Game/grey_score.svg'
+import { useQuery } from "@tanstack/react-query";
+import { getUserMe } from "@/lib/Dashboard/dashboard.requests";
 
 export default function Board(){
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const imgRef = useRef<HTMLImageElement | null>(null);
 	const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
+	const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
 
 	
 	useEffect(() => {
@@ -38,6 +43,8 @@ export default function Board(){
 		const img_filet = new Image();
 		const img_grey = new Image();
 		const img_pingu = new Image();
+		const img_pingu_score = new Image();
+		const img_grey_score = new Image();
 		
 		const render = () => {
 			const canvas = canvasRef.current;
@@ -54,6 +61,8 @@ export default function Board(){
 					img_filet.src = filet;
 					img_grey.src = grey;
 					img_pingu.src = pingu;
+					img_pingu_score.src = pingu_score;
+					img_grey_score.src = grey_score;
 					
 					// if (img_fishRef.current)
 					// 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
@@ -63,7 +72,7 @@ export default function Board(){
 	
 					Paddle_1(ctx, canvas, paddle_1, keys, img_pingu);
 					Paddle_2(ctx, canvas, paddle_2, keys, img_grey);
-					if (WallCollision(ballObj, canvas, ctx, Game_stat) == 1)
+					if (WallCollision(ballObj, canvas, ctx, Game_stat, img_grey_score, img_pingu_score) == 1)
 						console.log(' tu as marque');
 					Paddle_Collision(ballObj, paddle_1);
 					Paddle_Collision(ballObj, paddle_2);
@@ -88,8 +97,8 @@ export default function Board(){
 
 
 	return (
-	<div>
+	
 		<canvas id="canvas_pong" ref={canvasRef} height={1000} width="1600px" />
-	</div> );
+	 );
 		
 }

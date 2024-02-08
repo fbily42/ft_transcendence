@@ -1,4 +1,4 @@
-import filet from './../../../assets/filet.svg'
+import filet from './../../../assets/Game/filet.svg'
 
 export default function Static_image(ctx: CanvasRenderingContext2D,canvas: HTMLCanvasElement,  img_filet: HTMLImageElement)
 {

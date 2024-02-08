@@ -70,17 +70,19 @@ export function Paddle_Collision(ballObj: BallObj, paddle: PaddleObj)
 
 }
 
-function updatescore(Goal_playerone: number, Goal_playertwo: number, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement)
+function updatescore(Goal_playerone: number, Goal_playertwo: number, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, img_grey_score: HTMLImageElement, img_pingu_score:HTMLImageElement)
 {
 	ctx.font = '80px Arial';
-	ctx.fillStyle = 'black';
-	ctx.fillText( `${Goal_playerone}` , canvas.width / 4, 80);
+	ctx.fillStyle = '#45A0E3';
+	ctx.drawImage(img_pingu_score, (canvas.width / 4) - (canvas.width/ canvas.width * 90) , canvas.height/ canvas.height * 15, canvas.width/ canvas.width * 82, canvas.height/ canvas.height * 82);
+	ctx.drawImage(img_grey_score, (3 * canvas.width / 4) - (canvas.width/ canvas.width * 90) , canvas.height/ canvas.height * 15, canvas.width/ canvas.width * 82, canvas.height/ canvas.height * 82);
+	ctx.fillText( `${Goal_playerone}` , canvas.width / 4, 80, canvas.width / 10);
 	ctx.fillText( `${Goal_playertwo}` , 3 * canvas.width / 4, 80);
 
 
 }
 
-export function WallCollision(ballObj: BallObj, canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, Game_stat)
+export function WallCollision(ballObj: BallObj, canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, Game_stat, img_grey_score: HTMLImageElement, img_pingu_score:HTMLImageElement)
 {
 
 	// Collision avec les murs supérieur et inférieur
@@ -110,7 +112,7 @@ export function WallCollision(ballObj: BallObj, canvas: HTMLCanvasElement,ctx: C
 		}, 1000);
 		
     }
-	updatescore(Game_stat.score_1, Game_stat.score_2, ctx, canvas);
+	updatescore(Game_stat.score_1, Game_stat.score_2, ctx, canvas, img_grey_score, img_pingu_score);
 	return (0);
 }
 

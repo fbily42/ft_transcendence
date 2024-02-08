@@ -12,6 +12,16 @@ import {
 import axios from "axios";
 import Modal, { ModalGame } from "../Modal";
 import GameForm from "../Pong/GameForm";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+  } from "@/components/ui/dialog"
+  import pingu_duo from "./../../assets/Pong_page/duo.png"
+  
 
 const VerticalNavbar: React.FC = () => {
 	const [open, setOpen] = useState<boolean>(false);
@@ -106,28 +116,42 @@ const VerticalNavbar: React.FC = () => {
 						</Button>
 					</Link>
 					{/* <Link className="text-black"> */}
-						<Button
-							variant={
-								active === 2
-									? "gameBtnActive"
-									: "gameBtnDefault"
-							}
-							size="icon"
-							onClick={() => handleNavTabs(2)}
-							// onClick={() => setOpen(true)}
-						>
-							<div
-								className={`${
-									active === 2 ? "text-white" : "text-black"
-								}`}
+					<Dialog>
+						<DialogTrigger>
+							<Button
+								variant={
+									active === 2
+										? "gameBtnActive"
+										: "gameBtnDefault"
+								}
+								size="icon"
+								onClick={() => handleNavTabs(2)}
+								// onClick={() => setOpen(true)}
 							>
-								<Gamepad2 className="h-[24px] w-[24px]" />
-							</div>
-						</Button>
+								<div
+									className={`${
+										active === 2 ? "text-white" : "text-black"
+									}`}
+								>
+									<Gamepad2 className="h-[24px] w-[24px]" />
+								</div>
+							</Button>
+						</DialogTrigger>
+						<DialogContent>
 						
-						<ModalGame  open={open} onClose={() => setOpen(false)}>
-					<GameForm onClose={() => setOpen(false)}></GameForm>
-				</ModalGame>
+							<GameForm></GameForm>
+							{/* <DialogHeader>
+							<DialogTitle>Are you absolutely sure?</DialogTitle>
+							<DialogDescription>
+								This action cannot be undone. This will permanently delete your account
+								and remove your data from our servers.
+							</DialogDescription>
+							</DialogHeader> */}
+						</DialogContent>
+					</Dialog>
+						
+						{/* <ModalGame  open={open} onClose={() => setOpen(false)}> */}
+				{/* </ModalGame> */}
 					{/* </Link> */}
 					<Link to="/chat" className="text-black">
 						<Button
