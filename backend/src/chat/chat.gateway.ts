@@ -18,6 +18,7 @@ import { WsExceptionFilter } from './filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
 import cookieParser from 'cookie-parser';
+import { InviteChannelDto } from './dto/inviteChannel.dto';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -115,6 +116,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('privateMessage')
 	privateMessage(@ConnectedSocket() client : Socket) {
-		console.log(this.clients)
+		// console.log(this.clients)
+		//TODO -> private message logic
 	}
+
+	@SubscribeMessage('channelInvite')
+	channelInvitation(@MessageBody() invite: InviteChannelDto) {
+		const clientIds = this.clients.get(invite.name)
+		if (clientIds)
+		{
+			clientIds.forEach (socketId =>
+				this.server.to(socketId).emit('channelInvite', invite)
+			)
+		}
+	}
+
+	@SubscribeMessage('channelKick')
+	channelKick(@ConnectedSocket() client: Socket) {}
 }

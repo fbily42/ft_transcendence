@@ -7,6 +7,7 @@ export async function getChannels(): Promise<Channel[]> {
 		const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
 			withCredentials: true,
 		})
+		console.log(response.data)
 		return response.data
 	} catch (error) {
 		throw error
