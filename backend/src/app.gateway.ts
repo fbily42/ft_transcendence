@@ -13,12 +13,11 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { MessageDto } from './dto/message.dto';
-import { WsExceptionFilter } from './filter/ws-exception.filter';
+import { MessageDto } from './chat/dto/message.dto';
+import { WsExceptionFilter } from './chat/filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
-import cookieParser from 'cookie-parser';
-import { InviteChannelDto } from './dto/inviteChannel.dto';
+import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
