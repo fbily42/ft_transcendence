@@ -54,11 +54,11 @@ export function Paddle_Collision(ballObj: BallObj, paddle: PaddleObj)
 			angleRad = Math.round(angleRad * 100) / 100;
             
             // Change la direction de la balle en fonction du côté de la raquette touché
-			console.log('position avant ', ballObj.dx, ballObj.dy)
+			
 		
             ballObj.dx = Math.round(-Math.cos(angleRad) * 100) /100;
             ballObj.dy = Math.round(Math.sin(angleRad) * 100) /100;
-			console.log('position after', ballObj.dx, ballObj.dy)
+		
 
             // Si vous touchez la raquette gauche, inversez la direction en x
             if (paddle.x < ballObj.x) {

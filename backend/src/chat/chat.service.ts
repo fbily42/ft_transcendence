@@ -70,7 +70,6 @@ export class ChatService {
 					throw new HttpException('You are banned from this channel', HttpStatus.BAD_REQUEST);
 				if (channel.private && !user.invited)
 					throw new HttpException('This is a private channel', HttpStatus.BAD_REQUEST);
-				console.log('Goin to update')
 				await this.prisma.channelUser.update({
 					where: {
 						channelId_userId: {
@@ -131,7 +130,6 @@ export class ChatService {
 					banned: user?.banned
 				};
 			});
-			console.log(channelList)
 			return channelList
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)

@@ -51,7 +51,7 @@ export function Paddle_1(ctx: CanvasRenderingContext2D , canvas: HTMLCanvasEleme
 	// 	color : '#FFA62b',
 
 	// }
-	console.log('ici');
+
 	if (keys['a']) {
 		if ((paddle_1.y - 10) > 0 )
 			paddle_1.y -= 10;

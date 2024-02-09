@@ -73,7 +73,7 @@ export default function Board(){
 					Paddle_1(ctx, canvas, paddle_1, keys, img_pingu);
 					Paddle_2(ctx, canvas, paddle_2, keys, img_grey);
 					if (WallCollision(ballObj, canvas, ctx, Game_stat, img_grey_score, img_pingu_score) == 1)
-						console.log(' tu as marque');
+						// console.log(' tu as marque');
 					Paddle_Collision(ballObj, paddle_1);
 					Paddle_Collision(ballObj, paddle_2);
 				}
