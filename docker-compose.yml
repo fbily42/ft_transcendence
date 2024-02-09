@@ -72,9 +72,6 @@ services:
       - ./frontend/:/app
     networks:
       - transendence
-    command: >
-      bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
-      && npm run dev && rm -rf /cache/node_modules"
 
 volumes:
   postgres:
