@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import * as OTPAuth from "otpauth";
 import { encode, decode } from "hi-base32";
+import { v1 as uuidv1 } from 'uuid';
 import { PayloadToResult } from '@prisma/client/runtime/library';
 
 export interface Payload_type {
@@ -29,7 +30,6 @@ export class AuthService {
 				  },
 				body: `grant_type=authorization_code&client_id=${process.env.CLIENT_UID}&client_secret=${process.env.CLIENT_SECRET}&code=${code}&redirect_uri=${process.env.REDIRECT_URI}`,
 			})
-
 			if (!response.ok){
 				throw new HttpException('Unexpected HTTP error ', HttpStatus.INTERNAL_SERVER_ERROR);//check HttpStatus
 			}
@@ -69,7 +69,7 @@ export class AuthService {
 				where:{
 					name: login,
 				}
-			})
+			});
 			if (!user)
 			{
 				return this.createUser(login, token, photo);
@@ -126,6 +126,80 @@ export class AuthService {
 		}
 	}
 
+	async setJwt(userID: number){
+		try {
+			//Find user
+			const user = await this.prisma.user.findUnique({
+				where:{
+					id: userID,
+				}
+			})
+			if (!user)
+				throw new Error();
+			
+			//Creates jwt
+			return this.createJwt(user);
+			
+		}
+		catch (error) {
+			throw error;
+		}
+
+	}
+
+	async setRequestUuid(user: any) {
+		try {
+			//Generate UUID
+			const uuid = uuidv1();
+			const updateUser = await this.prisma.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					request_uuid : uuid,
+				},
+			});
+			return (uuid);
+		}
+		catch(error){
+			throw error;
+		}
+
+	}
+
+	async requestExists(uuid: string) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					request_uuid : uuid,
+				}
+			})
+			return (user);
+		}
+		catch(error) {
+			throw error;
+		}
+	}
+
+	async removeUuid(uuid: string) {
+		try {
+			const user = await this.requestExists(uuid);
+			if (user) {
+				const updated = await this.prisma.user.update({
+					where: {
+						id: user.id,
+					},
+					data: {
+						request_uuid: null,
+					},
+				})
+			}
+		}
+		catch(error) {
+			throw (error);
+		}
+	}
+
 	generateOtpSecret() : string {
 		try {
 			const keyLength = 15;
@@ -141,13 +215,22 @@ export class AuthService {
 
 	async generateOtp(userID) {
 		try {
+			//Look for user in DB
+			const user = await this.prisma.user.findUnique({
+				where : {
+					id: userID,
+				}
+			});
+
+			if (user && user.otp_secret && user.otp_url)
+				return {otp_secret: user.otp_secret, otp_url: user.otp_url};
 
 			//Generates a key
 			const base32_secret : string = this.generateOtpSecret();
 			
 			//Instantiate a TOTP object
 			const TOTP = new OTPAuth.TOTP({
-				algorithm: "SHA256",
+				algorithm: "SHA1",
 				digits: 6,
 				issuer: "Pinguscendence",
 				issuerInLabel: true,
@@ -185,7 +268,7 @@ export class AuthService {
 			});
 
 			const TOTP = new OTPAuth.TOTP({
-				algorithm: "SHA256",
+				algorithm: "SHA1",
 				digits: 6,
 				issuer: "Pinguscendence",
 				issuerInLabel: true,
@@ -193,7 +276,7 @@ export class AuthService {
 				secret: user.otp_secret,
 			});
 
-			const delta = TOTP.validate({token});
+			const delta = TOTP.validate({token, window: 2});
 
 			if (delta === null)
 				return false
@@ -232,6 +315,24 @@ export class AuthService {
 					otp_enabled: false,
 				},
 			});
+		}
+		catch(error) {
+			throw error;
+		}
+	}
+
+	async isOtpEnabled(userID) : Promise<boolean> {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userID,
+				},
+			});
+
+			if (user.otp_enabled) {
+				return true
+			}
+			return false;
 		}
 		catch(error) {
 			throw error;

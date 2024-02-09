@@ -1,13 +1,14 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
+import { ArgumentsHost, BadRequestException, Catch, ExceptionFilter } from "@nestjs/common";
 import { WsException } from "@nestjs/websockets";
 
-@Catch(WsException)
+//Works only on methods with @SubscribeMessage decorator
+@Catch(WsException, BadRequestException)
 export class WsExceptionFilter implements ExceptionFilter {
-	catch(exception: WsException, host: ArgumentsHost) {
+	catch(exception: WsException | BadRequestException, host: ArgumentsHost) {
 		const client = host.switchToWs().getClient();
-		const errorMessage = exception.getError()
+		const errorMessage = exception.message;
 
-		console.log(errorMessage);
-		client.emit('wsException', errorMessage);
+		console.log(exception)
+		client.emit('exception', errorMessage);
 	}
 }

@@ -189,24 +189,21 @@ const VerticalNavbar: React.FC = () => {
 							</div>
 						</Button>
 					</Link>
-
-					<Link to="/auth" className="text-black" onClick={handleLogout}>
-						<Button
-							variant={
-								active === 5 ? "tabBtnActive" : "tabBtnDefault"
-							}
-							size="openedTabSize"
-							onClick={() => handleNavTabs(5)}
+					<Button
+						variant={
+							active === 5 ? "tabBtnActive" : "tabBtnDefault"
+						}
+						size="openedTabSize"
+						onClick={handleLogout}
+					>
+						<div
+							className={`pr-[20px] ${
+								active === 5 ? "text-white" : "text-black"
+							}`}
 						>
-							<div
-								className={`pr-[20px] ${
-									active === 5 ? "text-white" : "text-black"
-								}`}
-							>
-								<LogOut className="h-[24px] w-[24px]" />
-							</div>
-						</Button>
-					</Link>
+							<LogOut className="h-[24px] w-[24px]" />
+						</div>
+					</Button>
 				</div>
 			</div>
 		</nav>

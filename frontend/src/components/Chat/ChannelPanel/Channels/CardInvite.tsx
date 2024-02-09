@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
     Card,
@@ -9,37 +8,44 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import axios from 'axios'
 import { useWebSocket } from '@/context/webSocketContext'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { Label } from '@radix-ui/react-label'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Socket } from 'socket.io-client'
 
-interface CardJoinProps {
-    onClose: () => void
-}
-
-type FormValues = {
+export type InviteFormValues = {
+    sentBy: string
     name: string
-    password?: string
+    channel: string
 }
 
-function CardJoin({ onClose }: CardJoinProps) {
-    const { register, handleSubmit } = useForm<FormValues>()
+interface CardInviteProps {
+    onClose: () => void
+    channel: string
+}
+
+const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
+    const { register, handleSubmit } = useForm<InviteFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const socket = useWebSocket() as Socket
+    const { data: me } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
 
-    const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    async function onSubmit(data: InviteFormValues) {
+        data.channel = channel
+        data.sentBy = me?.name || ''
         try {
-            if (data.password === '') delete data.password
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/chat/join`,
+            const response = await axios.patch(
+                `${import.meta.env.VITE_BACKEND_URL}/chat/channel/invite`,
                 data,
                 {
                     withCredentials: true,
                 }
             )
-            socket?.emit('joinChannel', data.name)
+            socket?.emit('channelInvite', data)
             onClose()
         } catch (error: any) {
             setErrorMessage(error.response.data.message)
@@ -50,35 +56,26 @@ function CardJoin({ onClose }: CardJoinProps) {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Card>
+                <Card className="border-none shadow-none">
                     <CardHeader>
-                        <CardTitle>Join</CardTitle>
+                        <CardTitle>Invite to channel</CardTitle>
                         <CardDescription>
-                            Enter channel's informations to join it.
+                            Enter noot's name to invite him in this channel.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <div className="space-y-1">
-                            <Label htmlFor="name">Channel's name</Label>
+                            <Label htmlFor="name">Name</Label>
                             <Input
                                 id="name"
-                                placeholder="Pinga's Place"
+                                placeholder="Pingu"
                                 {...register('name')}
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                placeholder="Optionnal"
-                                type="password"
-                                {...register('password')}
                             />
                         </div>
                         <div className="text-red-600">{errorMessage}</div>
                     </CardContent>
                     <CardFooter>
-                        <Button>Join Channel</Button>
+                        <Button>Invite to channel</Button>
                     </CardFooter>
                 </Card>
             </form>
@@ -86,4 +83,4 @@ function CardJoin({ onClose }: CardJoinProps) {
     )
 }
 
-export default CardJoin
+export default CardInvite

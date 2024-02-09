@@ -1,20 +1,33 @@
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import Modal from '../../Modal'
-import TabsChannel from './TabsChannel/TabsChannel'
+import TabsChannel from './Channels/TabsChannel'
 import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
-import { useQuery } from '@tanstack/react-query'
-import { Cog, Plus } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Plus, Share } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
+import UserList from './Channels/UserList'
+import { useWebSocket } from '@/context/webSocketContext'
+import { Socket } from 'socket.io-client'
+import CardInvite from './Channels/CardInvite'
 
-function ChannelPanel() {
+interface ChannelPanelProps {
+    setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
+    currentChannel: string
+}
+
+const ChannelPanel: React.FC<ChannelPanelProps> = ({
+    setCurrentChannel,
+    currentChannel,
+}) => {
     const [open, setOpen] = useState<boolean>(false)
     const [open2, setOpen2] = useState<boolean>(false)
 
     const [hide, setHide] = useState<boolean>(true)
-    const [currentChannel, setCurrentChannel] = useState<string>('')
-	const [color, setColor] = useState<string>('')
+    const [color, setColor] = useState<string>('')
+    const queryClient = useQueryClient()
+    const socket = useWebSocket() as Socket
 
     const { data: channels } = useQuery({
         queryKey: ['channels'],
@@ -22,9 +35,15 @@ function ChannelPanel() {
     })
 
     function handleClick(name: string) {
+        const previousChannel = currentChannel
         setHide(false)
         setCurrentChannel(name)
-		setColor('[#C1E2F7]')
+        queryClient.invalidateQueries({
+            queryKey: ['channelUsers', previousChannel],
+        })
+        setColor('[#C1E2F7]')
+        socket?.emit('leaveChannel', previousChannel)
+        socket?.emit('joinChannel', name)
     }
 
     if (!hide) {
@@ -49,26 +68,34 @@ function ChannelPanel() {
                         </Modal>
                     </div>
                     <div className="bg-pink-200">
-                        <h1 className="ml-4">Private Messages</h1>
+                        <h1 className="p-[4px]">Private Messages</h1>
                     </div>
                     <div className="bg-blue-200">
-                        <div className="justify-between overflow-auto-y">
-                            <h1 className="ml-4">Groups</h1>
-                            {channels?.map((channel, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => handleClick(channel.name)}
-									className="hover:cursor-pointer"
-                                >
-                                    <UserCards
-										bgColor={channel.name === currentChannel ? color : 'white'}
-                                        userName={channel.name}
-                                        userPicture={PinguFamily}
-                                        userStatus=""
-                                        variant="CHAT"
-                                    ></UserCards>
-                                </div>
-                            ))}
+                        <div className="justify-between">
+                            <h1 className="p-[4px]">Groups</h1>
+                            {channels?.map((channel, index) =>
+                                !channel.banned && !channel.invited ? (
+                                    <div
+                                        key={index}
+                                        onClick={() =>
+                                            handleClick(channel.name)
+                                        }
+                                        className="hover:cursor-pointer"
+                                    >
+                                        <UserCards
+                                            bgColor={
+                                                channel.name === currentChannel
+                                                    ? color
+                                                    : 'white'
+                                            }
+                                            userName={channel.name}
+                                            userPicture={PinguFamily}
+                                            userStatus=""
+                                            variant="CHAT"
+                                        ></UserCards>
+                                    </div>
+                                ) : null
+                            )}
                         </div>
                     </div>
                 </div>
@@ -82,13 +109,16 @@ function ChannelPanel() {
                             size="smIcon"
                             onClick={() => setOpen2(true)}
                         >
-                            <Cog></Cog>
+                            <Share></Share>
                         </Button>
                         <Modal open={open2} onClose={() => setOpen2(false)}>
-                            <div>Coucou</div>
-                            {/* PUT HERE THE CHANNEL PARAM PANEL */}
+                            <CardInvite
+                                channel={currentChannel}
+                                onClose={() => setOpen2(false)}
+                            ></CardInvite>
                         </Modal>
                     </div>
+                    <UserList channel={currentChannel}></UserList>
                 </div>
             </div>
         )
@@ -119,20 +149,24 @@ function ChannelPanel() {
                     <div className="bg-blue-200">
                         <div className="justify-between overflow-auto-y">
                             <h1 className="ml-4">Groups</h1>
-                            {channels?.map((channel, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => handleClick(channel.name)}
-                                >
-                                    <UserCards
-										bgColor='white'
-                                        userName={channel.name}
-                                        userPicture={PinguFamily}
-                                        userStatus=""
-                                        variant="CHAT"
-                                    ></UserCards>
-                                </div>
-                            ))}
+                            {channels?.map((channel, index) =>
+                                !channel.banned && !channel.invited ? (
+                                    <div
+                                        key={index}
+                                        onClick={() =>
+                                            handleClick(channel.name)
+                                        }
+                                    >
+                                        <UserCards
+                                            bgColor="white"
+                                            userName={channel.name}
+                                            userPicture={PinguFamily}
+                                            userStatus=""
+                                            variant="CHAT"
+                                        ></UserCards>
+                                    </div>
+                                ) : null
+                            )}
                         </div>
                     </div>
                 </div>

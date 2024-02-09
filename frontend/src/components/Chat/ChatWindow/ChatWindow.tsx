@@ -1,70 +1,149 @@
 import React, { useEffect, useState } from 'react'
-import Messages from './Messages'
 import { useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Send } from 'lucide-react'
+import { Plus, Send } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { getChannelUsers, getMessages } from '@/lib/Chat/chat.requests'
+import MessageBubble from './MessageBubble'
+import Placeholder from '../../../assets/empty-state/empty-chat.png'
+import Modal from '@/components/Modal'
+import TabsChannel from '../ChannelPanel/Channels/TabsChannel'
+import SelfMessage from './SelfMessage'
+import Pingu from '../../../assets/empty-state/pingu-face.svg'
 
-interface messageData {
-    user: string
+type MessageFormValues = {
+    userId: number
+    userName: string
     target: string
     message: string
 }
 
-function ChatWindow() {
-    const [value, setValue] = useState<string>('')
-    const socket = useWebSocket() as Socket
-    const [messages, setMessages] = useState<string[]>([])
+interface ChatWindowProps {
+    currentChannel: string
+}
 
-    //Send an event 'message' to WebSocket with value as argument
-    const send = (value: string) => {
-        socket?.emit('message', value)
+const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
+    const [open, setOpen] = useState<boolean>(false)
+    const { register, handleSubmit, reset } = useForm<MessageFormValues>()
+    const socket = useWebSocket() as Socket
+    const queryClient = useQueryClient()
+
+    const { data: messages } = useQuery({
+        queryKey: ['messages', currentChannel],
+        queryFn: () => getMessages(currentChannel),
+    })
+
+    const { data: me } = useQuery({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
+
+    const { data: users } = useQuery({
+        queryKey: ['channelUsers', currentChannel],
+        queryFn: () => getChannelUsers(currentChannel),
+    })
+
+    function getAvatar(name: string): string {
+        for (const user of users || []) {
+            if (user.name === name) {
+                return user.photo42
+            }
+        }
+        return Pingu
     }
 
-    //Save the message in a string array
+    //Call for each event 'newMessage' and invalidate the query 'messages' to update it
     const messageListener = (message: string) => {
-        setMessages([...messages, message])
+        if (message === 'newMessage')
+            queryClient.invalidateQueries({
+                queryKey: ['messages', currentChannel],
+            })
+    }
+
+    const updateListener = () => {
+        queryClient.invalidateQueries({
+            queryKey: ['channelUsers', currentChannel],
+        })
     }
 
     //On = Listen to the event 'message' then call messageListener() with the given arguments
     //Off = Stop listenning when component is unmount
     useEffect(() => {
-        socket?.on('message', messageListener)
+        socket?.on('messageToRoom', messageListener)
+        socket?.on('update', updateListener)
         return () => {
-            socket?.off('message', messageListener)
+            socket?.off('messageToRoom', messageListener)
+            socket?.off('update', updateListener)
         }
-    }, [socket, messageListener])
+    }, [socket, messageListener, updateListener])
 
-    return (
+    async function onSubmit(data: MessageFormValues) {
+        data.target = currentChannel
+        data.userName = me?.name || ''
+        data.userId = me?.id || 0
+        socket?.emit('messageToRoom', data)
+        reset({ message: '' })
+    }
+
+    return currentChannel ? (
         <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
-            <div className="bg-white flex flex-col justify-between w-full h-full rounded-[16px] overflow-hidden p-[20px] shadow-drop">
-                <div className=" w-full h-full overflow-hidden">
-                    <Messages messages={messages}></Messages>
+            <div className="bg-white flex flex-col justify-between w-full h-full rounded-[16px] p-[20px] shadow-drop">
+                <div className="flex flex-col-reverse gap-[36px] w-full h-full overflow-y-auto">
+                    {messages
+                        ?.slice(0)
+                        .reverse()
+                        .map((message, index) =>
+                            message.sentByName === me?.name ? (
+                                <SelfMessage
+                                    key={index}
+                                    message={message}
+                                    picture={me?.photo42 || ''}
+                                ></SelfMessage>
+                            ) : (
+                                <MessageBubble
+                                    key={index}
+                                    message={message}
+                                    picture={getAvatar(message.sentByName)}
+                                ></MessageBubble>
+                            )
+                        )}
                 </div>
-                <div className="flex w-full items-center space-x-2 border-t-[#E5E5EA] border-t-[1px] pt-[20px]">
-                    <Input className="shadow-none border-none focus-visible:ring-0" type="email" placeholder="Send message..." />
-                    <Button variant={'ghost'} size={'smIcon'} type="submit"><Send/></Button>
-                </div>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="flex w-full items-center space-x-2 border-t-[#E5E5EA] border-t-[1px] pt-[20px]">
+                        <Input
+                            className="shadow-none border-none focus-visible:ring-0"
+                            type="text"
+                            placeholder="Send message..."
+                            {...register('message')}
+                        />
+                        <Button variant={'ghost'} size={'smIcon'} type="submit">
+                            <Send />
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    ) : (
+        <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
+            <div className="bg-white flex flex-col justify-center items-center w-full h-full rounded-[16px] overflow-hidden p-[20px] shadow-drop">
+                <img className="w-[80%]" src={Placeholder}></img>
+                <Button
+                    className="w-[10%] justify-between bg-customYellow"
+                    onClick={() => setOpen(true)}
+                >
+                    <span>Noot chat</span>
+                    <Plus />
+                </Button>
+                <Modal open={open} onClose={() => setOpen(false)}>
+                    <TabsChannel onClose={() => setOpen(false)}></TabsChannel>
+                </Modal>
             </div>
         </div>
     )
 }
 
 export default ChatWindow
-
-/* 
-                    <input
-                        type="text"
-                        className="p-4 w-full"
-                        placeholder="Send a message"
-                        onChange={(e) => setValue(e.target.value)}
-                        value={value}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                send(value)
-                                setValue('')
-                            }
-                        }}
-                    />
-*/
