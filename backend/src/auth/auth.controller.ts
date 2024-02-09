@@ -251,7 +251,7 @@ export class AuthController{
 				path: '/',
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 

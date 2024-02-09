@@ -75,3 +75,17 @@
     @apply bg-background bg-customLightBlue text-foreground;
   }
 }
+
+#canvas_pong{
+	background-color: #C3E8F9;
+	/* border-radius: 40px; */
+	width: 100%;	
+	height: 100%;
+
+
+	/* max-width: 800px; */
+
+	display: block;
+	/* margin-left: 120px; */
+	/* margin-right: 120px; */
+}

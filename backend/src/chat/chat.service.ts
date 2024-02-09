@@ -10,6 +10,7 @@ import { InviteChannelDto } from './dto/inviteChannel.dto';
 @Injectable()
 export class ChatService {
 	constructor(private prisma: PrismaService) {}
+	public map: Map<string, any> = new Map();
 
 	async createChannel(userId: number, dto: NewChannelDto): Promise<string> {
 		try {

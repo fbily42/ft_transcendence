@@ -51,6 +51,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const jwt = parsedcookie['jwt'];
 	
 			const decode = this.jwtService.verify(jwt);
+
+			//pour l'instant pour une question de facilite je vais utiliser le login dans map mais il faudrait utiliser le decode.sub
+			this.chatService.map.set(decode.login, client.id);
       
 			client.data = { userId: decode.sub, userName: decode.login };
 			const clientIds = this.clients.get(client.data.userName);
