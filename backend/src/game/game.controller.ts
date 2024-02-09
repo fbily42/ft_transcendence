@@ -12,7 +12,7 @@ export class GameController{
 	@Get('invitGame/:name')
 	async getInviteLogin(@Param ('name') name: string ,@Req() req: Request, @Res() res: Response){
 		try {
-			console.log("name in controller ",name);
+			// console.log("name in controller ",name);
 			await this.GameService.confirmLogin(name);
 			res.status(200).send('Login found');
 			

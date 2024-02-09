@@ -10,7 +10,7 @@ export class GameService{
 		async confirmLogin(login: string)
 		{
 			try {
-				console.log("name in service ",login);
+				// console.log("name in service ",login);
 				const user = await this.prisma.user.findUnique({
 					where: {
 						name: login,

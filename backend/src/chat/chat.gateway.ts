@@ -52,9 +52,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 			const decode = this.jwtService.verify(jwt);
 
-			//pour l'instant pour une question de facilite je vais utiliser le login dans map mais il faudrait utiliser le decode.sub
-			this.chatService.map.set(decode.login, client.id);
-      
 			client.data = { userId: decode.sub, userName: decode.login };
 			const clientIds = this.clients.get(client.data.userName);
 			if (clientIds)
@@ -137,3 +134,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('channelKick')
 	channelKick(@ConnectedSocket() client: Socket) {}
 }
+
+/* @SubscribeMessage('game invitation')
+	handleGameInvitation(client :any, data: {to: string, game: any}): void {
+		console.log(`Game invitation received. To: ${data.to}, Game: ${data.game}`);
+		const toSocketId = this.chatService.map.get(data.to);
+
+		if (!toSocketId){
+			console.log("erreur pas dans la map");
+			return ;
+		}
+
+		client.to(toSocketId).emit('game invitation', {from: client.id, game: data.game});
+
+
+	} */

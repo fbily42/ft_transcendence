@@ -29,18 +29,18 @@ function GameForm(){
 			const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/game/invitGame/${search}`,{
 				withCredentials: true,
 			});
-			console.log("etape 1", response.data);
+		
 			if (socket)
 			{
-				console.log("etape 2");
+				
 				socket.emit('game invitation', {to: search, game:response.data});
 			}
 		} catch (error)
 		{
-			console.log('probleme')
+		
 		}
 
-		console.log(`Recherche pour ${search}`);
+	
    		// setResults([search]); // Mettez à jour cette ligne pour afficher les vrais résultats
     	setSearch('');
 	};
