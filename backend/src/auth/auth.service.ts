@@ -167,6 +167,24 @@ export class AuthService {
 
 	}
 
+	async isProfileSet(userID: string) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where:{
+					name: userID,
+				}
+			});
+
+			if (user.avatar && user.pseudo) {
+				return true;
+			}
+			return false;
+		}
+		catch (error){
+			throw error;
+		}
+	}
+
 	async requestExists(uuid: string) {
 		try {
 			const user = await this.prisma.user.findUnique({

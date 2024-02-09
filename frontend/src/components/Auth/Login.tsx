@@ -6,12 +6,15 @@ import PinguAnim from '../../assets/welcome-assets/PinguAnim.mp4'
 import SnowCoverTop from '../../assets/welcome-assets/SnowCoverTop.svg'
 import SnowCoverBottom from '../../assets/welcome-assets/SnowCoverBottom.svg'
 import Snow from './Snow'
+import LoginButton from './LoginButton'
+import SetProfileForm from './SetProfileForm'
 
 type Loginprops = {
     children: React.ReactNode
+    isAuth: boolean
 }
 
-const Login: React.FC<Loginprops> = ({ children }) => {
+const Login: React.FC<Loginprops> = ({ children, isAuth }) => {
     return (
         <div className="relative flex h-[100vh] bg-background">
             <div className="absolute z-10">
@@ -22,27 +25,11 @@ const Login: React.FC<Loginprops> = ({ children }) => {
                     <img src={PinguLogo}></img>
                 </div>
                 <div className="flex flex-col gap-y-[36px] items-center">
-                    <div className="flex flex-col gap-y-[10px] justify-center text-center">
-                        <div>
-                            <p className="text-5xl font-bold">
-                                WELCOME TO PINGUSCENDENCE
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-2xl">
-                                Login to visit Pingu and his family in
-                                Antarctica
-                            </p>
-                        </div>
-                    </div>
-                    <div className="w-full h-full flex justify-center items-center">
-                        <Link to={import.meta.env.VITE_REDIRECT_URI}>
-                            <Button className="bg-customYellow text-xl font-semibold">
-                                Login as 42 Student
-                            </Button>
-                        </Link>
-                        {children}
-                    </div>
+                    {isAuth ? (
+                        <SetProfileForm>{children}</SetProfileForm>
+                    ) : (
+                        <LoginButton>{children}</LoginButton>
+                    )}
                 </div>
                 <div>
                     <img src={PinguFamily}></img>
@@ -76,8 +63,10 @@ const Login: React.FC<Loginprops> = ({ children }) => {
                             </div>
                         </div>
                         <video
-                            autoPlay
-                            loop
+                            autoPlay={true}
+                            loop={true}
+                            muted={true}
+                            controls={false}
                             className="h-full object-cover rounded-2xl overflow-hidden"
                         >
                             <source src={PinguAnim} type="video/mp4" />
