@@ -26,37 +26,43 @@ export class UserService {
 	}
 
 	async getOtherInfo(pseudo, currentUser) {
-
 		try {
 			const user = await this.prisma.user.findUnique({
-				where:{
+				where: {
 					pseudo: pseudo,
 				},
-				select:{
+				select: {
 					name: true,
 					pseudo: true,
 					score: true,
 					avatar: true,
 					rank: true,
-				}
+				},
 			});
-	
-			if (!user && user.name == currentUser) 
-				throw new HttpException('This user does not exist', HttpStatus.BAD_REQUEST)
-			
-			delete user.token42;
-			delete user.jwt;
-			return user;
 
+			if (!user && user.name == currentUser)
+				throw new HttpException(
+					'This user does not exist',
+					HttpStatus.BAD_REQUEST,
+				);
+
+			// delete user.token42;
+			// delete user.jwt;
+			return user;
 		} catch (error) {
 			if (error instanceof HttpException) {
 				throw error;
 			} else if (error instanceof PrismaClientKnownRequestError) {
-				throw new HttpException(`Prisma error: ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
 			}
-			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
-			
 	}
 
 	async getLeaderboard() {
