@@ -128,3 +128,12 @@ model FriendShip {
 }
 // Use "npx prisma generate" = create TSClass from Schema for our code.
 // => import { User } from '@prisma/client';
+
+// model Images {
+// 	id 				Int @id @default(autoincrement())
+// 	createdAt 		DateTime @default(now())
+// 	updateAt 		DateTime @updatedAt
+
+// 	imageProfile	String
+// 	imageBackground	String
+// }

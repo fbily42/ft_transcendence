@@ -14,9 +14,13 @@ import { Photo42 } from '@/assets/avatarAssociation'
 import { useParams } from 'react-router-dom'
 
 function OtherProfile() {
-    let { pseudo } = useParams<string>()
+    const { id } = useParams<{ id: string }>()
+    console.log(id, 'id')
     // mettre isError
-    const { data, isError } = useQuery({ queryKey: ['pseudo'], queryFn: () => getOtherUser(pseudo!) })
+    const { data } = useQuery({
+        queryKey: ['pseudo'],
+        queryFn: () => getOtherUser(id!),
+    })
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
     const selectedAvatar = Photo42().imageBackground || ''
 

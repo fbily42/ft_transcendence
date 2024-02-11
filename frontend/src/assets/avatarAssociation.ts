@@ -11,12 +11,12 @@ import PingiBg from './avatar-assets/Pingi.svg'
 import RobbyProfile from './avatar-assets/robby-face.svg'
 import RobbyBg from './avatar-assets/Robby.svg'
 import { useQuery } from '@tanstack/react-query'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 export function Pingu() {
     return {
-        id: 1,
+        id: '876987678',
         imageProfile: PinguProfile,
         imageBackground: PinguBg,
     }
@@ -24,7 +24,7 @@ export function Pingu() {
 
 export function Pinga() {
     return {
-        id: 2,
+        id: '2674567548',
         imageProfile: PingaProfile,
         imageBackground: PingaBg,
     }
@@ -32,7 +32,7 @@ export function Pinga() {
 
 export function Mama() {
     return {
-        id: 3,
+        id: '398768976786',
         imageProfile: MamaProfile,
         imageBackground: MamaBg,
     }
@@ -40,7 +40,7 @@ export function Mama() {
 
 export function Papa() {
     return {
-        id: 4,
+        id: '4987676654',
         imageProfile: PapaProfile,
         imageBackground: PapaBg,
     }
@@ -48,7 +48,7 @@ export function Papa() {
 
 export function Pingi() {
     return {
-        id: 5,
+        id: '55332578',
         imageProfile: PingiProfile,
         imageBackground: PingiBg,
     }
@@ -56,27 +56,28 @@ export function Pingi() {
 
 export function Robby() {
     return {
-        id: 6,
+        id: '66544990',
         imageProfile: RobbyProfile,
         imageBackground: RobbyBg,
     }
 }
 
-export function Photo42() {
-    const { data } = useQuery<UserData>({
-        queryKey: ['me'],
-        queryFn: getUserMe,
+export function Photo42(id: string) {
+    const { data, isError, isSuccess } = useQuery<UserData>({
+        queryKey: ['users', id],
+        queryFn: () => getUserById(id),
     })
 
-    const result: {
-        id: number
-        imageProfile: string
-        imageBackground: string | undefined
-    } = {
-        id: 7,
-        imageProfile: data?.photo42 || '',
-        imageBackground: data?.photo42 || '',
+    if (isError || !isSuccess || !data) {
+        return {
+            id: '',
+            imageProfile: '',
+            imageBackground: '',
+        }
     }
-
-    return result
+    return {
+        id: data.id,
+        imageProfile: data.photo42 || '',
+        imageBackground: data.photo42 || '',
+    }
 }

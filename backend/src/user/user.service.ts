@@ -25,6 +25,30 @@ export class UserService {
 		return user;
 	}
 
+	async getUsers() {
+		const user = await this.prisma.user.findMany({
+			// select: {
+			// 	name: true,
+			// 	pseudo: true,
+			// 	score: true,
+			// 	avatar: true,
+			// 	rank: true,
+			// },
+		});
+		if (!user) return null;
+		return user;
+	}
+
+	async getUserById(id: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: Number(id),
+			},
+		});
+		if (!user) return null;
+		return user;
+	}
+
 	async getOtherInfo(pseudo, currentUser) {
 		try {
 			const user = await this.prisma.user.findUnique({
