@@ -10,6 +10,7 @@ import { XCircle } from "lucide-react";
 import axios from "axios";
 import { useWebSocket } from "@/context/webSocketContext";
 import pingu_duo from "./../../assets/Pong_page/duo.png"
+import { Socket } from "socket.io-client";
 
 
 // interface GameFormprops {
@@ -17,7 +18,7 @@ import pingu_duo from "./../../assets/Pong_page/duo.png"
 // }
 function GameForm(){
 	const [search, setSearch] = useState('');
-	const socket = useWebSocket();
+	const socket = useWebSocket() as Socket;
 	// const [results, setResults] = useState([]);
 
 
@@ -45,11 +46,18 @@ function GameForm(){
     	setSearch('');
 	};
 
+	let roomcounter = 0;
 	async function handleMatchmaking(event: any)
 	{
 		event.preventDefault();
-		//verifier qu'il y a une personne en ligne au moins autre que le client 
+		const roomName = 'room' + roomcounter++;
 		if (socket)
+		{
+			socket.emit('JoinRoom', roomName);
+			socket.on()
+	
+		}
+		//verifier qu'il y a une personne en ligne au moins autre que le client 
 			socket.emit('game invitation random');
 
 
