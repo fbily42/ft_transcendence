@@ -84,3 +84,5 @@ export async function getMessages(name: string): Promise<Message[]> {
         throw error
     }
 }
+
+export function directMessage(socket: Socket)

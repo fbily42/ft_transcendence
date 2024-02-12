@@ -13,12 +13,11 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { MessageDto } from './dto/message.dto';
-import { WsExceptionFilter } from './filter/ws-exception.filter';
+import { MessageDto } from './chat/dto/message.dto';
+import { WsExceptionFilter } from './chat/filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
-import cookieParser from 'cookie-parser';
-import { InviteChannelDto } from './dto/inviteChannel.dto';
+import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -41,6 +40,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server = new Server();
 		}
 
+	getClientsAsArray(): {key: string, value: string[]}[] {
+		const clientsArray = [];
+	
+		for (const [key, value] of this.clients.entries()) {
+			clientsArray.push({key: key, value: value});
+		}
+	
+		return clientsArray;
+	}
+
 	async handleConnection(client: Socket) {
 		
 		try {
@@ -58,6 +67,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				clientIds.push(client.id)
 			else
 				this.clients.set(client.data.userName, [client.id])
+			this.server.emit('users', this.getClientsAsArray())
 		} catch (error) {
 			client.emit('exception', error.message);
 			client.disconnect();
@@ -74,6 +84,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			else
 				this.clients.delete(client.data.userName)
 		}
+		this.server.emit("users", this.getClientsAsArray())
 	}
 
 	@SubscribeMessage('messageToRoom')
@@ -115,9 +126,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('privateMessage')
-	privateMessage(@ConnectedSocket() client : Socket) {
-		// console.log(this.clients)
-		//TODO -> private message logic
+	privateMessage(@ConnectedSocket() client : Socket, @MessageBody() target: string) {
+		
 	}
 
 	@SubscribeMessage('channelInvite')

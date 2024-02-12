@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Share } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 import UserList from './Channels/UserList'
-import { useWebSocket } from '@/context/webSocketContext'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
 import CardInvite from './Channels/CardInvite'
 
@@ -27,7 +27,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     const [hide, setHide] = useState<boolean>(true)
     const [color, setColor] = useState<string>('')
     const queryClient = useQueryClient()
-    const socket = useWebSocket() as Socket
+    const socket = useWebSocket() as WebSocketContextType
 
     const { data: channels } = useQuery({
         queryKey: ['channels'],
@@ -42,8 +42,8 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
             queryKey: ['channelUsers', previousChannel],
         })
         setColor('[#C1E2F7]')
-        socket?.emit('leaveChannel', previousChannel)
-        socket?.emit('joinChannel', name)
+        socket.webSocket?.emit('leaveChannel', previousChannel)
+        socket.webSocket?.emit('joinChannel', name)
     }
 
     if (!hide) {
