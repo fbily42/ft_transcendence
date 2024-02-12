@@ -20,3 +20,20 @@ ENV PATH /app/node_modules/.bin:$PATH
 EXPOSE 3000
 
 # CMD [ "npm", "run", "start" ]
+
+
+
+# FROM node:20
+
+# # install app dependencies
+# COPY package*.json ./
+
+# RUN npm install -g npm@latest
+# RUN npm install
+
+# #set working directory
+# WORKDIR /app
+
+# EXPOSE 3000
+
+# CMD [ "npm", "run", "dev" ]
