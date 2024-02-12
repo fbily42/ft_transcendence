@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '../ui/input'
@@ -8,6 +8,7 @@ import { Photo42, Pingu } from '@/assets/avatarAssociation'
 import { useQuery } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { Check, Pencil, Plus } from 'lucide-react'
 
 type SetProfileFormprops = {
     children: React.ReactNode
@@ -26,22 +27,46 @@ type ImageObject = {
 const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
     const { register, handleSubmit } = useForm<ProfileFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
+    const [openAvatars, setOpenAvatars] = useState<boolean>(false)
     const initialAvatar: ImageObject = Photo42()
-    const [selectedAvatar, setSelectedAvatar] =
-        useState<ImageObject>(initialAvatar)
+    const [selectedAvatar, setSelectedAvatar] = useState<string>(
+        initialAvatar.imageProfile
+    )
+    const [uploadedImage, setUploadedImage] = useState<File | null>(null)
 
     useEffect(() => {
-        setSelectedAvatar(initialAvatar)
+        setSelectedAvatar(initialAvatar.imageProfile)
     }, [initialAvatar.imageProfile])
 
     async function onSubmit(data: ProfileFormValues) {
         setErrorMessage('data pseudo = ' + data.pseudo)
     }
-    // console.log('query data = ', data)
-    // console.log('avatar src = ', selectedAvatar)
+
+    const onAvatarButtonClick = (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault()
+        setOpenAvatars(!openAvatars)
+    }
+
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault()
+        const file = e.target.files?.[0]
+
+        if (file && file.type == 'image/svg+xml') {
+            const url = URL.createObjectURL(file)
+            // You can perform additional checks or validations here if needed
+            console.log(file)
+            console.log(url)
+            // Update state with the selected image file
+            setUploadedImage(file)
+            setSelectedAvatar(url)
+        }
+    }
+
+    console.log('selected avatar ', selectedAvatar)
+    console.log('uploaded img ', uploadedImage)
     return (
-        <div>
-            <div className="flex flex-col gap-y-[10px] justify-center text-center">
+        <div className="flex flex-col  justify-center text-center space-y-5">
+            <div className="flex flex-col  justify-center text-center">
                 <div>
                     <p className="text-5xl font-bold">
                         WELCOME TO PINGUCENDENCE
@@ -53,34 +78,50 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                     </p>
                 </div>
             </div>
-            <div className="w-full h-full flex flex-col justify-center items-center bg-pink-400">
+            <div className="w-full h-full flex flex-col justify-center items-center">
                 <form
-                    className="flex flex-col justify-center items-center space-y-3"
+                    className="flex flex-col justify-center items-center space-y-4"
                     onSubmit={handleSubmit(onSubmit)}
                 >
-                    <div>
+                    <div className="flex flex-col justify-center items-center space-y-3">
                         <Label htmlFor="avatar" hidden>
                             Avatar
                         </Label>
                         <div
-                            className="relative bg-[#C1E2F7] w-[80px] h-[80px] border-[3px] border-customYellow rounded-full"
+                            className="relative bg-background w-[150px] h-[150px] border-[3px] border-customYellow rounded-full"
                             style={{
-                                backgroundImage: `url(${selectedAvatar.imageProfile})`,
+                                backgroundImage: `url(${selectedAvatar})`,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                             }}
                         >
-                            <div className="absolute -bottom-1 -right-1">
-                                <Button className="bg-customYellow rounded-full w-[30px] h-[30px]">
-                                    +
+                            <div className="absolute bottom-[3px] right-[3px]">
+                                <Button
+                                    className="bg-customYellow rounded-full w-[30px] h-[30px] text-lg hover:bg-customDarkBlue"
+                                    onClick={onAvatarButtonClick}
+                                >
+                                    <div className="text-white">
+                                        {openAvatars ? (
+                                            <Check className="h-[15px] w-[15px]" />
+                                        ) : (
+                                            <Pencil className="h-[15px] w-[15px]" />
+                                        )}
+                                    </div>
                                 </Button>
                             </div>
                         </div>
-                        {/* <AvatarImg
-                            onSelect={(selectedImage) =>
-                                setSelectedAvatar(selectedImage)
-                            }
-                        /> */}
+                        <div hidden={!openAvatars}>
+                            <AvatarImg
+                                onSelect={(selectedImage) =>
+                                    setSelectedAvatar(selectedImage)
+                                }
+                            />
+                            <Input
+                                type="file"
+                                accept="image/svg+xml"
+                                onChange={handleImageChange}
+                            />
+                        </div>
                     </div>
                     <div>
                         <Label htmlFor="pseudo" hidden>
@@ -91,10 +132,15 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                             placeholder="Noot's name"
                             {...register('pseudo')}
                         />
+                        <div className="text-red-600 text-sm">
+                            {errorMessage}
+                        </div>
                     </div>
-                    <div className="text-red-600 text-sm">{errorMessage}</div>
                     <div>
-                        <Button className="bg-customYellow text-lg font-semi-bold">
+                        <Button
+                            type="submit"
+                            className="bg-customYellow text-lg font-semi-bold"
+                        >
                             I'm ready to noot!
                         </Button>
                     </div>

@@ -27,7 +27,10 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
     return (
         <div className="flex">
             {images.map((image) => (
-                <div className="bg-[#C1E2F7] flex items-center w-[70px] h-[70px] border-[3px] border-customYellow rounded-full overflow-hidden">
+                <div
+                    key={image.id}
+                    className="bg-[#C1E2F7] flex items-center w-[70px] h-[70px] border-[3px] border-customYellow rounded-full overflow-hidden"
+                >
                     <Button
                         onClick={() =>
                             handleImageClick(image.imageBackground || '')

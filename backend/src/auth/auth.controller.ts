@@ -84,9 +84,11 @@ export class AuthController {
 			});
 			if (!user.avatar || !user.pseudo) {
 				res.redirect(`${process.env.FRONTEND_URL}/auth`);
+				return;
 			}
 			res.redirect(`${process.env.FRONTEND_URL}`);
 		} catch (error) {
+			console.log(error);
 			res.redirect(`${process.env.FRONTEND_URL}/auth`);
 			throw error;
 		}
