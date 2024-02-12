@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useWebSocket } from '@/context/webSocketContext'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { Label } from '@radix-ui/react-label'
 import { useQuery } from '@tanstack/react-query'
@@ -31,7 +31,7 @@ interface CardInviteProps {
 const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
     const { register, handleSubmit } = useForm<InviteFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
-    const socket = useWebSocket() as Socket
+    const socket = useWebSocket() as WebSocketContextType
     const { data: me } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
 
     async function onSubmit(data: InviteFormValues) {
@@ -45,7 +45,7 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
                     withCredentials: true,
                 }
             )
-            socket?.emit('channelInvite', data)
+            socket.webSocket?.emit('channelInvite', data)
             onClose()
         } catch (error: any) {
             setErrorMessage(error.response.data.message)
