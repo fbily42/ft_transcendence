@@ -34,6 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	clients = new Map<string, string[]>();
+	games_room = new Map<string, string[]>();
 
 	constructor (private jwtService: JwtService,
 		private prisma: PrismaService) {
@@ -114,6 +115,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.join(name);
 			this.server.to(name).emit('update', client.data.userName)
 		}
+	}
+
+	@SubscribeMessage('joinRoom')
+	joingame(@ConnectedSocket() client: Socket, @MessageBody() name: string)
+	{
+		for (let [key, value] of this.games_room)
+		{
+			let stringcount = 0;
+			for (let item of value){
+				if (typeof item === 'string')
+				{
+					stringcount++;
+				}
+				if (stringcount === 2){
+					break;
+				}
+			}
+			if (stringcount < 2)
+			{
+				client.join(key);
+				client.emit('JoinParty', `You have joined room : ${key}` )
+			}
+		}
+		client.join(name);
+		client.emit('JoinParty', `You have created a room : ${name}`);
 	}
 
 	@SubscribeMessage('leaveChannel')
