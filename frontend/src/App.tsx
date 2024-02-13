@@ -11,7 +11,7 @@ import { WebSocketProvider } from './context/webSocketContext'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import TwoFA from './Pages/TwoFA/TwoFA'
 import { TwoFAProvider } from './context/twoFAEnableContext'
-// import OtherProfile from './Pages/Profile/OtherProfile'
+import OtherProfile from './Pages/Profile/OtherProfile'
 
 const queryClient = new QueryClient()
 
@@ -40,12 +40,12 @@ function App() {
                                         path="/chat"
                                         element={<Chat />}
                                     ></Route>
-                                    {/* <Route
-                                        path="/profile/:id"
-                                        element={<OtherProfile />}
-                                    ></Route> */}
                                     <Route
                                         path="/profile/:id"
+                                        element={<OtherProfile />}
+                                    ></Route>
+                                    <Route
+                                        path="/profile/me"
                                         element={<Profile />}
                                     ></Route>
                                 </Route>

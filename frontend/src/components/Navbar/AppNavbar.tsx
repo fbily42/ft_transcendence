@@ -35,14 +35,14 @@ const VerticalNavbar: React.FC = () => {
             case '/chat':
                 setActive(3)
                 break
-            case `/profile/${data?.id}`:
+            case `/profile/me`:
                 setActive(4)
                 break
             case '/auth':
                 setActive(5)
                 break
             default:
-                setActive(1)
+                setActive(0)
         }
     }, [location.pathname, data?.id])
 
@@ -145,7 +145,7 @@ const VerticalNavbar: React.FC = () => {
                     </Link>
                 </div>
                 <div className="flex flex-col items-start gap-[13px]">
-                    <Link to={`/profile/${data?.id}`} className="text-black">
+                    <Link to={`/profile/me`} className="text-black">
                         <Button
                             variant={
                                 active === 4 ? 'tabBtnActive' : 'tabBtnDefault'

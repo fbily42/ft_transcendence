@@ -8,14 +8,12 @@ import {
     Photo42,
 } from '@/assets/avatarAssociation'
 import { Button } from '@/components/ui/button'
-import { useParams } from 'react-router-dom'
 
 type ImageSelectorProps = {
     onSelect: (selectedImage: string) => void
 }
 
 const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
-    const param = useParams()
     const images: {
         id: string
         imageProfile: string
@@ -27,7 +25,7 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
         Papa(),
         Pingi(),
         Robby(),
-        Photo42(param.id as string),
+        Photo42(),
     ]
 
     const handleImageClick = (image: string) => {

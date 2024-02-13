@@ -11,7 +11,7 @@ import PingiBg from './avatar-assets/Pingi.svg'
 import RobbyProfile from './avatar-assets/robby-face.svg'
 import RobbyBg from './avatar-assets/Robby.svg'
 import { useQuery } from '@tanstack/react-query'
-import { getUserById } from '@/lib/Dashboard/dashboard.requests'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 export function Pingu() {
@@ -62,22 +62,41 @@ export function Robby() {
     }
 }
 
-export function Photo42(id: string) {
-    const { data, isError, isSuccess } = useQuery<UserData>({
-        queryKey: ['users', id],
-        queryFn: () => getUserById(id),
+// export function Photo42(id: string) {
+//     const { data, isError, isSuccess } = useQuery<UserData>({
+//         queryKey: ['users', id],
+//         queryFn: () => getUserById(id),
+//     })
+
+//     if (isError || !isSuccess || !data) {
+//         return {
+//             id: '',
+//             imageProfile: '',
+//             imageBackground: '',
+//         }
+//     }
+//     return {
+//         id: data.id,
+//         imageProfile: data.photo42 || '',
+//         imageBackground: data.photo42 || '',
+//     }
+// }
+
+export function Photo42() {
+    const { data } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
     })
 
-    if (isError || !isSuccess || !data) {
-        return {
-            id: '',
-            imageProfile: '',
-            imageBackground: '',
-        }
+    const result: {
+        id: string
+        imageProfile: string
+        imageBackground: string | undefined
+    } = {
+        id: '775346546564',
+        imageProfile: data?.photo42 || '',
+        imageBackground: data?.photo42 || '',
     }
-    return {
-        id: data.id,
-        imageProfile: data.photo42 || '',
-        imageBackground: data.photo42 || '',
-    }
+
+    return result
 }

@@ -44,6 +44,14 @@ export class UserService {
 			where: {
 				id: Number(id),
 			},
+			select: {
+				name: true,
+				pseudo: true,
+				score: true,
+				avatar: true,
+				rank: true,
+				photo42: true,
+			},
 		});
 		if (!user) return null;
 		return user;
