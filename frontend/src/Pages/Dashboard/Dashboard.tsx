@@ -6,9 +6,10 @@ import Clouds from '../../assets/other/cloud.svg'
 import Mountains from '../../assets/other/mountain.svg'
 import PinguPlaying from '../../assets/other/Pingu.svg'
 import { Button } from '@/components/ui/button'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 function Dashboard(): JSX.Element {
-    const { data } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
+    const { data } = useQuery<UserData>({ queryKey: ['me'], queryFn: getUserMe })
 
     return (
         <>

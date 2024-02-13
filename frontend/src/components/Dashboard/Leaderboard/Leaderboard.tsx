@@ -6,7 +6,7 @@ import { LeaderboardData } from '@/lib/Dashboard/dashboard.types'
 
 export default function LeaderBoard(): JSX.Element {
     const { data } = useQuery<LeaderboardData[]>({
-        queryKey: [],
+        queryKey: ['leaderboard'],
         queryFn: getLeaderboard,
         refetchInterval: 1000 * 10,
     })

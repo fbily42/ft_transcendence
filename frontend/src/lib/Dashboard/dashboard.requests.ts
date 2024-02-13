@@ -24,7 +24,7 @@ export async function getOtherUser(pseudo: string): Promise<UserData> {
 
 export async function getUsers(): Promise<UserData> {
     const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/user/`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/all`,
         {
             withCredentials: true,
         }
@@ -33,22 +33,18 @@ export async function getUsers(): Promise<UserData> {
 }
 
 export async function getLeaderboard(): Promise<LeaderboardData[]> {
-    // try {
-    const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/user/leaderboard`,
-        {
-            withCredentials: true,
-        }
-    )
-    return response.data
-    // } catch (error) {
-    //     throw error
-    // }
+        const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/user/leaderboard`,
+            {
+                withCredentials: true,
+            }
+            )
+        return response.data
 }
 
 export async function getUserById(id: string): Promise<UserData> {
     const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/user/${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/profile/${id}`,
         {
             withCredentials: true,
         }
