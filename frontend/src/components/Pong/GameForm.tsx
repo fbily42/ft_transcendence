@@ -11,14 +11,15 @@ import axios from "axios";
 import { useWebSocket } from "@/context/webSocketContext";
 import pingu_duo from "./../../assets/Pong_page/duo.png"
 import { Socket } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 
 // interface GameFormprops {
 // 	onClose: () => void;
 // }
-function GameForm(){
+function GameForm({ closeDialog }){
 	const [search, setSearch] = useState('');
-	const socket = useWebSocket() as Socket;
+	const socket = useWebSocket();
 	// const [results, setResults] = useState([]);
 
 
@@ -45,20 +46,47 @@ function GameForm(){
    		// setResults([search]); // Mettez à jour cette ligne pour afficher les vrais résultats
     	setSearch('');
 	};
-
+	
 	let roomcounter = 0;
+	const navigate = useNavigate();
 	async function handleMatchmaking(event: any)
 	{
-		event.preventDefault();
+		event.preventDefault();//a quoi cela sert
 		const roomName = 'room' + roomcounter++;
+		//mettre fin au matchmaking des qu'il ferme le modal
 		if (socket)
 		{
-			socket.emit('JoinRoom', roomName);
-			socket.on()
+			socket.webSocket?.on('JoinParty', (message: string) => {
+				let words = message.split(' '); 
+				let lastWord = words[words.length - 1];
+				console.log(lastWord);
+				if (message.startsWith('You have joined'))
+				{
+					navigate('/pong');
+					closeDialog();
+					// console.log('join :', lastWord);//faire rejoindre la partie 
+				}
+				else if (message.startsWith('You have created'))
+				{
+					closeDialog();
+					// console.log('created :', lastWord);
+				}
+				if(message.startsWith('Ready'))
+				{
+					//possiblement faire un emit pour ensuite pouvoir le recuperer dans le game pour avoir le nom de la room 
+					navigate('/pong');
+					closeDialog();
+					// console.log('Start the Game');//faire rejoindre la partie
+				}
+				else
+					return; //error
+			})
+			socket.webSocket?.emit('JoinRoom', roomName);
+			// socket.emit('JoinRoom', roomName);
 	
 		}
 		//verifier qu'il y a une personne en ligne au moins autre que le client 
-			socket.emit('game invitation random');
+			// socket.emit('game invitation random');
 
 
 	}

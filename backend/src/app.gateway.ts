@@ -117,7 +117,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@SubscribeMessage('joinRoom')
+
+	//possible probleme
+	//si une personne cree une room elle peut pas en rejoindre une 
+	//si une personne veux annuler sa recherche comment faire
+	//que se passe t il si elle spam un bouton 
+	//si elle est en partie ne rien faire
+	//verifier le login de la personne pour l'empecher de faire deux matchmaking
+	@SubscribeMessage('JoinRoom')
 	joingame(@ConnectedSocket() client: Socket, @MessageBody() name: string)
 	{
 		for (let [key, value] of this.games_room)
@@ -125,22 +132,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let stringcount = 0;
 			for (let item of value){
 				if (typeof item === 'string')
-				{
 					stringcount++;
-				}
-				if (stringcount === 2){
+				if (stringcount === 2)
 					break;
-				}
 			}
 			if (stringcount < 2)
 			{
-				client.join(key);
-				client.emit('JoinParty', `You have joined room : ${key}` )
+				if (value[0] != client.id)
+				{
+					client.join(key);
+					let array = this.games_room.get(key);
+					array.push(client.id);
+					this.games_room.set(key, array);
+					client.emit('JoinParty', `You have joined room : ${key}`)
+					client.emit('Ready', key);
+					client.to(value[0]).emit('JoinParty', 'Ready');
+					return ;
+
+				}
+				else
+					return;
 			}
 		}
+		console.log('here5');
+		this.games_room.set(name, [client.id]);
 		client.join(name);
 		client.emit('JoinParty', `You have created a room : ${name}`);
+		return ;
 	}
+
 
 	@SubscribeMessage('leaveChannel')
 	leave(@ConnectedSocket() client: Socket, @MessageBody() name: string){

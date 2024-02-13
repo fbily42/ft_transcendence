@@ -26,8 +26,15 @@ export default function Board(){
 	// const imgRef = useRef<HTMLImageElement | null>(null);
 	const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
 	// const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
-	const socket = useWebSocket() as Socket;
+	const socket = useWebSocket();
+	let roomName: String = 'false'; 
 	
+	socket?.webSocket?.on('Ready', (room:string )=> {
+		roomName = room;
+	})
+	if (roomName ===  'false')
+		return;
+
 	useEffect(() => {
 		let {ballObj, paddle_1,paddle_2, Game_stat}= data;
 		// imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
@@ -39,6 +46,7 @@ export default function Board(){
 			}
 			setKeys(prevKeys => ({ ...prevKeys, [event.key]: true }));
 			//webso
+			
 		};
 		
 		const handleKeyUp = (event: KeyboardEvent) => {
