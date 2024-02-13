@@ -41,6 +41,9 @@ const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
                         <DropdownMenuItem asChild>
                             <Button className="w-full">Delete</Button>
                         </DropdownMenuItem>
+						<DropdownMenuItem asChild>
+                            <Button className="w-full">Chat</Button>
+                        </DropdownMenuItem>
                     </>
                 ) : (
                     <>

@@ -187,6 +187,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					],
 				})
 			}
+			console.log(channel.name)
 			this.server.to(client.id).emit('privateMessage', channel.name)
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)

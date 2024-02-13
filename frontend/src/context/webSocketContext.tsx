@@ -54,7 +54,8 @@ export const WebSocketProvider: React.FC = () => {
         })
 
 		ws?.on('privateMessage', (channel: string) => {
-			navigate('/chat', {state: {currentChannel: channel}})
+			console.log('Je vais rediriger vers ' + channel)
+			navigate('/chat', {state: {currentChannel: channel}, replace: true})
 		})
 
         return () => {

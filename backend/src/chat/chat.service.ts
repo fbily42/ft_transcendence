@@ -126,6 +126,7 @@ export class ChatService {
 				const user = channel.users.find(user => user.userId === userId);
 				return {
 					name: channel.name,
+					direct: channel.direct,
 					invited: user?.invited,
 					banned: user?.banned
 				};

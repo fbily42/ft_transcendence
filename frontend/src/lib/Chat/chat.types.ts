@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react'
 
 export type Channel = {
 	name: string
+	direct: boolean
 	invited: boolean
 	banned: boolean
 }

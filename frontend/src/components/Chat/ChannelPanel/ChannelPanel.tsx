@@ -9,8 +9,9 @@ import { Plus, Share } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 import UserList from './Channels/UserList'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import { Socket } from 'socket.io-client'
 import CardInvite from './Channels/CardInvite'
+import { getDirectName } from '@/lib/Chat/chat.utils'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
 interface ChannelPanelProps {
     setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
@@ -33,6 +34,11 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         queryKey: ['channels'],
         queryFn: getChannels,
     })
+
+	const { data: me } = useQuery({
+		queryKey: ['me'],
+		queryFn: getUserMe
+	})
 
     function handleClick(name: string) {
         const previousChannel = currentChannel
@@ -69,12 +75,35 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                     </div>
                     <div className="bg-pink-200">
                         <h1 className="p-[4px]">Private Messages</h1>
+                        {channels?.map((channel, index) =>
+                            channel.direct ? (
+                                <div
+                                    key={index}
+                                    onClick={() => handleClick(channel.name)}
+                                    className="hover:cursor-pointer"
+                                >
+                                    <UserCards
+                                        bgColor={
+                                            channel.name === currentChannel
+                                                ? color
+                                                : 'white'
+                                        }
+                                        userName={getDirectName(channel.name, me?.name!)}
+                                        userPicture={PinguFamily}
+                                        userStatus=""
+                                        variant="CHAT"
+                                    ></UserCards>
+                                </div>
+                            ) : null
+                        )}
                     </div>
                     <div className="bg-blue-200">
                         <div className="justify-between">
                             <h1 className="p-[4px]">Groups</h1>
                             {channels?.map((channel, index) =>
-                                !channel.banned && !channel.invited ? (
+                                !channel.banned &&
+                                !channel.invited &&
+                                !channel.direct ? (
                                     <div
                                         key={index}
                                         onClick={() =>
@@ -145,12 +174,35 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                     </div>
                     <div className="bg-pink-200">
                         <h1 className="ml-4">Private Messages</h1>
+                        {channels?.map((channel, index) =>
+                            channel.direct ? (
+                                <div
+                                    key={index}
+                                    onClick={() => handleClick(channel.name)}
+                                    className="hover:cursor-pointer"
+                                >
+                                    <UserCards
+                                        bgColor={
+                                            channel.name === currentChannel
+                                                ? color
+                                                : 'white'
+                                        }
+                                        userName={getDirectName(channel.name, me?.name!)}
+                                        userPicture={PinguFamily}
+                                        userStatus=""
+                                        variant="CHAT"
+                                    ></UserCards>
+                                </div>
+                            ) : null
+                        )}
                     </div>
                     <div className="bg-blue-200">
                         <div className="justify-between overflow-auto-y">
                             <h1 className="ml-4">Groups</h1>
                             {channels?.map((channel, index) =>
-                                !channel.banned && !channel.invited ? (
+                                !channel.banned &&
+                                !channel.invited &&
+                                !channel.direct ? (
                                     <div
                                         key={index}
                                         onClick={() =>
