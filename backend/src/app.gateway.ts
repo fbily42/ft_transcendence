@@ -152,7 +152,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('privateMessage')
-	privateMessage(@ConnectedSocket() client : Socket, @MessageBody() target: string) {
+	async privateMessage(@ConnectedSocket() client : Socket, @MessageBody() target: string) {
+		let channelName: string;
+			if (client.data.userName.toLowerCase() < target.toLowerCase())
+				channelName = `${client.data.userName}_${target}`
+			else
+				channelName = `${target}_${client.data.userName}`
+		console.log(channelName)
+		try {
+			const channel = await this.prisma.channel.findUnique({
+				where:{
+					name: channelName
+				}
+			})
+			if (!channel){
+				const channel = await this.prisma.channel.create({
+					data: {
+						name: channelName,
+						direct: true,
+						private: true,
+					}
+				})
+				const user = await this.prisma.user.findUnique({
+					where:{
+						name: target,
+					}
+				})
+				if (!user)
+					throw new Error('Private message target does not exists');
+				await this.prisma.channelUser.createMany({
+					data: [
+						{channelId: channel.id, userId: client.data.userId},
+						{channelId: channel.id, userId: user.id},
+					],
+				})
+			}
+			this.server.to(client.id).emit('privateMessage', channel.name)
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
 		
 	}
 
