@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '../ui/input'
@@ -33,6 +33,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
         initialAvatar.imageProfile
     )
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
+    const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
         setSelectedAvatar(initialAvatar.imageProfile)
@@ -50,6 +51,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
         const file = e.target.files?.[0]
+        console.log('event target ', e)
 
         if (file && file.type == 'image/svg+xml') {
             const url = URL.createObjectURL(file)
@@ -110,17 +112,38 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                                 </Button>
                             </div>
                         </div>
-                        <div hidden={!openAvatars}>
-                            <AvatarImg
-                                onSelect={(selectedImage) =>
-                                    setSelectedAvatar(selectedImage)
-                                }
-                            />
-                            <Input
-                                type="file"
-                                accept="image/svg+xml"
-                                onChange={handleImageChange}
-                            />
+                        <div className={openAvatars ? 'flex' : 'flex hidden'}>
+                            <div>
+                                <AvatarImg
+                                    onSelect={(selectedImage) =>
+                                        setSelectedAvatar(selectedImage)
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <Input
+                                    type="file"
+                                    accept="image/svg+xml"
+                                    onChange={handleImageChange}
+                                    hidden
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                />
+                                <Button
+                                    className="rounded-full bg-customYellow w-[70px] h-[70px]"
+                                    onClick={(
+                                        e: React.MouseEvent<HTMLElement>
+                                    ) => {
+                                        e.preventDefault()
+                                        if (fileInputRef.current)
+                                            fileInputRef.current.click()
+                                    }}
+                                >
+                                    <div className="text-white ">
+                                        <Plus className="h-[40px] w-[40px]" />
+                                    </div>
+                                </Button>
+                            </div>
                         </div>
                     </div>
                     <div>
