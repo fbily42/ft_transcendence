@@ -4,12 +4,30 @@ import UserCards from '../User/userCards/UserCards'
 import { Skeleton } from '../ui/skeleton'
 import { getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
+import { get } from 'http'
 
 export default function FriendsList() {
     const { data, isLoading, isError } = useQuery({
         queryKey: ['users'],
         queryFn: () => getUsers(),
     })
+
+    const webSocket = useWebSocket() as WebSocketContextType
+
+    // webSocket.usersOn.get('fbily')
+
+    function getStatus(name: string) {
+        const webSocketStatus = webSocket.usersOn.has(name)
+        let friendStatus: string
+
+        if (webSocketStatus === true) {
+            friendStatus = 'Online'
+        } else {
+            friendStatus = 'Offline'
+        }
+        return friendStatus
+    }
 
     if (isError) {
         return <div>Error</div>
@@ -35,7 +53,7 @@ export default function FriendsList() {
                             bgColor="white"
                             userName={user.name}
                             userPicture={user.photo42 || PinguAvatar}
-                            userStatus={'Status undifined'}
+                            userStatus={getStatus(user.name)}
                             variant="USER_PROFILE"
                         />
                     ))

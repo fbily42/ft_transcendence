@@ -14,7 +14,7 @@ interface UserCards {
     id: string
     userPicture: string
     userName: string
-    userStatus: string //change in boolean
+    userStatus: string
     bgColor: string
     variant: 'USER_PROFILE' | 'CHAT'
 }

@@ -13,15 +13,7 @@ import axios from 'axios'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import GameForm from '../Pong/GameForm'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
-import pingu_duo from './../../assets/Pong_page/duo.png'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
@@ -54,7 +46,6 @@ const VerticalNavbar: React.FC = () => {
                 setActive(0)
         }
     }, [location.pathname])
-
 
     // Update local storage when the active state changes
     useEffect(() => {

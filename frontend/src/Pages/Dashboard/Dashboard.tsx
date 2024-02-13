@@ -9,7 +9,12 @@ import { Button } from '@/components/ui/button'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 function Dashboard(): JSX.Element {
-    const { data } = useQuery<UserData>({ queryKey: ['me'], queryFn: getUserMe })
+    const { data } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
+    const CloudsArray = new Array(10).fill(Clouds) // Change the number for more or fewer clouds
+    const MountainsArray = new Array(10).fill(Mountains) // Change the number for more or fewer mountains
 
     return (
         <>
@@ -25,7 +30,7 @@ function Dashboard(): JSX.Element {
                                 ></img>
                             </div>
                             <div className="z-20 h-full w-full flex flex-col items-center justify-center gap-[36px]">
-                                <h1 className="text-6xl text-wrap text-center">
+                                <h1 className="text-white text-wrap text-center text-6xl font-semibold">
                                     Let's Play PinguPong
                                 </h1>
                                 <Button className="bg-customYellow">
@@ -35,16 +40,18 @@ function Dashboard(): JSX.Element {
                         </div>
                         <div className="z-0 absolute flex flex-col justify-between h-full border-t-[20px] border-b-[20px] border-white">
                             <div className="flex -space-x-[20px]">
-                                <img src={Clouds} alt="Clouds" />
-                                <img src={Clouds} alt="Clouds" />
-                                <img src={Clouds} alt="Clouds" />
-                                <img src={Clouds} alt="Clouds" />
+                                {CloudsArray.map((cloud, index) => (
+                                    <img key={index} src={cloud} alt="Clouds" />
+                                ))}
                             </div>
                             <div className="flex -space-x-[10px]">
-                                <img src={Mountains} alt="Mountains" />
-                                <img src={Mountains} alt="Mountains" />
-                                <img src={Mountains} alt="Mountains" />
-                                <img src={Mountains} alt="Mountains" />
+                                {MountainsArray.map((mountain, index) => (
+                                    <img
+                                        key={index}
+                                        src={mountain}
+                                        alt="Mountains"
+                                    />
+                                ))}
                             </div>
                         </div>
                     </div>
