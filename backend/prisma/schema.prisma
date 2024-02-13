@@ -2,130 +2,140 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-	provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-	provider = "postgresql"
-	url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-	id 				Int @id @default(autoincrement())
-	createdAt 		DateTime @default(now())
-	updateAt 		DateTime @updatedAt
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updateAt  DateTime @updatedAt
 
-	name			String @unique // 42 login
-	pseudo 			String? @unique // by default == name ?
-	avatar			String?
-	photo42			String
+    name    String  @unique // 42 login
+    pseudo  String? @unique // by default == name ?
+    avatar  String?
+    photo42 String
 
-	//Auth
-	token42 		Json
-	jwt				String[]
-	Ban_jwt			String[]
-	refreshToken	String?
+    //Auth
+    token42      Json
+    jwt          String[]
+    Ban_jwt      String[]
+    refreshToken String?
 
-	//2FA
-	otp_enabled		Boolean  @default(false)
-	otp_verified	Boolean  @default(false)
-	otp_secret		String?
-	otp_url			String?
-	request_uuid	String? @unique
+    //2FA
+    otp_enabled  Boolean @default(false)
+    otp_verified Boolean @default(false)
+    otp_secret   String?
+    otp_url      String?
+    request_uuid String? @unique
 
-	channels		ChannelUser[]
-	messages		Message[]
+    channels ChannelUser[]
+    messages Message[]
 
-	wins			Int @default(0)
-	looses			Int @default(0)
-	games			Int @default(0)
-	score			Int @default(0)
-	level			Int @default(0)
-	rank			Int @default(0)
+    wins   Int @default(0)
+    looses Int @default(0)
+    games  Int @default(0)
+    score  Int @default(0)
+    level  Int @default(0)
+    rank   Int @default(0)
 
-	friendship		FriendShip[] @relation(name: "UserFriends")
-	friends			FriendShip[] @relation(name: "FriendUsers")
+    friendship FriendShip[] @relation(name: "UserFriends")
+    friends    FriendShip[] @relation(name: "FriendUsers")
 
-	//history		Game[] -> TO IMPROVE
-	//friendship 	Friendship[] -> TODO
-	//notifs		String [] or NotificationModel[] -> TODO
+    //history		Game[] -> TO IMPROVE
+    //friendship 	Friendship[] -> TODO
+    //notifs		String [] or NotificationModel[] -> TODO
 }
 
-model	Channel {
-	id 				Int @id @default(autoincrement())
-	createdAt 		DateTime @default(now())
-	updateAt 		DateTime @updatedAt
+model Channel {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updateAt  DateTime @updatedAt
 
-	name			String	@unique
-	hash			String?
-	private			Boolean @default(false)
-	direct			Boolean @default(false)
+	  name			String	@unique
+	  hash			String?
+	  private			Boolean @default(false)
+    direct			Boolean @default(false)
 
-	users			ChannelUser[]
-	messages		Message[]
+    users    ChannelUser[]
+    messages Message[]
 }
 
 // Maybe it will change
-model	Message {
-	id 				Int @id @default(autoincrement())
-	sentAt			DateTime @default(now())
+model Message {
+    id     Int      @id @default(autoincrement())
+    sentAt DateTime @default(now())
 
-	sentBy			User	@relation(fields: [sentByName], references: [name])
-	sentByName		String
+    sentBy     User   @relation(fields: [sentByName], references: [name])
+    sentByName String
 
-	channel			Channel @relation(fields: [channelName], references: [name])
-	channelName		String
+    channel     Channel @relation(fields: [channelName], references: [name])
+    channelName String
 
-	content			String
+    content String
 }
 
 // Not the final model for Game.
-model	Game {
-	id 				Int @id @default(autoincrement())
-	createdAt 		DateTime @default(now())
-	endAt 			DateTime?
+model Game {
+    id        Int       @id @default(autoincrement())
+    createdAt DateTime  @default(now())
+    endAt     DateTime?
 
-	live			Boolean
-	//creator			User
-	//guest				User
-	winnerId		Int?
-	looserId		Int?
-	scoreCreator	Int @default(0)
-	scoreGuest		Int	@default(0)
-	//socket ?
-	//theme			String ou Url ? (same avatar)
-	difficulty		Int @default(1)
-	matchmaking		Boolean
+    live         Boolean
+    //creator			User
+    //guest				User
+    winnerId     Int?
+    looserId     Int?
+    scoreCreator Int     @default(0)
+    scoreGuest   Int     @default(0)
+    //socket ?
+    //theme			String ou Url ? (same avatar)
+    difficulty   Int     @default(1)
+    matchmaking  Boolean
 }
 
 // Relation table for many-to-many relation
 model ChannelUser {
-	channelId	Int
-	channel		Channel @relation(fields: [channelId], references: [id])
+    channelId Int
+    channel   Channel @relation(fields: [channelId], references: [id])
 
-	userId		Int
-	user		User @relation(fields: [userId], references: [id])
+    userId Int
+    user   User @relation(fields: [userId], references: [id])
 
-	owner		Boolean @default(false)
-	admin		Boolean @default(false)
-	member		Boolean @default(false)
-	banned		Boolean @default(false)
-	muted		Boolean @default(false)
-	invited		Boolean @default(false)
+    owner   Boolean @default(false)
+    admin   Boolean @default(false)
+    member  Boolean @default(false)
+    banned  Boolean @default(false)
+    muted   Boolean @default(false)
+    invited Boolean @default(false)
 
-	@@id([channelId, userId])
+    @@id([channelId, userId])
 }
 
 model FriendShip {
-	userId		Int
-	user		User @relation(name: "UserFriends", fields: [userId], references: [id])
+    userId Int
+    user   User @relation(name: "UserFriends", fields: [userId], references: [id])
 
-	friendId	Int
-	friend		User @relation(name: "FriendUsers", fields: [friendId], references: [id])
+    friendId Int
+    friend   User @relation(name: "FriendUsers", fields: [friendId], references: [id])
 
-	accepted	Boolean @default(false)
+    accepted Boolean @default(false)
 
-	@@id([userId, friendId])
+    @@id([userId, friendId])
 }
+
 // Use "npx prisma generate" = create TSClass from Schema for our code.
 // => import { User } from '@prisma/client';
+
+// model Images {
+// 	id 				Int @id @default(autoincrement())
+// 	createdAt 		DateTime @default(now())
+// 	updateAt 		DateTime @updatedAt
+
+// 	imageProfile	String
+// 	imageBackground	String
+// }
