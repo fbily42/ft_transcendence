@@ -2,16 +2,16 @@
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
-// import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import FriendsList from '@/components/Profile/FriendsList'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
-    // const param = useParams()
+    const param = useParams()
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -25,8 +25,8 @@ function Profile() {
     }, [])
 
     const { data, isError, isLoading } = useQuery({
-        queryKey: ['me'],
-        queryFn: getUserMe,
+        queryKey: ['users', param.id],
+        queryFn: () => getUserById(param.id!),
     })
     if (isError) {
         return <div>Error</div>
@@ -65,7 +65,7 @@ function Profile() {
                         >
                             <UserScoreCard />
                             <UserStatsCard />
-                            <UserActionsBtns />
+                            {/* <UserActionsBtns /> */}
                         </div>
                     </div>
                 </div>

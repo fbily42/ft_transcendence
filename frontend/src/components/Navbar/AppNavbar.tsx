@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import {
@@ -10,6 +10,8 @@ import {
     CircleUserRound,
 } from 'lucide-react'
 import axios from 'axios'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { useQuery } from '@tanstack/react-query'
 import GameForm from '../Pong/GameForm'
 import {
     Dialog,
@@ -24,6 +26,10 @@ import pingu_duo from './../../assets/Pong_page/duo.png'
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
+    const { data } = useQuery({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
 
     // Update active state when the route changes
     useEffect(() => {
@@ -38,16 +44,17 @@ const VerticalNavbar: React.FC = () => {
             case '/chat':
                 setActive(3)
                 break
-            case '/profile':
+            case `/profile/me`:
                 setActive(4)
                 break
             case '/auth':
                 setActive(5)
                 break
             default:
-                setActive(1)
+                setActive(0)
         }
     }, [location.pathname])
+
 
     // Update local storage when the active state changes
     useEffect(() => {
@@ -110,7 +117,6 @@ const VerticalNavbar: React.FC = () => {
                             </div>
                         </Button>
                     </Link>
-                    {/* <Link className="text-black"> */}
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button
@@ -156,7 +162,7 @@ const VerticalNavbar: React.FC = () => {
                     </Link>
                 </div>
                 <div className="flex flex-col items-start gap-[13px]">
-                    <Link to="/profile" className="text-black">
+                    <Link to={`/profile/me`} className="text-black">
                         <Button
                             variant={
                                 active === 4 ? 'tabBtnActive' : 'tabBtnDefault'
