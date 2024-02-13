@@ -244,14 +244,15 @@ export class AuthController{
 
 		try{
 			const token_refresh = req.cookies['jwt_refresh'] as string;
+			const token = req.cookies['jwt'] as string;
 			res.clearCookie('jwt', {path: '/' });
 
-			const signNewToken: string = await this.authService.refreshTheToken(token_refresh);
+			const signNewToken: string = await this.authService.refreshTheToken(token_refresh, token);
 			res.cookie('jwt', signNewToken, {
 				path: '/',
 				sameSite: 'strict',
 				httpOnly : true,
-				secure : true,
+				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
@@ -266,7 +267,7 @@ export class AuthController{
 
 
 	@Put('logout')
-	@UseGuards(AuthGuard)
+	// @UseGuards(AuthGuard)
 	async logout(@Req() req : Request, @Res() res : Response): Promise<void> {
 
 		try {

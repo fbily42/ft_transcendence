@@ -1,106 +1,108 @@
-import { SyntheticEvent, forwardRef, useMemo } from "react";
-import { Input } from "../ui/input"
+import { SyntheticEvent, forwardRef, useMemo } from 'react'
+import { Input } from '../ui/input'
 
 type OtpInputProps = {
-	value: string,
-	valueLength: number,
-	onChange: (value: string) => void,
+    value: string
+    valueLength: number
+    onChange: (value: string) => void
 }
 
-const RE_DIGIT = new RegExp(/^\d+$/);
+const RE_DIGIT = new RegExp(/^\d+$/)
 
-const OtpInput : React.FC<OtpInputProps> = ({value, valueLength, onChange} : OtpInputProps)  => {
+const OtpInput: React.FC<OtpInputProps> = ({
+    value,
+    valueLength,
+    onChange,
+}: OtpInputProps) => {
+    const valueItems = useMemo(() => {
+        const valueArray = value.split('')
+        const items: Array<string> = []
 
-	const valueItems = useMemo(() => {
-		const valueArray = value.split('');
-		const items: Array<string> = [];
-	
-		for (let i = 0; i < valueLength; i++) {
-		  const char = valueArray[i];
-	
-		  if (RE_DIGIT.test(char)) {
-			items.push(char);
-		  } else {
-			items.push('');
-		  }
-		}
-	
-		return items;
-	  }, [value, valueLength]);
+        for (let i = 0; i < valueLength; i++) {
+            const char = valueArray[i]
 
-	const inputOnChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-		idx: number
-	  ) => {
-		const	target : EventTarget & HTMLInputElement = e.target;
-		let		targetValue : string = target.value;
-		const	isTargetValueDigit : boolean = RE_DIGIT.test(targetValue);
+            if (RE_DIGIT.test(char)) {
+                items.push(char)
+            } else {
+                items.push('')
+            }
+        }
 
-		if (!isTargetValueDigit && targetValue != '') {
-			return
-		}
+        return items
+    }, [value, valueLength])
 
-		targetValue = isTargetValueDigit ? targetValue : ' '
+    const inputOnChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        idx: number
+    ) => {
+        const target: EventTarget & HTMLInputElement = e.target
+        let targetValue: string = target.value
+        const isTargetValueDigit: boolean = RE_DIGIT.test(targetValue)
 
-		const newValue : string = value.substring(0, idx) + targetValue + value.substring(idx + 1, valueLength);
-		
-		onChange(newValue.substring(0, valueLength));
-		// onChange(newValue);
+        if (!isTargetValueDigit && targetValue != '') {
+            return
+        }
 
-		if (!isTargetValueDigit)
-			return;
+        targetValue = isTargetValueDigit ? targetValue : ' '
 
-		const nextElemtSibling = target.nextElementSibling as HTMLInputElement | null ;
+        const newValue: string =
+            value.substring(0, idx) +
+            targetValue +
+            value.substring(idx + 1, valueLength)
 
-		if (nextElemtSibling)
-			nextElemtSibling.focus();
-	}
+        onChange(newValue.substring(0, valueLength))
+        // onChange(newValue);
 
-	const inputOnKeyDown = (
-		e: React.KeyboardEvent<HTMLInputElement>
-	) => {
-		const target = e.target as HTMLInputElement;
+        if (!isTargetValueDigit) return
 
-		target.setSelectionRange(0, target.value.length);
+        const nextElemtSibling =
+            target.nextElementSibling as HTMLInputElement | null
 
-		if (e.key !== 'Backspace' || target.value !== ''){
-			return;
-		}
+        if (nextElemtSibling) nextElemtSibling.focus()
+    }
 
-		const prevElemtSibling = target.previousElementSibling as HTMLInputElement | null;
+    const inputOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const target = e.target as HTMLInputElement
 
-		if (prevElemtSibling) {
-			prevElemtSibling.focus();
-		}
-	}
+        target.setSelectionRange(0, target.value.length)
 
-	const inputOnFocus = (
-		e: React.FocusEvent<HTMLInputElement>
-	) => {
-		const { target } = e;
-	
-		target.setSelectionRange(0, target.value.length);
-	};
+        if (e.key !== 'Backspace' || target.value !== '') {
+            return
+        }
 
-	return (
-		<div className="flex space-x-2 rtl:space-x-reverse justify-center">
-			{valueItems.map((digit, idx) => (
-				<Input
-				key={idx}
-				type="text"
-				inputMode="numeric"
-				autoComplete="one-time-code"
-				pattern="\d{1}"
-				maxLength={valueLength}
-				className="w-9 text-center font-extrabold"
-				value={digit}
-				onChange={(e) => (inputOnChange(e, idx))}
-				onKeyDown={inputOnKeyDown}
-				onFocus={inputOnFocus}
-				/>
-			))}
-		</div>
-	)
-};
+        const prevElemtSibling =
+            target.previousElementSibling as HTMLInputElement | null
 
-export default OtpInput;
+        if (prevElemtSibling) {
+            prevElemtSibling.focus()
+        }
+    }
+
+    const inputOnFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        const { target } = e
+
+        target.setSelectionRange(0, target.value.length)
+    }
+
+    return (
+        <div className="flex space-x-2 rtl:space-x-reverse justify-center">
+            {valueItems.map((digit, idx) => (
+                <Input
+                    key={idx}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="\d{1}"
+                    maxLength={valueLength}
+                    className="w-9 text-center font-extrabold"
+                    value={digit}
+                    onChange={(e) => inputOnChange(e, idx)}
+                    onKeyDown={inputOnKeyDown}
+                    onFocus={inputOnFocus}
+                />
+            ))}
+        </div>
+    )
+}
+
+export default OtpInput

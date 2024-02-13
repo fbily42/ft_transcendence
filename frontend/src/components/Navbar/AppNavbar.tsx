@@ -12,11 +12,20 @@ import {
 import axios from 'axios'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
+import GameForm from '../Pong/GameForm'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import pingu_duo from './../../assets/Pong_page/duo.png'
 
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
-
     const { data } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
@@ -44,7 +53,8 @@ const VerticalNavbar: React.FC = () => {
             default:
                 setActive(0)
         }
-    }, [location.pathname, data?.id])
+    }, [location.pathname])
+
 
     // Update local storage when the active state changes
     useEffect(() => {
@@ -107,25 +117,32 @@ const VerticalNavbar: React.FC = () => {
                             </div>
                         </Button>
                     </Link>
-                    <Link to="/pong" className="text-black">
-                        <Button
-                            variant={
-                                active === 2
-                                    ? 'gameBtnActive'
-                                    : 'gameBtnDefault'
-                            }
-                            size="icon"
-                            onClick={() => handleNavTabs(2)}
-                        >
-                            <div
-                                className={`${
-                                    active === 2 ? 'text-white' : 'text-black'
-                                }`}
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button
+                                variant={
+                                    active === 2
+                                        ? 'gameBtnActive'
+                                        : 'gameBtnDefault'
+                                }
+                                size="icon"
+                                onClick={() => handleNavTabs(2)}
                             >
-                                <Gamepad2 className="h-[24px] w-[24px]" />
-                            </div>
-                        </Button>
-                    </Link>
+                                <div
+                                    className={`${
+                                        active === 2
+                                            ? 'text-white'
+                                            : 'text-black'
+                                    }`}
+                                >
+                                    <Gamepad2 className="h-[24px] w-[24px]" />
+                                </div>
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <GameForm></GameForm>
+                        </DialogContent>
+                    </Dialog>
                     <Link to="/chat" className="text-black">
                         <Button
                             variant={

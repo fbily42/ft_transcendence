@@ -13,11 +13,11 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { MessageDto } from './dto/message.dto';
-import { WsExceptionFilter } from './filter/ws-exception.filter';
+import { MessageDto } from './chat/dto/message.dto';
+import { WsExceptionFilter } from './chat/filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
-import cookieParser from 'cookie-parser';
+import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -34,11 +34,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	clients = new Map<string, string[]>();
+	games_room = new Map<string, string[]>();
 
 	constructor (private jwtService: JwtService,
 		private prisma: PrismaService) {
 			this.server = new Server();
 		}
+
+	getClientsAsArray(): {key: string, value: string[]}[] {
+		const clientsArray = [];
+	
+		for (const [key, value] of this.clients.entries()) {
+			clientsArray.push({key: key, value: value});
+		}
+	
+		return clientsArray;
+	}
 
 	async handleConnection(client: Socket) {
 		
@@ -50,13 +61,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const jwt = parsedcookie['jwt'];
 	
 			const decode = this.jwtService.verify(jwt);
-      
+
 			client.data = { userId: decode.sub, userName: decode.login };
 			const clientIds = this.clients.get(client.data.userName);
 			if (clientIds)
 				clientIds.push(client.id)
 			else
 				this.clients.set(client.data.userName, [client.id])
+			this.server.emit('users', this.getClientsAsArray())
 		} catch (error) {
 			client.emit('exception', error.message);
 			client.disconnect();
@@ -73,6 +85,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			else
 				this.clients.delete(client.data.userName)
 		}
+		this.server.emit("users", this.getClientsAsArray())
 	}
 
 	@SubscribeMessage('messageToRoom')
@@ -104,6 +117,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('joinRoom')
+	joingame(@ConnectedSocket() client: Socket, @MessageBody() name: string)
+	{
+		for (let [key, value] of this.games_room)
+		{
+			let stringcount = 0;
+			for (let item of value){
+				if (typeof item === 'string')
+				{
+					stringcount++;
+				}
+				if (stringcount === 2){
+					break;
+				}
+			}
+			if (stringcount < 2)
+			{
+				client.join(key);
+				client.emit('JoinParty', `You have joined room : ${key}` )
+			}
+		}
+		client.join(name);
+		client.emit('JoinParty', `You have created a room : ${name}`);
+	}
+
 	@SubscribeMessage('leaveChannel')
 	leave(@ConnectedSocket() client: Socket, @MessageBody() name: string){
 		const rooms = client.rooms;
@@ -114,7 +152,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('privateMessage')
-	privateMessage(@ConnectedSocket() client : Socket) {
-		console.log(this.clients)
+	privateMessage(@ConnectedSocket() client : Socket, @MessageBody() target: string) {
+		
 	}
+
+	@SubscribeMessage('channelInvite')
+	channelInvitation(@MessageBody() invite: InviteChannelDto) {
+		const clientIds = this.clients.get(invite.name)
+		if (clientIds)
+		{
+			clientIds.forEach (socketId =>
+				this.server.to(socketId).emit('channelInvite', invite)
+			)
+		}
+	}
+
+	@SubscribeMessage('channelKick')
+	channelKick(@ConnectedSocket() client: Socket) {}
 }
+
+/* @SubscribeMessage('game invitation')
+	handleGameInvitation(client :any, data: {to: string, game: any}): void {
+		console.log(`Game invitation received. To: ${data.to}, Game: ${data.game}`);
+		const toSocketId = this.chatService.map.get(data.to);
+
+		if (!toSocketId){
+			console.log("erreur pas dans la map");
+			return ;
+		}
+
+		client.to(toSocketId).emit('game invitation', {from: client.id, game: data.game});
+
+
+	} */

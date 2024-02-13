@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
     Card,
@@ -12,46 +12,45 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateChannelProps, CreateFormValues } from '@/lib/Chat/chat.types'
-import { createChannel } from '@/lib/Chat/chat.requests'
+import { JoinChannelProps, JoinFormValues } from '@/lib/Chat/chat.types'
+import { joinChannel } from '@/lib/Chat/chat.requests'
 
-interface CardCreateProps {
+interface CardJoinProps {
     onClose: () => void
 }
 
-function CardCreate({ onClose }: CardCreateProps) {
-    const { register, handleSubmit } = useForm<CreateFormValues>()
+function CardJoin({ onClose }: CardJoinProps) {
+    const { register, handleSubmit } = useForm<JoinFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const queryClient = useQueryClient()
     const mutation = useMutation({
-        mutationFn: (data: CreateChannelProps) =>
-            createChannel(data.data, data.setErrorMessage, data.onClose),
+        mutationFn: (data: JoinChannelProps) =>
+            joinChannel(data.data, data.setErrorMessage, data.onClose),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['channels'] })
         },
     })
 
-    function onSubmit(data: CreateFormValues) {
+    function onSubmit(data: JoinFormValues) {
         mutation.mutate({ data, setErrorMessage, onClose })
     }
 
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Card>
+                <Card className='border-none shadow-none'>
                     <CardHeader>
-                        <CardTitle>Create</CardTitle>
+                        <CardTitle>Join</CardTitle>
                         <CardDescription>
-                            Enter channel's name and set a password if you need
-                            it.
+                            Enter channel's informations to join it.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <div className="space-y-1">
-                            <Label htmlFor="name">Channel's Name</Label>
+                            <Label htmlFor="name">Channel's name</Label>
                             <Input
                                 id="name"
-                                placeholder="Pingu's Family"
+                                placeholder="Pinga's Place"
                                 {...register('name')}
                             />
                         </div>
@@ -64,23 +63,10 @@ function CardCreate({ onClose }: CardCreateProps) {
                                 {...register('password')}
                             />
                         </div>
-                        <div className="flex items-center space-x-2 space-y-1">
-                            <input
-                                type="checkbox"
-                                id="private"
-                                {...register('private', {})}
-                            />
-                            <Label
-                                htmlFor="private"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                                Invitation only
-                            </Label>
-                        </div>
-                        <div className="text-red-500">{errorMessage}</div>
+                        <div className="text-red-600">{errorMessage}</div>
                     </CardContent>
                     <CardFooter>
-                        <Button type="submit">Create Channel</Button>
+                        <Button>Join Channel</Button>
                     </CardFooter>
                 </Card>
             </form>
@@ -88,4 +74,4 @@ function CardCreate({ onClose }: CardCreateProps) {
     )
 }
 
-export default CardCreate
+export default CardJoin
