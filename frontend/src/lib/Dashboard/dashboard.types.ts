@@ -6,7 +6,7 @@ export type FriendData = {
 }
 
 export type UserData = {
-    id: string
+    id: number
     name: string
     score: number
     rank: number
