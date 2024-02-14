@@ -9,7 +9,7 @@ import { OtpDto, UuidDto, TokenDto } from './auth.dto';
 import { Payload } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 
-interface all_token{
+type all_token = {
 	signedJwt: string;
 	signedrefreshToken: string;
 }

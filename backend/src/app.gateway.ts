@@ -18,6 +18,7 @@ import { WsExceptionFilter } from './chat/filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
 import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
+import { GameStat } from './Game/Game.types';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -28,6 +29,7 @@ import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
 	},
 	transports: ['websocket', 'polling'],
 	})
+	  
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	@WebSocketServer()
@@ -35,11 +37,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	clients = new Map<string, string[]>();
 	games_room = new Map<string, string[]>();
+	games_info = new Map<string , GameStat>();
+	
 
 	constructor (private jwtService: JwtService,
 		private prisma: PrismaService) {
 			this.server = new Server();
 		}
+		
 
 	getClientsAsArray(): {key: string, value: string[]}[] {
 		const clientsArray = [];
@@ -125,7 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	//si elle est en partie ne rien faire
 	//verifier le login de la personne pour l'empecher de faire deux matchmaking
 	@SubscribeMessage('JoinRoom')
-	joingame(@ConnectedSocket() client: Socket, @MessageBody() name: string)
+	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		for (let [key, value] of this.games_room)
 		{
@@ -144,9 +149,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					let array = this.games_room.get(key);
 					array.push(client.id);
 					this.games_room.set(key, array);
-					client.emit('JoinParty', `You have joined room : ${key}`)
-					client.emit('Ready', key);
-					client.to(value[0]).emit('JoinParty', 'Ready');
+					this.server.emit('JoinParty', `You have joined room : ${key}`)
+					console.log("nom de la room", key);
+					this.server.to(key).emit('Ready', key);
+					this.server.to(value[0]).emit('JoinParty', 'Ready');
 					return ;
 
 				}
@@ -154,12 +160,66 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					return;
 			}
 		}
-		console.log('here5');
-		this.games_room.set(name, [client.id]);
-		client.join(name);
-		client.emit('JoinParty', `You have created a room : ${name}`);
+		this.games_room.set(room, [client.id]);
+		client.join(room);
+		console.log(`room : ${room}`)
+		this.server.emit('JoinParty', `You have created a room : ${room}`);
 		return ;
 	}
+
+	@SubscribeMessage('CreateGameinfo')
+	CreateGameinfo(@ConnectedSocket() client: Socket, @MessageBody() room:string)
+	{
+		if (this.games_info.has(room)){
+			console.log('la data existe');
+			this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+		}
+		else{
+			this.games_info.set(room, new GameStat());
+			this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+		}
+	}
+	@SubscribeMessage('key')
+	UpdateKey(@ConnectedSocket() client: Socket, @MessageBody() data: { key: string; roomId: string })
+	{
+		let gamestat:GameStat = this.games_info.get(data.roomId)
+		// console.log("room", data.roomId);
+		// console.log(data);
+		console.log(gamestat)
+		console.log(data.key)
+		if (data.key === "a") {
+			if ((gamestat.paddle_1.y - 10) > 0 )
+				gamestat.paddle_1.y -= 10;
+			}
+		//socker.on lie au emit de keydown et keyup
+			//plus besoin du if il sera gerer dans le backend
+		else if (data.key === "d") {
+			if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
+			{
+				gamestat.paddle_1.y += 10;
+			}
+		}
+
+		if (data.key === "ArrowUp" ) {
+			if ((gamestat.paddle_2.y - 10) > 0 )
+				gamestat.paddle_2.y -= 10;
+			}
+			//socker.on lie au emit de keydown et keyup
+		//plus besoin du if il sera gerer dans le backend
+		else if (data.key === "ArrowDown") {
+			if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
+			{
+				gamestat.paddle_2.y += 10;
+			}
+		}
+		console.log('after change : ', gamestat)
+		this.games_info.set(data.roomId, gamestat);
+		console.log(`data roomID : ${data.roomId}`)
+		this.server.to(data.roomId).emit('UpdateKey', gamestat);
+
+	}
+
+	
 
 
 	@SubscribeMessage('leaveChannel')

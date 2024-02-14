@@ -23,7 +23,9 @@ export function BallMovement(ctx: CanvasRenderingContext2D, ballObj: BallObj, im
 	ctx.lineWidth = 1;
 	ctx?.fill();
 	ctx.stroke();
-		
+	
+
+	//socker.on
 	if (now - ballObj.last > delay) {
 		ballObj.last = now;
 	// Call your Ballmovement function here...
@@ -85,6 +87,8 @@ function updatescore(Goal_playerone: number, Goal_playertwo: number, ctx: Canvas
 export function WallCollision(ballObj: BallObj, canvas: HTMLCanvasElement,ctx: CanvasRenderingContext2D, Game_stat, img_grey_score: HTMLImageElement, img_pingu_score:HTMLImageElement)
 {
 
+
+	/* socker.on pour les collision */
 	// Collision avec les murs supérieur et inférieur
     if (ballObj.y - ballObj.rad <= 0) {
         ballObj.y = ballObj.rad; // Ajuste la position pour éviter le "collage"
