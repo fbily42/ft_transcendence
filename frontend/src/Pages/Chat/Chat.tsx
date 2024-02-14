@@ -1,6 +1,7 @@
 import ChannelPanel from '@/components/Chat/ChannelPanel/ChannelPanel'
 import ChatWindow from '@/components/Chat/ChatWindow/ChatWindow'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 function Chat() {
     const [currentChannel, setCurrentChannel] = useState<string>('')

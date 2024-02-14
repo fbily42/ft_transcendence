@@ -7,6 +7,7 @@ import { getChannels } from '@/lib/Chat/chat.requests'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Share } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
+import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import UserList from './Channels/UserList'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import CardInvite from './Channels/CardInvite'
@@ -35,10 +36,10 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         queryFn: getChannels,
     })
 
-	const { data: me } = useQuery({
-		queryKey: ['me'],
-		queryFn: getUserMe
-	})
+    const { data: me } = useQuery({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
 
     function handleClick(name: string) {
         const previousChannel = currentChannel
@@ -56,96 +57,117 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         return (
             <div className="flex h-full inner-block">
                 <div className=" bg-white w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
-                    <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
-                        <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                            Channels
-                        </h1>
-                        <Button
-                            variant="ghost"
-                            size="smIcon"
-                            onClick={() => setOpen(true)}
-                        >
-                            <Plus></Plus>
-                        </Button>
-                        <Modal open={open} onClose={() => setOpen(false)}>
-                            <TabsChannel
-                                onClose={() => setOpen(false)}
-                            ></TabsChannel>
-                        </Modal>
-                    </div>
-                    <div className="bg-pink-200">
-                        <h1 className="p-[4px]">Private Messages</h1>
-                        {channels?.map((channel, index) =>
-                            channel.direct ? (
-                                <div
-                                    key={index}
-                                    onClick={() => handleClick(channel.name)}
-                                    className="hover:cursor-pointer"
-                                >
-                                    <UserCards
-                                        bgColor={
-                                            channel.name === currentChannel
-                                                ? color
-                                                : 'white'
-                                        }
-                                        userName={getDirectName(channel.name, me?.name!)}
-                                        userPicture={PinguFamily}
-                                        userStatus=""
-                                        variant="CHAT"
-                                    ></UserCards>
-                                </div>
-                            ) : null
-                        )}
-                    </div>
-                    <div className="bg-blue-200">
-                        <div className="justify-between">
-                            <h1 className="p-[4px]">Groups</h1>
-                            {channels?.map((channel, index) =>
-                                !channel.banned &&
-                                !channel.invited &&
-                                !channel.direct ? (
-                                    <div
-                                        key={index}
-                                        onClick={() =>
-                                            handleClick(channel.name)
-                                        }
-                                        className="hover:cursor-pointer"
-                                    >
-                                        <UserCards
-                                            bgColor={
-                                                channel.name === currentChannel
-                                                    ? color
-                                                    : 'white'
+                    <div className="flex flex-col h-full">
+                        <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                            <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                                Channels
+                            </h1>
+                            <Button
+                                variant="ghost"
+                                size="smIcon"
+                                onClick={() => setOpen(true)}
+                            >
+                                <Plus></Plus>
+                            </Button>
+                            <Modal open={open} onClose={() => setOpen(false)}>
+                                <TabsChannel
+                                    onClose={() => setOpen(false)}
+                                ></TabsChannel>
+                            </Modal>
+                        </div>
+                        <div className="flex flex-col overflow-y-auto">
+                            <h1 className="p-[20px] text-gray-500">
+                                Private Messages
+                            </h1>
+                            <div className="flex flex-col overflow-y-auto">
+                                {channels?.map((channel, index) =>
+                                    channel.direct ? (
+                                        <div
+                                            key={index}
+                                            onClick={() =>
+                                                handleClick(channel.name)
                                             }
-                                            userName={channel.name}
-                                            userPicture={PinguFamily}
-                                            userStatus=""
-                                            variant="CHAT"
-                                        ></UserCards>
-                                    </div>
-                                ) : null
-                            )}
+                                            className="hover:cursor-pointer"
+                                        >
+                                            <UserCards
+                                                bgColor={
+                                                    channel.name ===
+                                                    currentChannel
+                                                        ? color
+                                                        : 'white'
+                                                }
+                                                userName={getDirectName(
+                                                    channel.name,
+                                                    me?.name!
+                                                )}
+                                                userPicture={Pingu}
+                                                userStatus=""
+                                                variant="CHAT"
+                                            ></UserCards>
+                                        </div>
+                                    ) : null
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col overflow-y-auto">
+                            <h1 className="p-[20px] text-gray-500">Groups</h1>
+                            <div className="flex flex-col overflow-y-auto">
+                                {channels?.map((channel, index) =>
+                                    !channel.banned &&
+                                    !channel.invited &&
+                                    !channel.direct ? (
+                                        <div
+                                            key={index}
+                                            onClick={() =>
+                                                handleClick(channel.name)
+                                            }
+                                            className="hover:cursor-pointer"
+                                        >
+                                            <UserCards
+                                                bgColor={
+                                                    channel.name ===
+                                                    currentChannel
+                                                        ? color
+                                                        : 'white'
+                                                }
+                                                userName={channel.name}
+                                                userPicture={PinguFamily}
+                                                userStatus=""
+                                                variant="CHAT"
+                                            ></UserCards>
+                                        </div>
+                                    ) : null
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className="bg-[#C1E2F7] w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
                     <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
                         <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                            {currentChannel}
+                            {getDirectName(currentChannel, me?.name!)}
                         </h1>
-                        <Button
-                            variant="ghost"
-                            size="smIcon"
-                            onClick={() => setOpen2(true)}
-                        >
-                            <Share></Share>
-                        </Button>
-                        <Modal open={open2} onClose={() => setOpen2(false)}>
-                            <CardInvite
-                                channel={currentChannel}
-                                onClose={() => setOpen2(false)}
-                            ></CardInvite>
-                        </Modal>
+                        {getDirectName(currentChannel, me?.name!) ===
+                        currentChannel ? (
+                            <div>
+                                <Button
+                                    variant="ghost"
+                                    size="smIcon"
+                                    onClick={() => setOpen2(true)}
+                                >
+                                    <Share></Share>
+                                </Button>
+                                <Modal
+                                    open={open2}
+                                    onClose={() => setOpen2(false)}
+                                >
+                                    <CardInvite
+                                        channel={currentChannel}
+                                        onClose={() => setOpen2(false)}
+                                    ></CardInvite>
+                                </Modal>
+                            </div>
+                        ) : null}
                     </div>
                     <UserList channel={currentChannel}></UserList>
                 </div>
@@ -155,70 +177,82 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         return (
             <div className="flex h-full inner-block">
                 <div className=" bg-white w-[290px] rounded-[36px] overflow-hidden ">
-                    <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
-                        <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                            Channels
-                        </h1>
-                        <Button
-                            variant="ghost"
-                            size="smIcon"
-                            onClick={() => setOpen(true)}
-                        >
-                            <Plus></Plus>
-                        </Button>
-                        <Modal open={open} onClose={() => setOpen(false)}>
-                            <TabsChannel
-                                onClose={() => setOpen(false)}
-                            ></TabsChannel>
-                        </Modal>
-                    </div>
-                    <div className="bg-pink-200">
-                        <h1 className="ml-4">Private Messages</h1>
-                        {channels?.map((channel, index) =>
-                            channel.direct ? (
-                                <div
-                                    key={index}
-                                    onClick={() => handleClick(channel.name)}
-                                    className="hover:cursor-pointer"
-                                >
-                                    <UserCards
-                                        bgColor={
-                                            channel.name === currentChannel
-                                                ? color
-                                                : 'white'
-                                        }
-                                        userName={getDirectName(channel.name, me?.name!)}
-                                        userPicture={PinguFamily}
-                                        userStatus=""
-                                        variant="CHAT"
-                                    ></UserCards>
-                                </div>
-                            ) : null
-                        )}
-                    </div>
-                    <div className="bg-blue-200">
-                        <div className="justify-between overflow-auto-y">
-                            <h1 className="ml-4">Groups</h1>
-                            {channels?.map((channel, index) =>
-                                !channel.banned &&
-                                !channel.invited &&
-                                !channel.direct ? (
-                                    <div
-                                        key={index}
-                                        onClick={() =>
-                                            handleClick(channel.name)
-                                        }
-                                    >
-                                        <UserCards
-                                            bgColor="white"
-                                            userName={channel.name}
-                                            userPicture={PinguFamily}
-                                            userStatus=""
-                                            variant="CHAT"
-                                        ></UserCards>
-                                    </div>
-                                ) : null
-                            )}
+                    <div className="flex flex-col h-full">
+                        <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                            <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                                Channels
+                            </h1>
+                            <Button
+                                variant="ghost"
+                                size="smIcon"
+                                onClick={() => setOpen(true)}
+                            >
+                                <Plus></Plus>
+                            </Button>
+                            <Modal open={open} onClose={() => setOpen(false)}>
+                                <TabsChannel
+                                    onClose={() => setOpen(false)}
+                                ></TabsChannel>
+                            </Modal>
+                        </div>
+                        <div className="flex flex-col overflow-y-auto">
+                            <h1 className="p-[20px] text-gray-500">
+                                Private Messages
+                            </h1>
+                            <div className="flex flex-col overflow-y-auto">
+                                {channels?.map((channel, index) =>
+                                    channel.direct ? (
+                                        <div
+                                            key={index}
+                                            onClick={() =>
+                                                handleClick(channel.name)
+                                            }
+                                            className="hover:cursor-pointer"
+                                        >
+                                            <UserCards
+                                                bgColor={
+                                                    channel.name ===
+                                                    currentChannel
+                                                        ? color
+                                                        : 'white'
+                                                }
+                                                userName={getDirectName(
+                                                    channel.name,
+                                                    me?.name!
+                                                )}
+                                                userPicture={Pingu}
+                                                userStatus=""
+                                                variant="CHAT"
+                                            ></UserCards>
+                                        </div>
+                                    ) : null
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col overflow-y-auto">
+                            <h1 className="p-[20px] text-gray-500">Groups</h1>
+                            <div className="flex flex-col overflow-y-auto">
+                                {channels?.map((channel, index) =>
+                                    !channel.banned &&
+                                    !channel.invited &&
+                                    !channel.direct ? (
+                                        <div
+                                            key={index}
+                                            onClick={() =>
+                                                handleClick(channel.name)
+                                            }
+                                        >
+                                            <UserCards
+                                                bgColor="white"
+                                                userName={channel.name}
+                                                userPicture={PinguFamily}
+                                                userStatus=""
+                                                variant="CHAT"
+                                            ></UserCards>
+                                        </div>
+                                    ) : null
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

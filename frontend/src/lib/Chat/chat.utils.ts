@@ -1,7 +1,9 @@
 import { WebSocketContextType } from "@/context/webSocketContext"
 
 export function getDirectName(channel: string, user: string | null): string {
-	const names: string[] = channel.split('_')
+	const names: string[] = channel?.split('_')
+	if (!names || names.length < 2)
+		return channel
 	if (names[0] === user)
 		return names[1]
 	else

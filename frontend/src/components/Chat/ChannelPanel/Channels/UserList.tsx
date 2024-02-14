@@ -34,9 +34,8 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
         <div className="justify-between overflow-auto-y">
             {users?.map((user, index) =>
                 !user.banned && !user.invited ? (
-                    <div className={getUserStatus(socket, user.name) ? '' : 'opacity-50'}>
+                    <div key={index} className={getUserStatus(socket, user.name) ? '' : 'opacity-50'}>
                         <UserCards
-                            key={index}
                             bgColor="transparent"
                             userName={user.name}
                             userPicture={user.photo42}
