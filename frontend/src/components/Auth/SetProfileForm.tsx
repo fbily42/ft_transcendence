@@ -9,6 +9,8 @@ import { useQuery } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { Check, Pencil, Plus } from 'lucide-react'
+import ImageInput from './ImageInput'
+import axios from 'axios'
 
 type SetProfileFormprops = {
     children: React.ReactNode
@@ -33,7 +35,6 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
         initialAvatar.imageProfile
     )
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
-    const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
         setSelectedAvatar(initialAvatar.imageProfile)
@@ -41,6 +42,26 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
 
     async function onSubmit(data: ProfileFormValues) {
         setErrorMessage('data pseudo = ' + data.pseudo)
+        if (uploadedImage) {
+            try {
+                const formData = new FormData()
+                formData.append('file', uploadedImage)
+
+                // Replace 'http://localhost:3000' with your actual backend API endpoint
+                const response = await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/uploads`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                        withCredentials: true,
+                    }
+                )
+            } catch (error) {
+                console.log('Error uploading file', error)
+            }
+        }
     }
 
     const onAvatarButtonClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -51,21 +72,20 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
         const file = e.target.files?.[0]
-        console.log('event target ', e)
 
         if (file && file.type == 'image/svg+xml') {
             const url = URL.createObjectURL(file)
             // You can perform additional checks or validations here if needed
-            console.log(file)
-            console.log(url)
+            console.log('file', file)
+            // console.log(url)
             // Update state with the selected image file
             setUploadedImage(file)
             setSelectedAvatar(url)
         }
     }
 
-    console.log('selected avatar ', selectedAvatar)
-    console.log('uploaded img ', uploadedImage)
+    // console.log('selected avatar ', selectedAvatar)
+    // console.log('uploaded img ', uploadedImage)
     return (
         <div className="flex flex-col  justify-center text-center space-y-5">
             <div className="flex flex-col  justify-center text-center">
@@ -115,34 +135,17 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                         <div className={openAvatars ? 'flex' : 'flex hidden'}>
                             <div>
                                 <AvatarImg
-                                    onSelect={(selectedImage) =>
+                                    onSelect={(selectedImage) => {
                                         setSelectedAvatar(selectedImage)
-                                    }
+                                        setUploadedImage(null)
+                                    }}
                                 />
                             </div>
                             <div>
-                                <Input
-                                    type="file"
-                                    accept="image/svg+xml"
+                                <ImageInput
                                     onChange={handleImageChange}
-                                    hidden
-                                    ref={fileInputRef}
-                                    className="hidden"
+                                    size={70}
                                 />
-                                <Button
-                                    className="rounded-full bg-customYellow w-[70px] h-[70px]"
-                                    onClick={(
-                                        e: React.MouseEvent<HTMLElement>
-                                    ) => {
-                                        e.preventDefault()
-                                        if (fileInputRef.current)
-                                            fileInputRef.current.click()
-                                    }}
-                                >
-                                    <div className="text-white ">
-                                        <Plus className="h-[40px] w-[40px]" />
-                                    </div>
-                                </Button>
                             </div>
                         </div>
                     </div>
