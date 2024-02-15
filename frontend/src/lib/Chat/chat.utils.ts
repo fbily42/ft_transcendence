@@ -1,4 +1,5 @@
 import { WebSocketContextType } from "@/context/webSocketContext"
+import { UserInChannel } from "./chat.types"
 
 export function getDirectName(channel: string, user: string | null): string {
 	const names: string[] = channel?.split('_')
@@ -18,4 +19,24 @@ export function getUserStatus(socket: WebSocketContextType, user: string): boole
     } else {
         return false
     }
+}
+
+export function getRole(user: UserInChannel): string {
+    const statusKeys: (keyof UserInChannel)[] = [
+        'owner',
+        'admin',
+        'member',
+        'muted',
+    ]
+    for (let key of statusKeys) {
+        if (user[key] === true) return key
+    }
+    return 'member'
+}
+
+export function getMyrole(name: string, users: UserInChannel[]): string {
+	const user = users.find(userInChannel => userInChannel.name === name)
+	if (user)
+		return getRole(user)
+	return ''
 }

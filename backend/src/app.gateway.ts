@@ -13,11 +13,10 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { MessageDto } from './chat/dto/message.dto';
 import { WsExceptionFilter } from './chat/filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
-import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
+import { InviteChannelDto, KickChannelDto, MessageDto } from './chat/dto';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -37,7 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	games_room = new Map<string, string[]>();
 
 	constructor (private jwtService: JwtService,
-		private prisma: PrismaService) {
+		private prisma: PrismaService,) {
 			this.server = new Server();
 		}
 
@@ -211,20 +210,60 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelKick')
-	channelKick(@ConnectedSocket() client: Socket) {}
-}
-
-/* @SubscribeMessage('game invitation')
-	handleGameInvitation(client :any, data: {to: string, game: any}): void {
-		console.log(`Game invitation received. To: ${data.to}, Game: ${data.game}`);
-		const toSocketId = this.chatService.map.get(data.to);
-
-		if (!toSocketId){
-			console.log("erreur pas dans la map");
-			return ;
+	async channelKick(@ConnectedSocket() client: Socket, @MessageBody() kick: KickChannelDto) {
+		try {
+			if (kick.targetId === kick.userId)
+				throw new Error('You can not kick yourself.')
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					name: kick.channel,
+				}
+			})
+			const user = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						userId: Number(kick.userId),
+						channelId: channel.id,
+					}
+				}
+			})
+			const target = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						userId: Number(kick.targetId),
+						channelId: channel.id,
+					}
+				}
+			})
+			if (!channel || !user || !target)
+				throw new Error('Bad request')
+			if (!user.admin && !user.owner)
+				throw new Error('You are not authorized to do this.')
+			if (user.admin && (target.owner || target.admin || target.invited || target.banned))
+				throw new Error('You can not kick this target.')
+			const deletedUser = await this.prisma.channelUser.delete({
+				where: {
+					channelId_userId: {
+						userId: Number(kick.targetId),
+						channelId: channel.id,
+					}
+				}
+			})
+			const clientIds = this.clients.get(kick.targetName)
+			if (clientIds)
+			{
+				clientIds.forEach(socketId =>
+					this.server.to(socketId).emit('kick', kick.channel)
+				)
+			}
+			this.server.to(kick.channel).emit('update', channel)
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
 		}
-
-		client.to(toSocketId).emit('game invitation', {from: client.id, game: data.game});
-
-
-	} */
+	}
+}

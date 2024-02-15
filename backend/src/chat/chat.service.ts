@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as argon from "argon2";
-import { JoinChannelDto, NewChannelDto } from './dto';
+import { JoinChannelDto, KickChannelDto, NewChannelDto } from './dto';
 import { Channel, ChannelUser, Message, User } from '@prisma/client';
 import { ChannelList, ChannelWithRelation, UserInChannel } from './chat.types';
 import { InviteChannelDto } from './dto/inviteChannel.dto';

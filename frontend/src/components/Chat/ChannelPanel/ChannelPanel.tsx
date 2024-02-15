@@ -13,6 +13,9 @@ import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import CardInvite from './Channels/CardInvite'
 import { getDirectName } from '@/lib/Chat/chat.utils'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { useNavigate } from 'react-router-dom'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
+import { Channel } from '@/lib/Chat/chat.types'
 
 interface ChannelPanelProps {
     setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
@@ -23,20 +26,20 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     setCurrentChannel,
     currentChannel,
 }) => {
+    const navigate = useNavigate()
     const [open, setOpen] = useState<boolean>(false)
     const [open2, setOpen2] = useState<boolean>(false)
-
     const [hide, setHide] = useState<boolean>(true)
     const [color, setColor] = useState<string>('')
     const queryClient = useQueryClient()
     const socket = useWebSocket() as WebSocketContextType
 
-    const { data: channels } = useQuery({
+    const { data: channels } = useQuery<Channel[]>({
         queryKey: ['channels'],
         queryFn: getChannels,
     })
 
-    const { data: me } = useQuery({
+    const { data: me } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
@@ -49,6 +52,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
             queryKey: ['channelUsers', previousChannel],
         })
         setColor('[#C1E2F7]')
+        navigate(`?channelId=${name}`)
         socket.webSocket?.emit('leaveChannel', previousChannel)
         socket.webSocket?.emit('joinChannel', name)
     }

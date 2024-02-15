@@ -15,6 +15,7 @@ type DropdownCardProps = {
 
 const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
     const navigate = useNavigate()
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -41,7 +42,7 @@ const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
                         <DropdownMenuItem asChild>
                             <Button className="w-full">Delete</Button>
                         </DropdownMenuItem>
-						<DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild>
                             <Button className="w-full">Chat</Button>
                         </DropdownMenuItem>
                     </>
