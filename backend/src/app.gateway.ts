@@ -150,7 +150,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					array.push(client.id);
 					this.games_room.set(key, array);
 					this.server.emit('JoinParty', `You have joined room : ${key}`)
-					console.log("nom de la room", key);
+					// console.log("nom de la room", key);
 					this.server.to(key).emit('Ready', key);
 					this.server.to(value[0]).emit('JoinParty', 'Ready');
 					return ;
@@ -162,7 +162,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		this.games_room.set(room, [client.id]);
 		client.join(room);
-		console.log(`room : ${room}`)
+		// console.log(`room : ${room}`)
 		this.server.emit('JoinParty', `You have created a room : ${room}`);
 		return ;
 	}
@@ -171,7 +171,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	CreateGameinfo(@ConnectedSocket() client: Socket, @MessageBody() room:string)
 	{
 		if (this.games_info.has(room)){
-			console.log('la data existe');
+			// console.log('la data existe');
 			this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
 		}
 		else{
@@ -179,42 +179,94 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
 		}
 	}
+
+	@SubscribeMessage('ballMov')
+	ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		// const now = Date.now();
+		// const delay = 10;
+		let gamestat:GameStat = this.games_info.get(room);
+		// if (now - gamestat.ball.last > delay)
+		// {
+			// gamestat.ball.last = now;
+			gamestat.ball.x += gamestat.ball.dx * gamestat.ball.speed;
+			gamestat.ball.y += gamestat.ball.dy * gamestat.ball.speed;
+			
+			gamestat.WallCollision();
+		// }
+		// gamestat.PaddleCollision(gamestat.paddle_1);
+		// gamestat.PaddleCollision(gamestat.paddle_2);
+
+		this.games_info.set(room, gamestat);
+		this.server.to(room).emit('UpdateKey', gamestat);
+	}
+
+	//faire le cas ou une personne quitte
+	//le cas ou c'est la fin de la partie 
+	@SubscribeMessage('leaveRoom')
+	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		let gamestat:GameStat = this.games_info.get(room);//il faut supprimer la roomm et le Gamestat
+		let games_room = this.games_room;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+		let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
+		gamestat
+		for (let [key , value ] of this.games_room)
+		{
+
+		}
+
+	}
+
+	@SubscribeMessage('paddllColl')
+	paddllColl(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		let gamestat:GameStat = this.games_info.get(room);
+		gamestat.PaddleCollision(gamestat.paddle_1);
+		gamestat.PaddleCollision(gamestat.paddle_2);
+		this.games_info.set(room, gamestat);
+		this.server.to(room).emit('UpdateKey', gamestat);
+		
+
+	}
+	
 	@SubscribeMessage('key')
 	UpdateKey(@ConnectedSocket() client: Socket, @MessageBody() data: { key: string; roomId: string })
 	{
 		let gamestat:GameStat = this.games_info.get(data.roomId)
-		// console.log("room", data.roomId);
-		// console.log(data);
-		console.log(gamestat)
-		console.log(data.key)
-		if (data.key === "a") {
-			if ((gamestat.paddle_1.y - 10) > 0 )
-				gamestat.paddle_1.y -= 10;
-			}
-		//socker.on lie au emit de keydown et keyup
-			//plus besoin du if il sera gerer dans le backend
-		else if (data.key === "d") {
-			if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
-			{
-				gamestat.paddle_1.y += 10;
-			}
-		}
+		let array = this.games_room.get(data.roomId);
+		// if(array[0] == client.id)
+		// {
 
-		if (data.key === "ArrowUp" ) {
-			if ((gamestat.paddle_2.y - 10) > 0 )
-				gamestat.paddle_2.y -= 10;
+			if (data.key === "a") {
+				if ((gamestat.paddle_1.y - 10) > 0 )
+					gamestat.paddle_1.y -= 5;
+				}
+
+			else if (data.key === "d") {
+				if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
+				{
+					gamestat.paddle_1.y += 5;
+				}
 			}
-			//socker.on lie au emit de keydown et keyup
-		//plus besoin du if il sera gerer dans le backend
-		else if (data.key === "ArrowDown") {
-			if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
-			{
-				gamestat.paddle_2.y += 10;
+
+		// }
+		// if(array[1] == client.id)
+		// {
+			if (data.key === "ArrowUp" ) {
+				if ((gamestat.paddle_2.y - 10) > 0 )
+					gamestat.paddle_2.y -= 5;
+				}
+	
+			else if (data.key === "ArrowDown") {
+				if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
+				{
+					gamestat.paddle_2.y += 5;
+				}
 			}
-		}
-		console.log('after change : ', gamestat)
+
+		// }
+
 		this.games_info.set(data.roomId, gamestat);
-		console.log(`data roomID : ${data.roomId}`)
 		this.server.to(data.roomId).emit('UpdateKey', gamestat);
 
 	}

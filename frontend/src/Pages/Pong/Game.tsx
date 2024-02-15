@@ -21,7 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
-import { GameStat } from '@/lib/Game/Game.types'
+import { GameStat, imageForGame } from '@/lib/Game/Game.types'
 // import { Image } from "@/components/Pong/Game utils/data";
 
 //creer une map room pour lier l'ID de la room avec un objec, pour a chaque fois renvoyer l'objet modifier
@@ -34,130 +34,122 @@ export default function Board() {
     const socket = useWebSocket()
 
     const [roomName, setRoomName] = useState<string>('false')
-	const [gameInfo, setGameInfo] = useState<GameStat>()
+    const [gameInfo, setGameInfo] = useState<GameStat>()
 
-	const img_fish = new Image()
-	const img_filet = new Image()
-	const img_grey = new Image()
-	const img_pingu = new Image()
-	const img_pingu_score = new Image()
-	const img_grey_score = new Image()
-	const img_ice = new Image()
-	const img_ice_bottom = new Image()
+    const gameImages = new imageForGame()
 
-    // socket?.webSocket?.on('Ready', (room:string )=> {
-    // 	roomName = room;
-    // 	console.log("inside",roomName);
-    // })
-    // console.log('Not inside ',roomName);
-    // if (roomName ===  'false')
-    // 	return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (keys[event.key]) {
+            return
+        }
+        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
+    }
 
-    socket?.webSocket?.on('Ready', (room: string) => {
-        const roomName = room
-        setRoomName(roomName)
-		console.log(`Je recois room : ${room}`)
-        socket?.webSocket?.emit('CreateGameinfo', room)
-        //   console.log("inside",roomName);
-    })
-
-	const handleKeyDown = (event: KeyboardEvent) => {
-		if (keys[event.key]) {
-			return
-		}
-		setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
-	}
-
-	const handleKeyUp = (event: KeyboardEvent) => {
-		setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
-	}
-	window.addEventListener('keydown', handleKeyDown)
-	
-	window.addEventListener('keyup', handleKeyUp)
+    const handleKeyUp = (event: KeyboardEvent) => {
+        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
+    }
 
     useEffect(() => {
-        let { ballObj, paddle_1, paddle_2, Game_stat } = data
-		socket?.webSocket?.on('UpdateKey', (Game_stat: GameStat) => {
-			console.log('Je set gameState :', Game_stat)
-			setGameInfo(Game_stat);
-		})
+        socket?.webSocket?.on('Ready', (room: string) => {
+            const roomName = room
+            setRoomName(roomName)
+
+            socket?.webSocket?.emit('CreateGameinfo', room)
+        })
+        socket?.webSocket?.on('UpdateKey', (Game_stat: GameStat) => {
+            setGameInfo(Game_stat)
+        })
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+            socket?.webSocket?.off('UpdateKey')
+            window.removeEventListener('keyup', handleKeyUp)
+        }
+    }, [])
+
+    useEffect(() => {
         // imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
         let animationFrameId: number
-        console.log('je suis ici 5')
-		
+
         const render = () => {
-			console.log('Je vais render dans cette roon : ' + roomName)
+            console.log('etape 2')
             const canvas = canvasRef.current
-            if (canvas) {
-                paddle_2.x = canvas?.width - 70
+            if (canvas && gameInfo) {
+                gameInfo.paddle_2.x = canvas?.width - 70
                 const ctx = canvas.getContext('2d')
                 if (!ctx) return
-                if (Game_stat.Gamestate === 'playing') {
-                    img_ice_bottom.src = ice_bottom
-                    img_ice.src = ice
-                    img_fish.src = fish
-                    img_filet.src = filet
-                    img_grey.src = grey
-                    img_pingu.src = pingu
-                    img_pingu_score.src = pingu_score
-                    img_grey_score.src = grey_score
+                console.log('etape 1')
+                console.log(gameInfo)
+                if (gameInfo.gamestatus.Gamestate === 'playing') {
+                    console.log('inside !!')
+                    gameImages.image.img_ice_bottom.src = ice_bottom
+                    gameImages.image.img_ice.src = ice
+                    gameImages.image.img_fish.src = fish
+                    gameImages.image.img_filet.src = filet
+                    gameImages.image.img_grey.src = grey
+                    gameImages.image.img_pingu.src = pingu
+                    gameImages.image.img_pingu_score.src = pingu_score
+                    gameImages.image.img_grey_score.src = grey_score
 
-                    // console.log("la hauteur est de ",canvas.height, "la largeur est de ",canvas.width)
                     // if (img_fishRef.current)
                     // 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
                     ctx?.clearRect(0, 0, canvas.width, canvas.height)
-                    Static_image(
-                        ctx,
-                        canvas,
-                        img_filet,
-                        img_ice,
-                        img_ice_bottom
-                    )
-                    BallMovement(ctx, ballObj, img_fish)
+                    Static_image(ctx, canvas, gameImages)
                     if (socket && gameInfo) {
+                        BallMovement(
+                            ctx,
+                            gameInfo,
+                            gameImages,
+                            socket,
+                            roomName
+                        ) //envoie un update
                         Paddle_1(
                             ctx,
-                            canvas,
-							gameInfo,
-                            keys,
-                            img_pingu,
-                            socket,
-                            roomName,
-
-                        )
-                        Paddle_2(
-                            ctx,
-                            canvas,
                             gameInfo,
                             keys,
-                            img_grey,
+                            gameImages,
                             socket,
-                            roomName,
-                        )
+                            roomName
+                        ) //envoie un update si a ou d utilise
+                        Paddle_2(
+                            ctx,
+                            gameInfo,
+                            keys,
+                            gameImages,
+                            socket,
+                            roomName
+                        ) //envoie un update si Arrowup ou ArrowDown utilise
                     }
                     if (
+                        socket &&
                         WallCollision(
-                            ballObj,
+                            gameInfo,
                             canvas,
                             ctx,
-                            Game_stat,
-                            img_grey_score,
-                            img_pingu_score
+                            gameImages,
+                            socket,
+                            roomName
                         ) == 1
                     )
                         console.log(' tu as marque')
-                    Paddle_Collision(ballObj, paddle_1)
-                    Paddle_Collision(ballObj, paddle_2)
+                    if (socket) {
+                        Paddle_Collision(
+                            gameInfo,
+                            gameInfo.paddle_1,
+                            socket,
+                            roomName
+                        )
+                        // Paddle_Collision(gameInfo, gameInfo.paddle_2)
+                    }
                 }
             }
             animationFrameId = requestAnimationFrame(render)
+            console.log('END')
         }
         render()
-
         return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-            window.removeEventListener('keyup', handleKeyUp)
-			socket?.webSocket?.off('UpdateKey')
+            // socket?.websocket?.emit('leaveRoom')
             // window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationFrameId)
         }
