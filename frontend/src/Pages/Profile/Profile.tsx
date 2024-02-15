@@ -2,7 +2,7 @@
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { getMyFriends, getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
@@ -12,7 +12,10 @@ import FriendsList from '@/components/Profile/FriendsList'
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
     // const param = useParams()
-
+    const { data: friends } = useQuery({
+        queryKey: ['myFriends'],
+        queryFn: () => getMyFriends(),
+    })
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
     }
@@ -83,7 +86,7 @@ function Profile() {
                         Noot Friends
                     </h1>
                 </div>
-                <FriendsList />
+                <FriendsList friends={friends} />
             </div>
         </div>
     )

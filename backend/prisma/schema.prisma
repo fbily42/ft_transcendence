@@ -56,10 +56,10 @@ model Channel {
     createdAt DateTime @default(now())
     updateAt  DateTime @updatedAt
 
-	  name			String	@unique
-	  hash			String?
-	  private			Boolean @default(false)
-    direct			Boolean @default(false)
+    name    String  @unique
+    hash    String?
+    private Boolean @default(false)
+    direct  Boolean @default(false)
 
     users    ChannelUser[]
     messages Message[]

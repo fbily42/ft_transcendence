@@ -1,18 +1,20 @@
-// import SetUp2FAModal from '@/components/Profile/SetUp2FAModal';
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
-import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
-import { getUserById } from '@/lib/Dashboard/dashboard.requests'
+import { getFriends, getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import FriendsList from '@/components/Profile/FriendsList'
+import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
     const param = useParams()
-
+    const { data: friends } = useQuery({
+        queryKey: ['userFriend', param.id],
+        queryFn: () => getFriends(param.id!),
+    })
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
     }
@@ -66,6 +68,7 @@ function Profile() {
                             <UserScoreCard />
                             <UserStatsCard />
                             {/* <UserActionsBtns /> */}
+                            <OtherActionsBtns />
                         </div>
                     </div>
                 </div>
@@ -83,7 +86,7 @@ function Profile() {
                         Noot Friends
                     </h1>
                 </div>
-                <FriendsList />
+                <FriendsList friends={friends} />
             </div>
         </div>
     )
