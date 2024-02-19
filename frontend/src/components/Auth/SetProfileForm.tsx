@@ -11,14 +11,16 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { Check, Pencil, Plus } from 'lucide-react'
 import ImageInput from './ImageInput'
 import axios from 'axios'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 type SetProfileFormprops = {
     children: React.ReactNode
 }
 
-type ProfileFormValues = {
-    pseudo: string
-}
+// type ProfileFormValues = {
+//     pseudo: string
+// }
 
 type ImageObject = {
     id: number
@@ -26,8 +28,24 @@ type ImageObject = {
     imageBackground: string | undefined
 }
 
+const zodSchema = z.object({
+    pseudo: z
+        .string()
+        .min(2, { message: 'Pseudo must be at least 2 characters long' })
+        .max(20, { message: 'Pseudo can not exceed 20 characters' })
+        .regex(/^[a-zA-Z]+$/, { message: 'Pseudo can only contain letters' }),
+})
+
+type ProfileFormValues = z.infer<typeof zodSchema>
+
 const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
-    const { register, handleSubmit } = useForm<ProfileFormValues>()
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<ProfileFormValues>({
+        resolver: zodResolver(zodSchema),
+    })
     const [errorMessage, setErrorMessage] = useState<string>('')
     const [openAvatars, setOpenAvatars] = useState<boolean>(false)
     const initialAvatar: ImageObject = Photo42()
@@ -42,25 +60,29 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
 
     async function onSubmit(data: ProfileFormValues) {
         setErrorMessage('data pseudo = ' + data.pseudo)
-        if (uploadedImage) {
-            try {
-                const formData = new FormData()
-                formData.append('file', uploadedImage)
+        try {
+            const formData = new FormData()
 
-                // Replace 'http://localhost:3000' with your actual backend API endpoint
-                const response = await axios.post(
-                    `${import.meta.env.VITE_BACKEND_URL}/uploads`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                        withCredentials: true,
-                    }
-                )
-            } catch (error) {
-                console.log('Error uploading file', error)
+            if (uploadedImage) formData.append('file', uploadedImage)
+            else {
+                formData.append('avatar', selectedAvatar)
             }
+            formData.append('pseudo', data.pseudo)
+
+            console.log(...formData)
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_BACKEND_URL}/uploads`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    withCredentials: true,
+                }
+            )
+        } catch (error) {
+            console.log('Error uploading file', error)
         }
     }
 
@@ -160,6 +182,9 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                         />
                         <div className="text-red-600 text-sm">
                             {errorMessage}
+                        </div>
+                        <div className="text-red-600 text-sm">
+                            {errors.pseudo && <p>{errors.pseudo.message}</p>}
                         </div>
                     </div>
                     <div>

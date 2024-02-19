@@ -15,6 +15,7 @@ export type UserData = {
 	friends: FriendData[];
 	photo42: string;
 	avatar: string;
+	pseudo: string;
 }
 
 export type LeaderboardData = {
