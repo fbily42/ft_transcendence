@@ -65,33 +65,30 @@ export default function Board() {
             window.removeEventListener('keydown', handleKeyDown)
             socket?.webSocket?.off('UpdateKey')
             window.removeEventListener('keyup', handleKeyUp)
+            socket?.webSocket?.emit('leaveRoom')
         }
     }, [])
+    gameImages.image.img_ice_bottom.src = ice_bottom
+    gameImages.image.img_ice.src = ice
+    gameImages.image.img_fish.src = fish
+    gameImages.image.img_filet.src = filet
+    gameImages.image.img_grey.src = grey
+    gameImages.image.img_pingu.src = pingu
+    gameImages.image.img_pingu_score.src = pingu_score
+    gameImages.image.img_grey_score.src = grey_score
 
     useEffect(() => {
         // imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
         let animationFrameId: number
 
         const render = () => {
-            console.log('etape 2')
             const canvas = canvasRef.current
             if (canvas && gameInfo) {
                 gameInfo.paddle_2.x = canvas?.width - 70
                 const ctx = canvas.getContext('2d')
                 if (!ctx) return
-                console.log('etape 1')
-                console.log(gameInfo)
-                if (gameInfo.gamestatus.Gamestate === 'playing') {
-                    console.log('inside !!')
-                    gameImages.image.img_ice_bottom.src = ice_bottom
-                    gameImages.image.img_ice.src = ice
-                    gameImages.image.img_fish.src = fish
-                    gameImages.image.img_filet.src = filet
-                    gameImages.image.img_grey.src = grey
-                    gameImages.image.img_pingu.src = pingu
-                    gameImages.image.img_pingu_score.src = pingu_score
-                    gameImages.image.img_grey_score.src = grey_score
 
+                if (gameInfo.gamestatus.Gamestate === 'playing') {
                     // if (img_fishRef.current)
                     // 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
                     ctx?.clearRect(0, 0, canvas.width, canvas.height)
@@ -145,11 +142,10 @@ export default function Board() {
                 }
             }
             animationFrameId = requestAnimationFrame(render)
-            console.log('END')
         }
         render()
         return () => {
-            // socket?.websocket?.emit('leaveRoom')
+            // socket?.webSocket?.emit('leaveRoom')
             // window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationFrameId)
         }

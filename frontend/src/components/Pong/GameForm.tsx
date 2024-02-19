@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
 import React, { useRef, KeyboardEvent } from 'react'
@@ -19,6 +19,11 @@ import { useNavigate } from 'react-router-dom'
 function GameForm({ closeDialog }) {
     const [search, setSearch] = useState('')
     const socket = useWebSocket()
+    // const [matchmaking, setMatchmaking] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const currentRoom = useRef<string | null>(null)
+    const processingMessage = useRef(false)
+
     // const [results, setResults] = useState([]);
 
     const handleSearch = async (event: any) => {
@@ -50,34 +55,79 @@ function GameForm({ closeDialog }) {
         return `room_${now}_${Math.floor(random)}` // Combine les deux pour créer un ID
     }
     const navigate = useNavigate()
-    async function handleMatchmaking(event: any) {
-        event.preventDefault() //a quoi cela sert
-        const roomName: string = generateUniqueRoomId()
+    useEffect(() => {
+        console.log('nombre de tour')
         //mettre fin au matchmaking des qu'il ferme le modal
         if (socket) {
-            socket.webSocket?.on('JoinParty', (message: string) => {
-                let words = message.split(' ')
-                let lastWord = words[words.length - 1]
-                if (message.startsWith('You have joined')) {
-                    closeDialog();
-                    navigate('/pong')
-                    // console.log('join :', lastWord);//faire rejoindre la partie
-                } else if (message.startsWith('You have created')) {
-                    closeDialog()
-                    // console.log('created :', lastWord);
-                }
-                if (message.startsWith('Ready')) {
-                    //possiblement faire un emit pour ensuite pouvoir le recuperer dans le game pour avoir le nom de la room
-                    closeDialog();
-                    navigate('/pong')
-                    // console.log('Start the Game');//faire rejoindre la partie
-                } else return //error
-            })
-            socket.webSocket?.emit('JoinRoom', roomName)
+            if (loading) {
+                const roomName: string = generateUniqueRoomId()
+                currentRoom.current = roomName
+                console.log('1 roomName:', roomName)
+                console.log('2 currentRoom:', currentRoom.current)
+                socket.webSocket?.on('JoinParty', (message: string) => {
+                    let words = message.split(' ')
+                    let lastWord = words[words.length - 1]
+                    if (message.startsWith('You have joined')) {
+                        console.log('message : ', message)
+                        processingMessage.current = true
+                        closeDialog()
+                        navigate('/pong')
+                        // console.log('join :', lastWord);//faire rejoindre la partie
+                    } else if (message.startsWith('You have created')) {
+                        console.log('message : ', message)
+                        // closeDialog()
+                        // processingMessage.current = true;
+                    }
+                    if (message.startsWith('Ready')) {
+                        console.log('message : ', message)
+                        //possiblement faire un emit pour ensuite pouvoir le recuperer dans le game pour avoir le nom de la room
+                        processingMessage.current = true
+                        closeDialog()
+                        navigate('/pong')
+                        // console.log('Start the Game');//faire rejoindre la partie
+                    } else return //error
+                    // setMatchmaking(true)
+                    console.log('je suis rentre dnas le .on')
+                })
+                socket.webSocket?.emit('JoinRoom', roomName)
+            } else if (currentRoom.current) {
+                console.log('je leave dans le if ', currentRoom.current)
+                socket?.webSocket?.emit('leaveRoom', currentRoom.current)
+            }
             // socket.emit('JoinRoom', roomName);
         }
         //verifier qu'il y a une personne en ligne au moins autre que le client
         // socket.emit('game invitation random');
+        // setMatchmaking(false)
+        return () => {
+            // setLoading(false)
+            socket?.webSocket?.off('JoinParty')
+            console.log(loading, processingMessage)
+            if (loading && !processingMessage.current) {
+                setLoading(false)
+                console.log(
+                    'leaveRoom dans le return',
+                    currentRoom.current,
+                    loading,
+                    processingMessage
+                )
+                socket?.webSocket?.emit('leaveRoom', currentRoom.current)
+                console.log('bool ', loading)
+            } else
+                console.log(
+                    "je n'ai pas fait de leave en quittant le useEffect"
+                )
+        }
+    }, [loading])
+    async function handleMatchmaking(event: any) {
+        event.preventDefault() //a quoi cela sert
+        if (!loading) {
+            console.log('loading passe a true')
+            setLoading(true)
+        } else {
+            console.log('loading passe a false')
+            setLoading(false)
+        }
     }
 
     return (
@@ -127,7 +177,7 @@ function GameForm({ closeDialog }) {
                         className="w-full flex justify-center border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 mb-4"
                         type="submit"
                     >
-                        Submit
+                        {loading ? 'Matchmaking...(just wait)' : 'Submit'}
                     </button>
                 </form>
             </div>

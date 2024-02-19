@@ -132,73 +132,96 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('JoinRoom')
 	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
-		for (let [key, value] of this.games_room)
-		{
-			let stringcount = 0;
-			for (let item of value){
-				if (typeof item === 'string')
-					stringcount++;
-				if (stringcount === 2)
-					break;
-			}
-			if (stringcount < 2)
+		try{
+			for (let [key, value] of this.games_room)
 			{
-				if (value[0] != client.id)
-				{
-					client.join(key);
-					let array = this.games_room.get(key);
-					array.push(client.id);
-					this.games_room.set(key, array);
-					this.server.emit('JoinParty', `You have joined room : ${key}`)
-					// console.log("nom de la room", key);
-					this.server.to(key).emit('Ready', key);
-					this.server.to(value[0]).emit('JoinParty', 'Ready');
-					return ;
-
+				let stringcount = 0;
+				for (let item of value){
+					if (typeof item === 'string')
+						stringcount++;
+					if (stringcount === 2)
+						break;
 				}
-				else
-					return;
+				if (stringcount < 2)
+				{
+					if (value[0] != client.id)
+					{
+						client.join(key);
+						let array = this.games_room.get(key);
+						array.push(client.id);
+						this.games_room.set(key, array);
+						this.server.to(client.id).emit('JoinParty', `You have joined room : ${key}`)
+						// console.log("nom de la room", key);
+						this.server.to(key).emit('Ready', key);
+						this.server.to(value[0]).emit('JoinParty', 'Ready');
+						return ;
+	
+					}
+					else
+						return;
+				}
 			}
+			this.games_room.set(room, [client.id]);
+			client.join(room);
+			// console.log(`room : ${room}`)
+			this.server.to(client.id).emit('JoinParty', `You have created a room : ${room}`);
+			return ;
+
 		}
-		this.games_room.set(room, [client.id]);
-		client.join(room);
-		// console.log(`room : ${room}`)
-		this.server.emit('JoinParty', `You have created a room : ${room}`);
-		return ;
+		catch (error)
+		{
+			throw new WsException('Internal Server Error');
+		}
 	}
 
 	@SubscribeMessage('CreateGameinfo')
 	CreateGameinfo(@ConnectedSocket() client: Socket, @MessageBody() room:string)
 	{
-		if (this.games_info.has(room)){
-			// console.log('la data existe');
-			this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+		try{
+
+			if (this.games_info.has(room)){
+				// console.log('la data existe');
+				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+			}
+			else{
+				this.games_info.set(room, new GameStat());
+				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+			}
 		}
-		else{
-			this.games_info.set(room, new GameStat());
-			this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+
 		}
 	}
 
 	@SubscribeMessage('ballMov')
 	ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
-		// const now = Date.now();
-		// const delay = 10;
-		let gamestat:GameStat = this.games_info.get(room);
-		// if (now - gamestat.ball.last > delay)
-		// {
-			// gamestat.ball.last = now;
-			gamestat.ball.x += gamestat.ball.dx * gamestat.ball.speed;
-			gamestat.ball.y += gamestat.ball.dy * gamestat.ball.speed;
-			
-			gamestat.WallCollision();
-		// }
-		// gamestat.PaddleCollision(gamestat.paddle_1);
-		// gamestat.PaddleCollision(gamestat.paddle_2);
+		try {
 
-		this.games_info.set(room, gamestat);
-		this.server.to(room).emit('UpdateKey', gamestat);
+			// const now = Date.now();
+			// const delay = 10;
+			let gamestat:GameStat = this.games_info.get(room);
+			// if (now - gamestat.ball.last > delay)
+			// {
+				// gamestat.ball.last = now;
+				gamestat.ball.x += gamestat.ball.dx * gamestat.ball.speed;
+				gamestat.ball.y += gamestat.ball.dy * gamestat.ball.speed;
+				
+				gamestat.WallCollision();
+			// }
+			// gamestat.PaddleCollision(gamestat.paddle_1);
+			// gamestat.PaddleCollision(gamestat.paddle_2);
+	
+			this.games_info.set(room, gamestat);
+			this.server.to(room).emit('UpdateKey', gamestat);
+		}
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+		}
+
 	}
 
 	//faire le cas ou une personne quitte
@@ -206,13 +229,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('leaveRoom')
 	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
-		let gamestat:GameStat = this.games_info.get(room);//il faut supprimer la roomm et le Gamestat
-		let games_room = this.games_room;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
-		let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
-		gamestat
-		for (let [key , value ] of this.games_room)
-		{
+		try {
 
+			let gamestat:GameStat = this.games_info.get(room);//il faut supprimer la roomm et le Gamestat
+			let games_room = this.games_room;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+			let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
+			
+			// for (let [key , value ] of this.games_room)
+			// {
+			// 	if (key == room)
+			// 	{
+					
+			// 	}
+				
+			// }
+			this.games_room.delete(room);
+			this.games_info.delete(room);
+		}
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
 		}
 
 	}
@@ -220,11 +256,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('paddllColl')
 	paddllColl(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
-		let gamestat:GameStat = this.games_info.get(room);
-		gamestat.PaddleCollision(gamestat.paddle_1);
-		gamestat.PaddleCollision(gamestat.paddle_2);
-		this.games_info.set(room, gamestat);
-		this.server.to(room).emit('UpdateKey', gamestat);
+		try {
+
+			let gamestat:GameStat = this.games_info.get(room);
+			gamestat.PaddleCollision(gamestat.paddle_1);
+			gamestat.PaddleCollision(gamestat.paddle_2);
+			this.games_info.set(room, gamestat);
+			this.server.to(room).emit('UpdateKey', gamestat);
+		}
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+		}
 		
 
 	}
@@ -232,42 +275,53 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('key')
 	UpdateKey(@ConnectedSocket() client: Socket, @MessageBody() data: { key: string; roomId: string })
 	{
-		let gamestat:GameStat = this.games_info.get(data.roomId)
-		let array = this.games_room.get(data.roomId);
-		// if(array[0] == client.id)
-		// {
+		try {
 
-			if (data.key === "a") {
-				if ((gamestat.paddle_1.y - 10) > 0 )
-					gamestat.paddle_1.y -= 5;
-				}
-
-			else if (data.key === "d") {
-				if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
-				{
-					gamestat.paddle_1.y += 5;
-				}
-			}
-
-		// }
-		// if(array[1] == client.id)
-		// {
-			if (data.key === "ArrowUp" ) {
-				if ((gamestat.paddle_2.y - 10) > 0 )
-					gamestat.paddle_2.y -= 5;
-				}
+			let gamestat:GameStat = this.games_info.get(data.roomId)
+			let array = this.games_room.get(data.roomId);
+			// if(array[0] == client.id)
+			// {
 	
-			else if (data.key === "ArrowDown") {
-				if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
-				{
-					gamestat.paddle_2.y += 5;
+				if (data.key === "a") {
+					if ((gamestat.paddle_1.y - 10) > 0 )
+						gamestat.paddle_1.y -= 5;
+					}
+	
+				else if (data.key === "d") {
+					if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
+					{
+						gamestat.paddle_1.y += 5;
+					}
 				}
-			}
-
-		// }
-
-		this.games_info.set(data.roomId, gamestat);
-		this.server.to(data.roomId).emit('UpdateKey', gamestat);
+				// else
+				// 	return;
+	
+			// }
+			// if(array[1] == client.id)
+			// {
+				if (data.key === "ArrowUp" ) {
+					if ((gamestat.paddle_2.y - 10) > 0 )
+						gamestat.paddle_2.y -= 5;
+					}
+		
+				else if (data.key === "ArrowDown") {
+					if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
+					{
+						gamestat.paddle_2.y += 5;
+					}
+				}
+				// else
+				// return;
+	
+			// }
+	
+			this.games_info.set(data.roomId, gamestat);
+			this.server.to(data.roomId).emit('UpdateKey', gamestat);
+		}
+		catch (error)
+		{
+			throw new WsException('Internal Server Error')
+		}
 
 	}
 
