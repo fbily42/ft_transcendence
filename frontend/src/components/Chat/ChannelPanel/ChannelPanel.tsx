@@ -1,16 +1,16 @@
 import { Button } from '@/components/ui/button'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from '../../Modal'
-import TabsChannel from './Channels/TabsChannel'
+import TabsChannel from './TabsChannel'
 import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Share } from 'lucide-react'
 import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
-import UserList from './Channels/UserList'
+import UserList from './UserList'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import CardInvite from './Channels/CardInvite'
+import CardInvite from './CardInvite'
 import { getDirectName } from '@/lib/Chat/chat.utils'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useNavigate } from 'react-router-dom'
@@ -30,7 +30,6 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     const [open, setOpen] = useState<boolean>(false)
     const [open2, setOpen2] = useState<boolean>(false)
     const [hide, setHide] = useState<boolean>(true)
-    const [color, setColor] = useState<string>('')
     const queryClient = useQueryClient()
     const socket = useWebSocket() as WebSocketContextType
 
@@ -51,11 +50,39 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         queryClient.invalidateQueries({
             queryKey: ['channelUsers', previousChannel],
         })
-        setColor('[#C1E2F7]')
         navigate(`?channelId=${name}`)
         socket.webSocket?.emit('leaveChannel', previousChannel)
         socket.webSocket?.emit('joinChannel', name)
     }
+
+    useEffect(() => {
+        socket?.webSocket?.on('kickedFromChannel', (channel: string) => {
+            if (currentChannel === channel) {
+                setCurrentChannel('')
+                setHide(true)
+                navigate('')
+            }
+        })
+        socket?.webSocket?.on('activePrivateMessage', (channelName: string) => {
+            const previousChannel = currentChannel
+            setHide(false)
+            queryClient.invalidateQueries({
+                queryKey: ['channelUsers', previousChannel],
+            })
+            setCurrentChannel(channelName)
+            navigate(`?channelId=${channelName}`)
+            socket.webSocket?.emit('leaveChannel', previousChannel)
+            socket.webSocket?.emit('joinChannel', channelName)
+        })
+        socket?.webSocket?.on('updateChannelList', () => {
+            queryClient.invalidateQueries({ queryKey: ['channels'] })
+        })
+        return () => {
+            socket?.webSocket?.off('kickedFromChannel')
+            socket?.webSocket?.off('activePrivateMessage')
+            socket?.webSocket?.off('updateChannelList')
+        }
+    })
 
     if (!hide) {
         return (
@@ -83,7 +110,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                             <h1 className="p-[20px] text-gray-500">
                                 Private Messages
                             </h1>
-                            <div className="flex flex-col overflow-y-auto">
+                            <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
                                     channel.direct ? (
                                         <div
@@ -97,7 +124,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? color
+                                                        ? '[#C1E2F7]'
                                                         : 'white'
                                                 }
                                                 userName={getDirectName(
@@ -115,7 +142,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                         </div>
                         <div className="flex flex-col overflow-y-auto">
                             <h1 className="p-[20px] text-gray-500">Groups</h1>
-                            <div className="flex flex-col overflow-y-auto">
+                            <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
                                     !channel.banned &&
                                     !channel.invited &&
@@ -131,7 +158,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? color
+                                                        ? '[#C1E2F7]'
                                                         : 'white'
                                                 }
                                                 userName={channel.name}
@@ -203,7 +230,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                             <h1 className="p-[20px] text-gray-500">
                                 Private Messages
                             </h1>
-                            <div className="flex flex-col overflow-y-auto">
+                            <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
                                     channel.direct ? (
                                         <div
@@ -217,7 +244,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? color
+                                                        ? '[#C1E2F7]'
                                                         : 'white'
                                                 }
                                                 userName={getDirectName(
@@ -235,7 +262,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                         </div>
                         <div className="flex flex-col overflow-y-auto">
                             <h1 className="p-[20px] text-gray-500">Groups</h1>
-                            <div className="flex flex-col overflow-y-auto">
+                            <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
                                     !channel.banned &&
                                     !channel.invited &&

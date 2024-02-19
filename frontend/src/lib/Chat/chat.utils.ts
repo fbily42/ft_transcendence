@@ -27,6 +27,7 @@ export function getRole(user: UserInChannel): string {
         'admin',
         'member',
         'muted',
+		'banned',
     ]
     for (let key of statusKeys) {
         if (user[key] === true) return key
@@ -35,6 +36,8 @@ export function getRole(user: UserInChannel): string {
 }
 
 export function getMyrole(name: string, users: UserInChannel[]): string {
+	if (!name || !users)
+		return ''
 	const user = users.find(userInChannel => userInChannel.name === name)
 	if (user)
 		return getRole(user)

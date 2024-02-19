@@ -9,24 +9,13 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
+import { CardInviteProps, InviteFormValues } from '@/lib/Chat/chat.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { Label } from '@radix-ui/react-label'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Socket } from 'socket.io-client'
-
-export type InviteFormValues = {
-    sentBy: string
-    name: string
-    channel: string
-}
-
-interface CardInviteProps {
-    onClose: () => void
-    channel: string
-}
 
 const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
     const { register, handleSubmit } = useForm<InviteFormValues>()
@@ -36,7 +25,7 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
 
     async function onSubmit(data: InviteFormValues) {
         data.channel = channel
-        data.sentBy = me?.name || ''
+        data.sentBy = me?.name!
         try {
             const response = await axios.patch(
                 `${import.meta.env.VITE_BACKEND_URL}/chat/channel/invite`,

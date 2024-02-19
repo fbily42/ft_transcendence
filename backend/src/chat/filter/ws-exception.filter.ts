@@ -8,7 +8,8 @@ export class WsExceptionFilter implements ExceptionFilter {
 		const client = host.switchToWs().getClient();
 		const errorMessage = exception.message;
 
+		// console.log(`WebSocket exception : ${errorMessage}`) -> for prod version
 		console.log(exception)
-		client.emit('exception', errorMessage);
+		// client.emit('exception', errorMessage);
 	}
 }
