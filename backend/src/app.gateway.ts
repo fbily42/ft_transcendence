@@ -18,6 +18,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js
 import * as cookie from 'cookie';
 import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
 import { ChatService } from './chat/chat.service';
+import { GameStat } from './Game/Game.types';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -28,6 +29,7 @@ import { ChatService } from './chat/chat.service';
 	},
 	transports: ['websocket', 'polling'],
 	})
+	  
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	@WebSocketServer()
@@ -35,12 +37,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	clients = new Map<string, string[]>();
 	games_room = new Map<string, string[]>();
+	games_info = new Map<string , GameStat>();
+	
 
 	constructor (private jwtService: JwtService,
 		private prisma: PrismaService,
 		private chatService: ChatService) {
 			this.server = new Server();
 		}
+		
 
 	getClientsAsArray(): {key: string, value: string[]}[] {
 		const clientsArray = [];
@@ -129,30 +134,211 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@SubscribeMessage('joinRoom')
-	joingame(@ConnectedSocket() client: Socket, @MessageBody() name: string)
+
+	//possible probleme
+	//si une personne cree une room elle peut pas en rejoindre une 
+	//si une personne veux annuler sa recherche comment faire
+	//que se passe t il si elle spam un bouton 
+	//si elle est en partie ne rien faire
+	//verifier le login de la personne pour l'empecher de faire deux matchmaking
+	@SubscribeMessage('JoinRoom')
+	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
-		for (let [key, value] of this.games_room)
-		{
-			let stringcount = 0;
-			for (let item of value){
-				if (typeof item === 'string')
-				{
-					stringcount++;
+		try{
+			for (let [key, value] of this.games_room)
+			{
+				let stringcount = 0;
+				for (let item of value){
+					if (typeof item === 'string')
+						stringcount++;
+					if (stringcount === 2)
+						break;
 				}
-				if (stringcount === 2){
-					break;
+				if (stringcount < 2)
+				{
+					if (value[0] != client.id)
+					{
+						client.join(key);
+						let array = this.games_room.get(key);
+						array.push(client.id);
+						this.games_room.set(key, array);
+						this.server.to(client.id).emit('JoinParty', `You have joined room : ${key}`)
+						// console.log("nom de la room", key);
+						this.server.to(key).emit('Ready', key);
+						this.server.to(value[0]).emit('JoinParty', 'Ready');
+						return ;
+	
+					}
+					else
+						return;
 				}
 			}
-			if (stringcount < 2)
-			{
-				client.join(key);
-				client.emit('JoinParty', `You have joined room : ${key}` )
+			this.games_room.set(room, [client.id]);
+			client.join(room);
+			// console.log(`room : ${room}`)
+			this.server.to(client.id).emit('JoinParty', `You have created a room : ${room}`);
+			return ;
+
+		}
+		catch (error)
+		{
+			throw new WsException('Internal Server Error');
+		}
+	}
+
+	@SubscribeMessage('CreateGameinfo')
+	CreateGameinfo(@ConnectedSocket() client: Socket, @MessageBody() room:string)
+	{
+		try{
+
+			if (this.games_info.has(room)){
+				// console.log('la data existe');
+				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+			}
+			else{
+				this.games_info.set(room, new GameStat());
+				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
 			}
 		}
-		client.join(name);
-		client.emit('JoinParty', `You have created a room : ${name}`);
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+
+		}
 	}
+
+	@SubscribeMessage('ballMov')
+	ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		try {
+
+			// const now = Date.now();
+			// const delay = 10;
+			let gamestat:GameStat = this.games_info.get(room);
+			// if (now - gamestat.ball.last > delay)
+			// {
+				// gamestat.ball.last = now;
+				gamestat.ball.x += gamestat.ball.dx * gamestat.ball.speed;
+				gamestat.ball.y += gamestat.ball.dy * gamestat.ball.speed;
+				
+				gamestat.WallCollision();
+			// }
+			// gamestat.PaddleCollision(gamestat.paddle_1);
+			// gamestat.PaddleCollision(gamestat.paddle_2);
+	
+			this.games_info.set(room, gamestat);
+			this.server.to(room).emit('UpdateKey', gamestat);
+		}
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+		}
+
+	}
+
+	//faire le cas ou une personne quitte
+	//le cas ou c'est la fin de la partie 
+	@SubscribeMessage('leaveRoom')
+	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		try {
+
+			let gamestat:GameStat = this.games_info.get(room);//il faut supprimer la roomm et le Gamestat
+			let games_room = this.games_room;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+			let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
+			
+			// for (let [key , value ] of this.games_room)
+			// {
+			// 	if (key == room)
+			// 	{
+					
+			// 	}
+				
+			// }
+			this.games_room.delete(room);
+			this.games_info.delete(room);
+		}
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+		}
+
+	}
+
+	@SubscribeMessage('paddllColl')
+	paddllColl(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		try {
+
+			let gamestat:GameStat = this.games_info.get(room);
+			gamestat.PaddleCollision(gamestat.paddle_1);
+			gamestat.PaddleCollision(gamestat.paddle_2);
+			this.games_info.set(room, gamestat);
+			this.server.to(room).emit('UpdateKey', gamestat);
+		}
+		catch(error)
+		{
+			throw new WsException('Internal Server Error')
+		}
+		
+
+	}
+	
+	@SubscribeMessage('key')
+	UpdateKey(@ConnectedSocket() client: Socket, @MessageBody() data: { key: string; roomId: string })
+	{
+		try {
+
+			let gamestat:GameStat = this.games_info.get(data.roomId)
+			let array = this.games_room.get(data.roomId);
+			// if(array[0] == client.id)
+			// {
+	
+				if (data.key === "a") {
+					if ((gamestat.paddle_1.y - 10) > 0 )
+						gamestat.paddle_1.y -= 5;
+					}
+	
+				else if (data.key === "d") {
+					if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
+					{
+						gamestat.paddle_1.y += 5;
+					}
+				}
+				// else
+				// 	return;
+	
+			// }
+			// if(array[1] == client.id)
+			// {
+				if (data.key === "ArrowUp" ) {
+					if ((gamestat.paddle_2.y - 10) > 0 )
+						gamestat.paddle_2.y -= 5;
+					}
+		
+				else if (data.key === "ArrowDown") {
+					if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
+					{
+						gamestat.paddle_2.y += 5;
+					}
+				}
+				// else
+				// return;
+	
+			// }
+	
+			this.games_info.set(data.roomId, gamestat);
+			this.server.to(data.roomId).emit('UpdateKey', gamestat);
+		}
+		catch (error)
+		{
+			throw new WsException('Internal Server Error')
+		}
+
+	}
+
+	
+
 
 	@SubscribeMessage('leaveChannel')
 	leave(@ConnectedSocket() client: Socket, @MessageBody() name: string){

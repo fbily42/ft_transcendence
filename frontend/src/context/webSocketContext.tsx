@@ -50,6 +50,7 @@ export const WebSocketProvider: React.FC = () => {
                 }
             )
         })
+		
 
         ws?.on('users', (users: SocketUsers) => {
             const usersMap: Map<string, string[]> = arrayToMap(users)
