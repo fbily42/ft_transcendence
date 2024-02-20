@@ -51,3 +51,45 @@ export async function getUserById(id: string): Promise<UserData> {
     )
     return response.data
 }
+
+export async function addNewFriend(friendId: string) {
+    const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/add/${friendId}`,
+        null,
+        {
+            withCredentials: true,
+        }
+    )
+
+    return response.data
+}
+
+export async function removeFriend(friendId: string) {
+    const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/remove/${friendId}`,
+        {
+            withCredentials: true,
+        }
+    )
+    return response.data
+}
+
+export async function getFriends(friendId: string) {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/friend/${friendId}`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function getMyFriends() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/me`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}

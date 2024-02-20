@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 import { LeaderboardDTO } from './dto/leaderboard.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
@@ -8,15 +7,12 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
-		private jwtService: JwtService,
 	) {}
 
-	async getInfo(jwt: any) {
-		const jwtPayload = this.jwtService.decode(jwt);
-
+	async getInfo(name: string) {
 		const user = await this.prisma.user.findUnique({
 			where: {
-				name: jwtPayload.login,
+				name: name,
 			},
 		});
 		if (!user) return null;
@@ -52,6 +48,7 @@ export class UserService {
 				avatar: true,
 				rank: true,
 				photo42: true,
+				friends: true,
 			},
 		});
 		if (!user) return null;
@@ -110,7 +107,6 @@ export class UserService {
 				score: true,
 			},
 		});
-		//console.log('Leaderboard Data:', leaderboardData);
 
 		return leaderboardData;
 	}

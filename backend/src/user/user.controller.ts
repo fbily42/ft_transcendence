@@ -12,6 +12,7 @@ import {
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { LeaderboardDTO } from './dto/leaderboard.dto';
+import { User } from 'src/decorators/user.decorators';
 
 @Controller('user')
 @UseGuards(AuthGuard)
@@ -19,10 +20,9 @@ export class UserController {
 	constructor(private userService: UserService) {}
 
 	@Get('me')
-	async getUserInfo(@Req() req: Request) {
+	async getUserInfo(@User() user) {
 		//To access userLogin and userID in req, see example below
-		const jwt = req.cookies.jwt;
-		return await this.userService.getInfo(jwt);
+		return this.userService.getInfo(user.name);
 	}
 
 	@Get('all')

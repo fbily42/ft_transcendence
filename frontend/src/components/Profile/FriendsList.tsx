@@ -1,21 +1,18 @@
-import { UserData } from '@/lib/Dashboard/dashboard.types'
+import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserCards from '../User/userCards/UserCards'
 import { Skeleton } from '../ui/skeleton'
 import { getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import { get } from 'http'
 
-export default function FriendsList() {
-    const { data, isLoading, isError } = useQuery({
+export default function FriendsList({ friends }: { friends: FriendData[] }) {
+    const { data, isLoading, isError } = useQuery<UserData>({
         queryKey: ['users'],
         queryFn: () => getUsers(),
     })
 
     const webSocket = useWebSocket() as WebSocketContextType
-
-    // webSocket.usersOn.get('fbily')
 
     function getStatus(name: string) {
         const webSocketStatus = webSocket.usersOn.has(name)
@@ -36,24 +33,19 @@ export default function FriendsList() {
         return <div>Loading...</div>
     }
 
-    const users: UserData[] = Array.isArray(data)
-        ? data.filter(Boolean)
-        : data
-          ? [data]
-          : []
-
     return (
         <div>
+            <h2>Friends</h2>
             <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {users && users.length > 0 ? (
-                    users.map((user) => (
+                {friends && friends.length > 0 ? (
+                    friends.map((friend: FriendData) => (
                         <UserCards
-                            id={user.id}
-                            key={user.id} // Utilisez l'ID de l'utilisateur comme clé
+                            id={friend.id.toString()}
+                            key={friend.id}
                             bgColor="white"
-                            userName={user.name}
-                            userPicture={user.photo42 || PinguAvatar}
-                            userStatus={getStatus(user.name)}
+                            userName={friend.name}
+                            userPicture={friend.avatar || PinguAvatar}
+                            userStatus={getStatus(friend.name)}
                             variant="USER_PROFILE"
                         />
                     ))
