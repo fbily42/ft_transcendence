@@ -44,7 +44,6 @@ export class FriendsService {
 				return friend.user;
 			return friend.friend;
 		})
-		console.log(test);
 		return test;
 	}
 
@@ -82,7 +81,6 @@ export class FriendsService {
 				return friend.user;
 			return friend.friend;
 		})
-		console.log(test);
 		return test;
 	}
 

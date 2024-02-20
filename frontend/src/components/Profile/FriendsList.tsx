@@ -11,22 +11,8 @@ export default function FriendsList({ friends }: { friends: FriendData[] }) {
         queryKey: ['users'],
         queryFn: () => getUsers(),
     })
-    // const param = useParams()
-
-    // const { data, isError, isLoading } = useQuery({
-    //     queryKey: ['users', param.id],
-    //     queryFn: () => getUserById(param.id!),
-    // })
-    // if (isError) {
-    //     return <div>Error</div>
-    // }
-    // if (isLoading) {
-    //     return <div>Loading...</div>
-    // }
 
     const webSocket = useWebSocket() as WebSocketContextType
-
-    // webSocket.usersOn.get('fbily')
 
     function getStatus(name: string) {
         const webSocketStatus = webSocket.usersOn.has(name)
@@ -47,23 +33,10 @@ export default function FriendsList({ friends }: { friends: FriendData[] }) {
         return <div>Loading...</div>
     }
 
-    console.log(friends, 'friends')
-
     return (
         <div>
+            <h2>Friends</h2>
             <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {/* {users && users.length > 0 ? (
-                    users.map((user) => (
-                        <UserCards
-                            id={user.id.toString()}
-                            key={user.id}
-                            bgColor="white"
-                            userName={user.name}
-                            userPicture={user.photo42 || PinguAvatar}
-                            userStatus={getStatus(user.name)}
-                            variant="USER_PROFILE"
-                        />
-                    )) */}
                 {friends && friends.length > 0 ? (
                     friends.map((friend: FriendData) => (
                         <UserCards
