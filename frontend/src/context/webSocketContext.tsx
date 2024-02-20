@@ -47,6 +47,7 @@ export const WebSocketProvider: React.FC = () => {
                 }
             )
         })
+		
 
         ws?.on('users', (users: SocketUsers) => {
             const usersMap: Map<string, string[]> = arrayToMap(users)
@@ -61,6 +62,7 @@ export const WebSocketProvider: React.FC = () => {
             if (ws) {
                 ws?.off('channelInvite')
                 ws?.off('users')
+
                 ws.close()
             }
         }
