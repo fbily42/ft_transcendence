@@ -40,12 +40,13 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
                     className="bg-[#C1E2F7] flex items-center w-[70px] h-[70px] border-[3px] border-customYellow rounded-full overflow-hidden"
                 >
                     <Button
-                        onClick={() =>
+                        onClick={(e: React.MouseEvent<HTMLElement>) => {
+                            e.preventDefault()
                             handleImageClick(image.imageBackground || '')
-                        }
+                        }}
                         key={image.id}
                         id="boxe"
-                        className="w-full h-full bg-center bg-no-repeat bg-[#C1E2F7]"
+                        className="w-full h-full bg-center bg-no-repeat bg-[#C1E2F7] hover:bg-[#C1E2F7]"
                         style={{
                             backgroundImage: `url(${image.imageProfile})`,
                             backgroundSize: 'cover',

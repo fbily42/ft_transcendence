@@ -10,29 +10,40 @@ import OtpModal from '@/components/TwoFA/OtpModal'
 
 function Auth(): JSX.Element {
     const [isAuth, setIsAuth] = useState<boolean>(false)
+    const [isProfileSet, setIsProfileSet] = useState<boolean>(false)
 
     useEffect(() => {
         async function checkIsAuth(): Promise<void> {
             try {
                 const response = await axios.get(
-                    `${import.meta.env.VITE_BACKEND_URL}/auth/isAuth`,
+                    `${import.meta.env.VITE_BACKEND_URL}/auth/isProfileSet`,
                     {
                         withCredentials: true,
                     }
                 )
                 setIsAuth(true)
+                setIsProfileSet(true)
             } catch (error) {
-                setIsAuth(false)
+                if (error.response.status == 404) {
+                    setIsProfileSet(false)
+                    setIsAuth(true)
+                } else {
+                    setIsProfileSet(false)
+                    setIsAuth(false)
+                }
             }
         }
 
         checkIsAuth()
     }, [])
 
-    if (isAuth) return <Navigate to="/" />
-    else {
+    const onProfileSet = () => setIsProfileSet(true)
+
+    if (isAuth && isProfileSet) {
+        return <Navigate to="/" />
+    } else {
         return (
-            <Login>
+            <Login isAuth={isAuth}>
                 <Outlet></Outlet>
             </Login>
         )
