@@ -14,6 +14,7 @@ import Modal from '@/components/Modal'
 import TabsChannel from '../ChannelPanel/TabsChannel'
 import SelfMessage from './SelfMessage'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
+import { getRole } from '@/lib/Chat/chat.utils'
 
 type MessageFormValues = {
     userId: string
@@ -48,7 +49,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     })
 
     function getAvatar(name: string): string {
-        for (const user of users || []) {
+        for (const user of users!) {
             if (user.name === name) {
                 return user.photo42
             }
@@ -57,23 +58,33 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     }
 
     useEffect(() => {
-        socket.webSocket?.on('messageToRoom', () => {
+        socket?.webSocket?.on('messageToRoom', () => {
             queryClient.invalidateQueries({
                 queryKey: ['messages', currentChannel],
             })
         })
         return () => {
-            socket.webSocket?.off('messageToRoom')
+            socket?.webSocket?.off('messageToRoom')
         }
     }, [socket])
 
     async function onSubmit(data: MessageFormValues) {
         data.target = currentChannel
-        data.userName = me?.name || ''
-        data.userId = me?.id || 0
+        data.userName = me?.name!
+        data.userId = me?.id!
         socket.webSocket?.emit('messageToRoom', data)
         reset({ message: '' })
     }
+
+	function getSenderRole(name: string): string {
+		for (const user of users!) {
+            if (user.name === name) {
+				const role = getRole(user)
+                return role
+            }
+        }
+		return ''
+	}
 
     return currentChannel ? (
         <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
@@ -87,13 +98,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                 <SelfMessage
                                     key={index}
                                     message={message}
-                                    picture={me?.photo42 || ''}
+                                    picture={me?.photo42!}
+									role={getSenderRole(me?.name!)}
                                 ></SelfMessage>
                             ) : (
                                 <MessageBubble
                                     key={index}
                                     message={message}
                                     picture={getAvatar(message.sentByName)}
+									role={getSenderRole(message.sentByName)}
                                 ></MessageBubble>
                             )
                         )}

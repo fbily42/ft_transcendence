@@ -8,6 +8,7 @@ import DropdownChannelUser from './DropdownChannelUser'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useEffect } from 'react'
+import UserCardChannelUser from './UserCardChannelUser'
 
 interface UserListProps {
     channel: string
@@ -52,20 +53,13 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                                         : 'opacity-50'
                                 }
                             >
-                                <UserCards
-                                    id={user.userId.toString()}
-                                    bgColor="transparent"
-                                    userName={user.name}
-                                    userPicture={user.photo42}
-                                    userStatus={getRole(user)}
-                                    variant="CHAT"
-                                ></UserCards>
-                                <DropdownChannelUser
-                                    targetId={user.userId.toString()}
+                                <UserCardChannelUser
+                                    targetId={user.userId}
                                     targetName={user.name}
-                                    role={getMyrole(me?.name!, users)}
+                                    targetPicture={user.photo42}
                                     targetRole={getRole(user)}
-                                ></DropdownChannelUser>
+                                    userRole={getMyrole(me?.name!, users)}
+                                ></UserCardChannelUser>
                             </div>
                         ) : null
                     )}
@@ -79,20 +73,16 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                             {users?.map((user, index) =>
                                 user.banned ? (
                                     <div key={index} className={'opacity-50'}>
-                                        <UserCards
-                                            id={user.userId.toString()}
-                                            bgColor="transparent"
-                                            userName={user.name}
-                                            userPicture={user.photo42}
-                                            userStatus={getRole(user)}
-                                            variant="CHAT"
-                                        ></UserCards>
-                                        <DropdownChannelUser
-                                            targetId={user.userId.toString()}
+                                        <UserCardChannelUser
+                                            targetId={user.userId}
                                             targetName={user.name}
-                                            role={getMyrole(me?.name!, users)}
+                                            targetPicture={user.photo42}
                                             targetRole={getRole(user)}
-                                        ></DropdownChannelUser>
+                                            userRole={getMyrole(
+                                                me?.name!,
+                                                users
+                                            )}
+                                        ></UserCardChannelUser>
                                     </div>
                                 ) : null
                             )}

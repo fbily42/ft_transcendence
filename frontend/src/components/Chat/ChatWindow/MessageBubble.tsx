@@ -3,13 +3,15 @@ import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import React from 'react'
 import { format } from 'date-fns'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
+import { getBorderColor } from '@/lib/Chat/chat.utils'
 
 interface MessageProps {
     message: Message
     picture: string
+	role: string
 }
 
-const MessageBubble: React.FC<MessageProps> = ({ message, picture }) => {
+const MessageBubble: React.FC<MessageProps> = ({ message, picture, role }) => {
     const formattedDate = format(message.sentAt, 'hh:mm a')
     return (
         <div id="full-div" className="flex w-full">
@@ -25,7 +27,7 @@ const MessageBubble: React.FC<MessageProps> = ({ message, picture }) => {
                         <div className="flex items-center">
                             <Avatar className="w-[48px] h-[48px]">
                                 <AvatarImage
-                                    className="border-[3px] border-[#45A0E3] rounded-full object-cover w-[40px] h-[40px]"
+                                    className={`border-[3px] ${getBorderColor(role)} rounded-full object-cover w-[40px] h-[40px]`}
                                     src={picture}
                                 />
                                 <AvatarFallback>{Pingu}</AvatarFallback>
@@ -33,7 +35,7 @@ const MessageBubble: React.FC<MessageProps> = ({ message, picture }) => {
                         </div>
                         <div
                             id="message"
-                            className="flex-col gap-[10px] p-[8px] border-[3px] rounded-[12px] border-[#C1E2F7]"
+                            className={`flex-col gap-[10px] p-[8px] border-[3px] rounded-[12px] ${getBorderColor(role)}`}
                         >
                             <p className="font-bold">{message.sentByName}</p>
                             <p>{message.content}</p>
