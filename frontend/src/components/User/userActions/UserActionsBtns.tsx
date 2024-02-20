@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -15,33 +15,34 @@ import { Label } from '@/components/ui/label'
 import UserAvatar from '../userAvatar/UserAvatar'
 import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
 import AvatarImg from '../userAvatar/AvatarImg'
+import { useParams } from 'react-router-dom'
 
 export default function UserActionsBtns() {
-    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
+    // const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
+    const param = useParams()
 
+    const initialAvatar = Photo42(param.id as string)
     const [selectedAvatar, setSelectedAvatar] = useState<string>(
-        Photo42().imageBackground || ''
+        initialAvatar.imageProfile
     )
-   function handleChangeImage() {
-    return ''
-   }
-
-    console.log(selectedAvatar, 'Ici', Photo42)
-
-    const handleResize = () => {
-        setIsMobile(window.innerWidth < 900)
+    function handleChangeImage() {
+        return ''
     }
 
-    useEffect(() => {
-        handleResize()
-        window.addEventListener('resize', handleResize)
+    // const handleResize = () => {
+    //     setIsMobile(window.innerWidth < 900)
+    // }
 
-        // Cleanup the event listener on component unmount
-        return () => {
-            window.removeEventListener('resize', handleResize)
-        }
-    }, [])
+    // useEffect(() => {
+    //     handleResize()
+    //     window.addEventListener('resize', handleResize)
+
+    //     // Cleanup the event listener on component unmount
+    //     return () => {
+    //         window.removeEventListener('resize', handleResize)
+    //     }
+    // }, [])
 
     return (
         <div
@@ -83,7 +84,10 @@ export default function UserActionsBtns() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button onClick={() => handleChangeImage()} type="submit">
+                        <Button
+                            onClick={() => handleChangeImage()}
+                            type="submit"
+                        >
                             Save changes
                         </Button>
                     </DialogFooter>

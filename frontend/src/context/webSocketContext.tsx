@@ -54,6 +54,10 @@ export const WebSocketProvider: React.FC = () => {
 			setUsersOn(usersMap)
         })
 
+		ws?.on('privateMessage', (channel: string) => {
+			navigate('/chat', {state: {currentChannel: channel}})
+		})
+
         return () => {
             if (ws) {
                 ws?.off('channelInvite')

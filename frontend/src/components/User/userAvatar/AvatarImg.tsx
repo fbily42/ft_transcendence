@@ -15,10 +15,18 @@ type ImageSelectorProps = {
 
 const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
     const images: {
-        id: number
+        id: string
         imageProfile: string
         imageBackground: string | undefined
-    }[] = [Pingu(), Pinga(), Mama(), Papa(), Pingi(), Robby(), Photo42()]
+    }[] = [
+        Pingu(),
+        Pinga(),
+        Mama(),
+        Papa(),
+        Pingi(),
+        Robby(),
+        Photo42(),
+    ]
 
     const handleImageClick = (image: string) => {
         onSelect(image)
@@ -27,7 +35,10 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
     return (
         <div className="flex">
             {images.map((image) => (
-                <div className="bg-[#C1E2F7] flex items-center w-[70px] h-[70px] border-[3px] border-customYellow rounded-full overflow-hidden">
+                <div
+                    key={image.id}
+                    className="bg-[#C1E2F7] flex items-center w-[70px] h-[70px] border-[3px] border-customYellow rounded-full overflow-hidden"
+                >
                     <Button
                         onClick={() =>
                             handleImageClick(image.imageBackground || '')

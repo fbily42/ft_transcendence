@@ -9,8 +9,9 @@ import Auth from './Pages/Auth/Auth'
 import ProtectedRoute from './components/ProtectedRoute'
 import { WebSocketProvider } from './context/webSocketContext'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import TwoFA from "./Pages/TwoFA/TwoFA";
-import { TwoFAProvider } from "./context/twoFAEnableContext";
+import TwoFA from './Pages/TwoFA/TwoFA'
+import { TwoFAProvider } from './context/twoFAEnableContext'
+import OtherProfile from './Pages/Profile/OtherProfile'
 
 const queryClient = new QueryClient()
 
@@ -31,10 +32,20 @@ function App() {
                                         path="/"
                                         element={<Dashboard />}
                                     ></Route>
-                                    <Route path="/pong" element={<Pong />}></Route>
-                                    <Route path="/chat" element={<Chat />}></Route>
                                     <Route
-                                        path="/profile"
+                                        path="/pong"
+                                        element={<Pong />}
+                                    ></Route>
+                                    <Route
+                                        path="/chat"
+                                        element={<Chat />}
+                                    ></Route>
+                                    <Route
+                                        path="/profile/:id"
+                                        element={<OtherProfile />}
+                                    ></Route>
+                                    <Route
+                                        path="/profile/me"
                                         element={<Profile />}
                                     ></Route>
                                 </Route>

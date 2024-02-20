@@ -2,7 +2,7 @@ import React from 'react'
 import {
     Card,
     CardHeader,
-    CardContent,
+    // CardContent,
     CardTitle,
     CardDescription,
 } from '@/components/ui/card'
@@ -11,19 +11,21 @@ import PinguAvatar from '../../../assets/empty-state/pingu-face.svg'
 import DropdownCard from './DropdownCard'
 
 interface UserCards {
+    id: string
     userPicture: string
     userName: string
-    userStatus: string //change in boolean
-	bgColor: string
+    userStatus: string
+    bgColor: string
     variant: 'USER_PROFILE' | 'CHAT'
 }
 
 const UserCards: React.FC<UserCards> = ({
+    id,
     userName,
     userPicture,
     userStatus,
     variant,
-	bgColor,
+    bgColor,
 }) => {
     return (
         <div className="h-full w-full">
@@ -43,14 +45,8 @@ const UserCards: React.FC<UserCards> = ({
                         <CardDescription>{userStatus}</CardDescription>
                     </CardHeader>
                 </div>
-                {/* <div>
-                    <CardHeader>
-                        <CardTitle>{userName}</CardTitle>
-                        <CardDescription>{userStatus}</CardDescription>
-                    </CardHeader>
-                </div> */}
                 <div>
-                    <DropdownCard variant={variant} />
+                    <DropdownCard variant={variant} id={id} />
                 </div>
             </Card>
         </div>
