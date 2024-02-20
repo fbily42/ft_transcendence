@@ -1,12 +1,12 @@
 export type FriendData = {
-    id: number
+    id: string
     name: string
     avatar?: string
     status: string
 }
 
 export type UserData = {
-	id: number;
+	id: string;
 	name: string;
 	score: number;
   rank: number;

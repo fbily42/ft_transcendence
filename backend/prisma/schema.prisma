@@ -11,27 +11,26 @@ datasource db {
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
+    id        String   @id @default(uuid())
     createdAt DateTime @default(now())
     updateAt  DateTime @updatedAt
 
     name    String  @unique // 42 login
-    pseudo  String? @unique // by default == name ?
+    pseudo  String? @unique
     avatar  String?
     photo42 String
 
     //Auth
-    token42      Json
     jwt          String[]
-    Ban_jwt      String[]
+    banJwt      String[]
     refreshToken String?
 
     //2FA
-    otp_enabled  Boolean @default(false)
-    otp_verified Boolean @default(false)
-    otp_secret   String?
-    otp_url      String?
-    request_uuid String? @unique
+    otpEnabled  Boolean @default(false)
+    otpVerified Boolean @default(false)
+    otpSecret   String?
+    otpUrl      String?
+    requestUuid String? @unique
 
     channels ChannelUser[]
     messages Message[]
@@ -46,9 +45,9 @@ model User {
     friendship FriendShip[] @relation(name: "UserFriends")
     friends    FriendShip[] @relation(name: "FriendUsers")
 
-    //history		Game[] -> TO IMPROVE
-    //friendship 	Friendship[] -> TODO
-    //notifs		String [] or NotificationModel[] -> TODO
+    blocked String[]
+
+    Games Game[]
 }
 
 model Channel {
@@ -65,37 +64,30 @@ model Channel {
     messages Message[]
 }
 
-// Maybe it will change
 model Message {
-    id     Int      @id @default(autoincrement())
-    sentAt DateTime @default(now())
+    id     		Int      @id @default(autoincrement())
+    sentAt 		DateTime @default(now())
 
-    sentBy     User   @relation(fields: [sentByName], references: [name], onDelete: Cascade)
-    sentByName String
+    sentBy		User   @relation(fields: [sentByName], references: [name], onDelete: Cascade)
+    sentByName	String
 
     channel     Channel @relation(fields: [channelName], references: [name], onDelete: Cascade)
     channelName String
 
-    content String
+    content 	String
 }
 
-// Not the final model for Game.
 model Game {
-    id        Int       @id @default(autoincrement())
-    createdAt DateTime  @default(now())
-    endAt     DateTime?
+    id        		Int       @id @default(autoincrement())
+    createdAt 		DateTime  @default(now())
+    endAt     		DateTime?
 
-    live         Boolean
-    //creator			User
-    //guest				User
-    winnerId     Int?
-    looserId     Int?
-    scoreCreator Int     @default(0)
-    scoreGuest   Int     @default(0)
-    //socket ?
-    //theme			String ou Url ? (same avatar)
-    difficulty   Int     @default(1)
-    matchmaking  Boolean
+    userId 			String
+    user   			User   @relation(fields: [userId], references: [name], onDelete: Cascade)
+
+	opponent		String
+	userScore		Int
+	opponentScore	Int
 }
 
 // Relation table for many-to-many relation
@@ -103,8 +95,8 @@ model ChannelUser {
     channelId Int
     channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
-    userId Int
-    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     owner   Boolean @default(false)
     admin   Boolean @default(false)
@@ -117,25 +109,14 @@ model ChannelUser {
 }
 
 model FriendShip {
-    userId Int
-    user   User @relation(name: "UserFriends", fields: [userId], references: [id])
+    userId String
+    user   User   @relation(name: "UserFriends", fields: [userId], references: [id])
 
-    friendId Int
-    friend   User @relation(name: "FriendUsers", fields: [friendId], references: [id])
+    friendId String
+    friend   User   @relation(name: "FriendUsers", fields: [friendId], references: [id])
 
     accepted Boolean @default(false)
 
     @@id([userId, friendId])
 }
 
-// Use "npx prisma generate" = create TSClass from Schema for our code.
-// => import { User } from '@prisma/client';
-
-// model Images {
-// 	id 				Int @id @default(autoincrement())
-// 	createdAt 		DateTime @default(now())
-// 	updateAt 		DateTime @updatedAt
-
-// 	imageProfile	String
-// 	imageBackground	String
-// }

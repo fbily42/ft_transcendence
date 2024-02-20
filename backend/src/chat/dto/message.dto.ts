@@ -1,10 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class MessageDto {
 	
 	@IsNotEmpty()
-	@IsNumber()
-	readonly userId: number
+	@IsString()
+	readonly userId: string
 
 	@IsNotEmpty()
 	@IsString()

@@ -15,9 +15,9 @@ export class FriendsService {
 			where: {
 				OR:[
 					{
-						friendId: Number(friendId)
+						friendId: friendId
 					},{
-						userId:Number(friendId)
+						userId: friendId
 					}
 				],
 				accepted:true,
@@ -40,7 +40,7 @@ export class FriendsService {
 			}
 		})
 		const test = friends.map((friend) => {
-			if (friend.friendId === Number(friendId))
+			if (friend.friendId === friendId)
 				return friend.user;
 			return friend.friend;
 		})
@@ -52,9 +52,9 @@ export class FriendsService {
 			where: {
 				OR:[
 					{
-						friendId: Number(friendId)
+						friendId: friendId
 					},{
-						userId:Number(friendId)
+						userId: friendId
 					}
 				],
 				accepted:false,
@@ -77,7 +77,7 @@ export class FriendsService {
 			}
 		})
 		const test = friends.map((friend) => {
-			if (friend.friendId === Number(friendId))
+			if (friend.friendId === friendId)
 				return friend.user;
 			return friend.friend;
 		})
@@ -88,8 +88,8 @@ export class FriendsService {
 		const requestFriend = await this.prisma.friendShip.findUnique({
 			where: {
 				userId_friendId:{
-					userId: Number(userId),
-					friendId: Number(friendId)
+					userId: userId,
+					friendId: friendId
 				}
 			}
 		})
@@ -99,8 +99,8 @@ export class FriendsService {
 		const invitation = await this.prisma.friendShip.findUnique({
 			where: {
 				userId_friendId:{
-					userId: Number(friendId),
-					friendId: Number(userId)
+					userId: friendId,
+					friendId: userId
 				}
 			}
 		})
@@ -109,8 +109,8 @@ export class FriendsService {
 		}
 		const newFriendship = await this.prisma.friendShip.create({
 			data: {
-				userId: Number(userId),
-				friendId: Number(friendId)
+				userId: userId,
+				friendId: friendId
 			}
 		})
 		return newFriendship;
@@ -120,8 +120,8 @@ export class FriendsService {
 		const friendship = await this.prisma.friendShip.findUnique({
 			where: {
 				userId_friendId:{
-					userId: Number(friendId),
-					friendId: Number(userId)
+					userId: friendId,
+					friendId: userId
 				}
 			}
 		})
@@ -132,8 +132,8 @@ export class FriendsService {
 		const acceptFriend = await this.prisma.friendShip.update({
 			where: {
 				userId_friendId:{
-					userId: Number(friendId),
-					friendId: Number(userId)
+					userId: friendId,
+					friendId: userId
 				}
 			},
 			data: {
@@ -147,8 +147,8 @@ export class FriendsService {
 		const myFriendship = await this.prisma.friendShip.findUnique({
 			where: {
 				userId_friendId:{
-					userId: Number(userId),
-					friendId: Number(friendId)
+					userId: userId,
+					friendId: friendId
 				}
 			}
 		})
@@ -156,8 +156,8 @@ export class FriendsService {
 			return this.prisma.friendShip.delete({
 				where:{
 					userId_friendId:{
-						userId: Number(userId),
-						friendId: Number(friendId)
+						userId: userId,
+						friendId: friendId
 					}
 				}
 			})
@@ -165,8 +165,8 @@ export class FriendsService {
 		const otherFriendship = await this.prisma.friendShip.findUnique({
 			where: {
 				userId_friendId:{
-					userId: Number(friendId),
-					friendId: Number(userId)
+					userId: friendId,
+					friendId: userId
 				}
 			}
 		})
@@ -174,8 +174,8 @@ export class FriendsService {
 			return this.prisma.friendShip.delete({
 				where:{
 					userId_friendId:{
-						userId: Number(friendId),
-						friendId: Number(userId)
+						userId: friendId,
+						friendId: userId
 					}
 				}
 			})

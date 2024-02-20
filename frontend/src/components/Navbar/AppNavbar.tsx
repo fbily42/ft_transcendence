@@ -18,11 +18,11 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
-	  const [open, setOpen] = useState(false);
-<!--     const { data } = useQuery({
-        queryKey: ['me'],
-        queryFn: getUserMe,
-    }) -->
+    const [open, setOpen] = useState(false)
+    // const { data } = useQuery({
+    //     queryKey: ['me'],
+    //     queryFn: getUserMe,
+    // })
 
     // Update active state when the route changes
     useEffect(() => {
@@ -32,7 +32,7 @@ const VerticalNavbar: React.FC = () => {
                 setActive(1)
                 break
             case '/pong':
-				// setOpen(true)
+                // setOpen(true)
                 setActive(2)
                 break
             case '/chat':
@@ -82,10 +82,10 @@ const VerticalNavbar: React.FC = () => {
         }
     }
 
-	const closeDialog = () => {
-		//faire un emit pour retirer la personne de la map du matchmaking car cela veut dire qu'elle a ferme la page, mais uniquement si elle a ferme la modal avant que la game commence 
-		setOpen(false);
-	  };
+    const closeDialog = () => {
+        //faire un emit pour retirer la personne de la map du matchmaking car cela veut dire qu'elle a ferme la page, mais uniquement si elle a ferme la modal avant que la game commence
+        setOpen(false)
+    }
     return (
         <nav className="fixed bg-white shadow-drop h-screen w-[86px] flex flex-col justify-center pl-[18px] py-[36px]">
             <div className="flex flex-col justify-between h-full">

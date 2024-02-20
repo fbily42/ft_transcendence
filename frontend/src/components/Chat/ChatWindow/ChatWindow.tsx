@@ -16,7 +16,7 @@ import SelfMessage from './SelfMessage'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 
 type MessageFormValues = {
-    userId: number
+    userId: string
     userName: string
     target: string
     message: string

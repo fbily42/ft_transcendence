@@ -42,7 +42,7 @@ export type InviteFormValues = {
 }
 
 export type UserInChannel = {
-	userId: number,
+	userId: string,
 	name: string,
 	pseudo: string,
 	avatar: string,

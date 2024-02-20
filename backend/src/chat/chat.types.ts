@@ -7,7 +7,7 @@ export type ChannelWithRelation = Prisma.ChannelGetPayload<{
 }>
 
 export type UserInChannel = {
-	userId: number,
+	userId: string,
 	name: string,
 	pseudo: string,
 	avatar: string,

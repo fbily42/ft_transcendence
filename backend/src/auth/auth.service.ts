@@ -9,7 +9,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { PayloadToResult } from '@prisma/client/runtime/library';
 
 export interface Payload_type {
-	sub: number;
+	sub: string;
 	login: string;
   }
 
@@ -62,7 +62,7 @@ export class AuthService {
 		}
 	};
 
-	async findUser(login :string, token :any, photo :string){
+	async findUser(login :string, photo :string){
 
 		try {
 			const user: User = await this.prisma.user.findUnique({
@@ -72,7 +72,7 @@ export class AuthService {
 			});
 			if (!user)
 			{
-				return this.createUser(login, token, photo);
+				return this.createUser(login, photo);
 			}
 			return user;
 		}
@@ -81,13 +81,12 @@ export class AuthService {
 		}
 	}
 
-	async createUser(login: string, token :any, photo: string) {
+	async createUser(login: string, photo: string) {
 
 		try {
 			const user: User = await this.prisma.user.create({
 				data: {
 					name: login,
-					token42: token,
 					photo42: photo,
 				},
 			});
@@ -126,7 +125,7 @@ export class AuthService {
 		}
 	}
 
-	async setJwt(userID: number){
+	async setJwt(userID: string){
 		try {
 			//Find user
 			const user = await this.prisma.user.findUnique({
@@ -147,7 +146,7 @@ export class AuthService {
 
 	}
 
-	async setRequestUuid(user: any) {
+	async setrequestUuid(user: any) {
 		try {
 			//Generate UUID
 			const uuid = uuidv1();
@@ -156,7 +155,7 @@ export class AuthService {
 					id: user.id,
 				},
 				data: {
-					request_uuid : uuid,
+					requestUuid : uuid,
 				},
 			});
 			return (uuid);
@@ -189,7 +188,7 @@ export class AuthService {
 		try {
 			const user = await this.prisma.user.findUnique({
 				where: {
-					request_uuid : uuid,
+					requestUuid : uuid,
 				}
 			})
 			return (user);
@@ -208,7 +207,7 @@ export class AuthService {
 						id: user.id,
 					},
 					data: {
-						request_uuid: null,
+						requestUuid: null,
 					},
 				})
 			}
@@ -240,8 +239,8 @@ export class AuthService {
 				}
 			});
 
-			if (user && user.otp_secret && user.otp_url)
-				return {otp_secret: user.otp_secret, otp_url: user.otp_url};
+			if (user && user.otpSecret && user.otpUrl)
+				return {otpSecret: user.otpSecret, otpUrl: user.otpUrl};
 
 			//Generates a key
 			const base32_secret : string = this.generateOtpSecret();
@@ -265,12 +264,12 @@ export class AuthService {
 					id: userID,
 				},
 				data: {
-					otp_secret: base32_secret,
-					otp_url: url,
+					otpSecret: base32_secret,
+					otpUrl: url,
 				},
 			});
 
-			return {otp_secret: base32_secret, otp_url: url};
+			return {otpSecret: base32_secret, otpUrl: url};
 		}
 		catch (error) {
 			throw error;
@@ -291,7 +290,7 @@ export class AuthService {
 				issuer: "Pinguscendence",
 				issuerInLabel: true,
 				period: 30,
-				secret: user.otp_secret,
+				secret: user.otpSecret,
 			});
 
 			const delta = TOTP.validate({token, window: 2});
@@ -313,8 +312,8 @@ export class AuthService {
 					id: userID,
 				},
 				data: {
-					otp_enabled: true,
-					otp_verified: true,
+					otpEnabled: true,
+					otpVerified: true,
 				},
 			});
 		}
@@ -330,7 +329,7 @@ export class AuthService {
 					id: userID,
 				},
 				data: {
-					otp_enabled: false,
+					otpEnabled: false,
 				},
 			});
 		}
@@ -347,7 +346,7 @@ export class AuthService {
 				},
 			});
 
-			if (user.otp_enabled) {
+			if (user.otpEnabled) {
 				return true
 			}
 			return false;
@@ -365,7 +364,7 @@ export class AuthService {
 				},
 			});
 
-			if (user.otp_verified) {
+			if (user.otpVerified) {
 				return true
 			}
 			return false;
@@ -382,7 +381,7 @@ export class AuthService {
 					id: userID,
 				},
 				data: {
-					otp_enabled: true,
+					otpEnabled: true,
 				},
 			});
 		}
@@ -401,7 +400,7 @@ export class AuthService {
 					id: decode.sub,
 				},
 				data: {
-					Ban_jwt: {push: jwt_refresh},
+					banJwt: {push: jwt_refresh},
 				},
 			});
 		}
@@ -431,7 +430,7 @@ export class AuthService {
 			{
 				throw new HttpException("No user found", HttpStatus.NOT_FOUND);
 			}
-			else if (user.Ban_jwt.find(token => token === token_refresh))
+			else if (user.banJwt.find(token => token === token_refresh))
 			{
 				throw new HttpException("Token already used", HttpStatus.FORBIDDEN);
 			}

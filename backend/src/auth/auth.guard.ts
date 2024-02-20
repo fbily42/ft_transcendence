@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
 							id: decode.sub,
 						},
 						{
-							Ban_jwt: {
+							banJwt: {
 								has: encodedJwt,
 							},
 						},
@@ -53,7 +53,7 @@ export class AuthGuard implements CanActivate {
 				return false;
 			}
 
-			if (user.Ban_jwt.includes(encodedJwt)) {
+			if (user.banJwt.includes(encodedJwt)) {
 				response.status(403).json({
 					status: "fail",
 					message: "Jwt is banned",

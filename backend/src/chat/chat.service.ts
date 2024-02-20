@@ -12,7 +12,7 @@ export class ChatService {
 	constructor(private prisma: PrismaService) {}
 	public map: Map<string, any> = new Map();
 
-	async createChannel(userId: number, dto: NewChannelDto): Promise<string> {
+	async createChannel(userId: string, dto: NewChannelDto): Promise<string> {
 		try {
 			let hash: string = null;
 			if (dto.password)
@@ -43,7 +43,7 @@ export class ChatService {
 		}
 	}
 
-	async joinChannel(userId :number, dto: JoinChannelDto): Promise<void>{
+	async joinChannel(userId :string, dto: JoinChannelDto): Promise<void>{
 		try {
 			const channel: ChannelWithRelation = await this.prisma.channel.findUnique({
 				where: {
@@ -101,7 +101,7 @@ export class ChatService {
 		}
 	}
 
-	async getChannels(userId: number): Promise<ChannelList[]> {
+	async getChannels(userId: string): Promise<ChannelList[]> {
 		try {
 			const channels = await this.prisma.channel.findMany({
 				where: {
@@ -205,7 +205,7 @@ export class ChatService {
 		}
 	}
 
-	async inviteUser(userId: number, dto: InviteChannelDto) {
+	async inviteUser(userId: string, dto: InviteChannelDto) {
 		try {
 			const user: User = await this.prisma.user.findUnique({
 				where: {
@@ -251,7 +251,7 @@ export class ChatService {
 		}
 	}
 
-	async createPrivateMessage(user: string, userId: number, target: string){
+	async createPrivateMessage(user: string, userId: string, target: string){
 		let channelName: string;
 		if (user.toLowerCase() < target.toLowerCase())
 			channelName = `${user}_${target}`
@@ -340,7 +340,7 @@ export class ChatService {
 				where: {
 					channelId_userId:
 					{
-						userId: Number(cmd.userId),
+						userId: cmd.userId,
 						channelId: channel.id
 					}
 				}
@@ -350,7 +350,7 @@ export class ChatService {
 			const target = await this.prisma.channelUser.findUnique({
 				where: {
 					channelId_userId: {
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				}
@@ -375,7 +375,7 @@ export class ChatService {
 			const user = await this.prisma.channelUser.findUnique({
 				where: {
 					channelId_userId: {
-						userId: Number(cmd.userId),
+						userId: cmd.userId,
 						channelId: channel.id,
 					}
 				}
@@ -383,7 +383,7 @@ export class ChatService {
 			const target = await this.prisma.channelUser.findUnique({
 				where: {
 					channelId_userId: {
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				}
@@ -397,7 +397,7 @@ export class ChatService {
 			const deletedUser = await this.prisma.channelUser.delete({
 				where: {
 					channelId_userId: {
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				}
@@ -431,7 +431,7 @@ export class ChatService {
 				where: {
 					channelId_userId:
 					{
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id
 					}
 				},
@@ -452,7 +452,7 @@ export class ChatService {
 			const newAdmin = await this.prisma.channelUser.update({
 				where: {
 					channelId_userId:{
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				},
@@ -477,7 +477,7 @@ export class ChatService {
 			const newMember = await this.prisma.channelUser.update({
 				where: {
 					channelId_userId:{
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				},
@@ -502,7 +502,7 @@ export class ChatService {
 			const muted = await this.prisma.channelUser.update({
 				where: {
 					channelId_userId:{
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				},
@@ -523,7 +523,7 @@ export class ChatService {
 			const unmuted = await this.prisma.channelUser.update({
 				where: {
 					channelId_userId:{
-						userId: Number(cmd.targetId),
+						userId: cmd.targetId,
 						channelId: channel.id,
 					}
 				},

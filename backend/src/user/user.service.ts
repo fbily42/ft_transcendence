@@ -16,7 +16,6 @@ export class UserService {
 			},
 		});
 		if (!user) return null;
-		delete user.token42;
 		delete user.jwt;
 		return user;
 	}
@@ -38,7 +37,7 @@ export class UserService {
 	async getUserById(id: string) {
 		const user = await this.prisma.user.findUnique({
 			where: {
-				id: Number(id),
+				id: id,
 			},
 			select: {
 				id: true,
