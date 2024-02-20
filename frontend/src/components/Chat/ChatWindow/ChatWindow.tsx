@@ -11,7 +11,7 @@ import { getChannelUsers, getMessages } from '@/lib/Chat/chat.requests'
 import MessageBubble from './MessageBubble'
 import Placeholder from '../../../assets/empty-state/empty-chat.png'
 import Modal from '@/components/Modal'
-import TabsChannel from '../ChannelPanel/Channels/TabsChannel'
+import TabsChannel from '../ChannelPanel/TabsChannel'
 import SelfMessage from './SelfMessage'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 
@@ -56,30 +56,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         return Pingu
     }
 
-    //Call for each event 'newMessage' and invalidate the query 'messages' to update it
-    const messageListener = (message: string) => {
-        if (message === 'newMessage')
+    useEffect(() => {
+        socket.webSocket?.on('messageToRoom', () => {
             queryClient.invalidateQueries({
                 queryKey: ['messages', currentChannel],
             })
-    }
-
-    const updateListener = () => {
-        queryClient.invalidateQueries({
-            queryKey: ['channelUsers', currentChannel],
         })
-    }
-
-    //On = Listen to the event 'message' then call messageListener() with the given arguments
-    //Off = Stop listenning when component is unmount
-    useEffect(() => {
-        socket.webSocket?.on('messageToRoom', messageListener)
-        socket.webSocket?.on('update', updateListener)
         return () => {
-            socket.webSocket?.off('messageToRoom', messageListener)
-            socket.webSocket?.off('update', updateListener)
+            socket.webSocket?.off('messageToRoom')
         }
-    }, [socket, messageListener, updateListener])
+    }, [socket])
 
     async function onSubmit(data: MessageFormValues) {
         data.target = currentChannel

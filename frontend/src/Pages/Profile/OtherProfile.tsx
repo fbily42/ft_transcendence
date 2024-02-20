@@ -8,10 +8,14 @@ import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import FriendsList from '@/components/Profile/FriendsList'
+import { Button } from '@/components/ui/button'
+import { directMessage } from '@/lib/Chat/chat.utils'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
     const param = useParams()
+	const socket = useWebSocket() as WebSocketContextType;
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -36,6 +40,10 @@ function Profile() {
     }
 
     const selectedAvatar = data?.photo42
+
+	function directMessage(name: string) {
+		socket.webSocket?.emit('privateMessage', name)
+	}
 
     return (
         <div
@@ -72,7 +80,9 @@ function Profile() {
                 <div
                     id="User bottom info"
                     className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
-                ></div>
+                >
+                    <Button onClick={() => directMessage(data?.name!)}>CHAT WITH ME</Button>
+                </div>
             </div>
             <div
                 id="User friends"

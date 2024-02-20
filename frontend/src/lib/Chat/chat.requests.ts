@@ -1,6 +1,7 @@
 import axios from "axios";
-import { Channel, CreateFormValues, JoinFormValues, Message, UserInChannel } from "./chat.types";
+import { Channel, CmdData, CreateFormValues, JoinFormValues, Message, UserInChannel } from "./chat.types";
 import { Dispatch, SetStateAction } from "react";
+import { WebSocketContextType } from "@/context/webSocketContext";
 
 export async function getChannels(): Promise<Channel[]> {
 	try {
@@ -85,4 +86,30 @@ export async function getMessages(name: string): Promise<Message[]> {
     }
 }
 
-export function directMessage(socket: Socket)
+export function kick(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelKick', data)
+}
+
+export function ban(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelBan', data)
+}
+
+export function unban(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelUnban', data)
+}
+
+export function setAdmin(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelSetAdmin', data)
+}
+
+export function setMember(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelSetMember', data)
+}
+
+export function mute(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelMute', data)
+}
+
+export function unmute(data: CmdData, socket: WebSocketContextType) {
+    socket?.webSocket?.emit('channelUnmute', data)
+}

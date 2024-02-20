@@ -13,11 +13,11 @@ import {
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
-import { MessageDto } from './chat/dto/message.dto';
 import { WsExceptionFilter } from './chat/filter/ws-exception.filter';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as cookie from 'cookie';
-import { InviteChannelDto } from './chat/dto/inviteChannel.dto';
+import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
+import { ChatService } from './chat/chat.service';
 import { GameStat } from './Game/Game.types';
 
 @UsePipes(new ValidationPipe())
@@ -41,7 +41,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 
 	constructor (private jwtService: JwtService,
-		private prisma: PrismaService) {
+		private prisma: PrismaService,
+		private chatService: ChatService) {
 			this.server = new Server();
 		}
 		
@@ -96,19 +97,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('messageToRoom')
 	async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() message: MessageDto){
 		try {
-			const messages = await this.prisma.message.create({
-				data: {
-					channelName: message.target,
-					content: message.message,
-					sentByName: message.userName,
-				}
-			})
+			if (client.rooms.has(message.target)){
+				const messages = await this.chatService.createMessage(message)
+				this.server.to(message.target).emit('messageToRoom');
+			}
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new WsException(`Prisma error code : ${error.code}`);
 			throw new WsException('Internal Server Error');
 		}
-		this.server.to(message.target).emit('messageToRoom', 'newMessage');
 	}
 
 	@SubscribeMessage('joinChannel')
@@ -118,7 +115,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (rooms.has(name))
 				return ;
 			client.join(name);
-			this.server.to(name).emit('update', client.data.userName)
+			this.server.to(name).emit('updateChannelUsers')
+		}
+	}
+
+	@SubscribeMessage('newChannelUser')
+	updateUserList(@ConnectedSocket() client: Socket, @MessageBody() channel: string){
+		this.server.to(channel).emit('updateChannelUsers')
+	}
+
+	@SubscribeMessage('newChannel')
+	newChannel(@ConnectedSocket() client: Socket){
+		const clientIds = this.clients.get(client.data.userName)
+		if (clientIds){
+			clientIds.forEach(socketId => {
+				this.server.to(socketId).emit('updateChannelList')
+			})
 		}
 	}
 
@@ -339,41 +351,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('privateMessage')
 	async privateMessage(@ConnectedSocket() client : Socket, @MessageBody() target: string) {
-		let channelName: string;
-			if (client.data.userName.toLowerCase() < target.toLowerCase())
-				channelName = `${client.data.userName}_${target}`
-			else
-				channelName = `${target}_${client.data.userName}`
-		console.log(channelName)
 		try {
-			const channel = await this.prisma.channel.findUnique({
-				where:{
-					name: channelName
-				}
-			})
-			if (!channel){
-				const channel = await this.prisma.channel.create({
-					data: {
-						name: channelName,
-						direct: true,
-						private: true,
-					}
-				})
-				const user = await this.prisma.user.findUnique({
-					where:{
-						name: target,
-					}
-				})
-				if (!user)
-					throw new Error('Private message target does not exists');
-				await this.prisma.channelUser.createMany({
-					data: [
-						{channelId: channel.id, userId: client.data.userId},
-						{channelId: channel.id, userId: user.id},
-					],
-				})
-			}
-			this.server.to(client.id).emit('privateMessage', channel.name)
+			const privateMessage = await this.chatService.createPrivateMessage(client.data.userName, client.data.userId, target)
+			this.server.to(client.id).emit('privateMessage')
+			this.server.to(client.id).emit('activePrivateMessage', privateMessage)
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new WsException(`Prisma error code : ${error.code}`)
@@ -382,7 +363,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			else
 				throw new WsException('Internal server error')
 		}
-		
 	}
 
 	@SubscribeMessage('channelInvite')
@@ -397,20 +377,181 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelKick')
-	channelKick(@ConnectedSocket() client: Socket) {}
-}
-
-/* @SubscribeMessage('game invitation')
-	handleGameInvitation(client :any, data: {to: string, game: any}): void {
-		console.log(`Game invitation received. To: ${data.to}, Game: ${data.game}`);
-		const toSocketId = this.chatService.map.get(data.to);
-
-		if (!toSocketId){
-			console.log("erreur pas dans la map");
-			return ;
+	async channelKick(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const kickedUser = await this.chatService.kickUser(cmd)
+			if (kickedUser) {
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						const clientTokick = this.server.sockets.sockets.get(socketId)
+						if (clientTokick) {
+							clientTokick.leave(cmd.channel)
+							this.server.to(socketId).emit('kickedFromChannel', cmd.channel)
+						}
+						this.server.to(socketId).emit('kick', cmd.channel)
+					})
+				}
+				this.server.to(cmd.channel).emit('updateChannelUsers')
+			}
+			throw new WsException('Internal server error')
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
 		}
+	}
 
-		client.to(toSocketId).emit('game invitation', {from: client.id, game: data.game});
+	@SubscribeMessage('channelBan')
+	async channelBan(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const bannedUser = await this.chatService.banUser(cmd)
+			if (bannedUser){
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						const clientTokick = this.server.sockets.sockets.get(socketId)
+						if (clientTokick) {
+							clientTokick.leave(cmd.channel)
+							this.server.to(socketId).emit('kickedFromChannel', cmd.channel)
+						}
+						this.server.to(socketId).emit('ban', cmd.channel)
+					})
+				}
+				this.server.to(cmd.channel).emit('updateChannelUsers')
+			}
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
+	}
 
+	@SubscribeMessage('channelUnban')
+	async channelUnban(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const unbanUser = await this.chatService.unbanUser(cmd)
+			if (unbanUser) {
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						this.server.to(socketId).emit('unban', cmd.channel)
+					})
+				}
+			}
+			this.server.to(cmd.channel).emit('updateChannelUsers')
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
+	}
 
-	} */
+	@SubscribeMessage('channelSetAdmin')
+	async channelSetAdmin(@MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const admin = await this.chatService.setAdmin(cmd)
+			if (admin) {
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						this.server.to(socketId).emit('setAdmin', cmd.channel)
+					})
+				}
+			}
+			this.server.to(cmd.channel).emit('updateChannelUsers')	
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
+	}
+
+	@SubscribeMessage('channelSetMember')
+	async channelSetMember(@MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const member = await this.chatService.setMember(cmd)
+			if (member) {
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						this.server.to(socketId).emit('setMember', cmd.channel)
+					})
+				}
+			}
+			this.server.to(cmd.channel).emit('updateChannelUsers')	
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
+	}
+
+	@SubscribeMessage('channelMute')
+	async channelMute(@MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const muted = await this.chatService.muteUser(cmd)
+			if (muted) {
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						this.server.to(socketId).emit('muted', cmd.channel)
+					})
+				}
+			}
+			this.server.to(cmd.channel).emit('updateChannelUsers')
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
+	}
+
+	@SubscribeMessage('channelUnmute')
+	async channelUnmute(@MessageBody() cmd: ChannelCmdDto) {
+		try {
+			const unmuted = await this.chatService.unmuteUser(cmd)
+			if (unmuted) {
+				const clientIds = this.clients.get(cmd.targetName)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						this.server.to(socketId).emit('unmuted', cmd.channel)
+					})
+				}
+			}
+			this.server.to(cmd.channel).emit('updateChannelUsers')	
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
+	}
+}

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 import * as argon from "argon2";
-import { JoinChannelDto, NewChannelDto } from './dto';
+import { ChannelCmdDto, JoinChannelDto, MessageDto, NewChannelDto } from './dto';
 import { Channel, ChannelUser, Message, User } from '@prisma/client';
 import { ChannelList, ChannelWithRelation, UserInChannel } from './chat.types';
 import { InviteChannelDto } from './dto/inviteChannel.dto';
@@ -126,6 +126,7 @@ export class ChatService {
 				const user = channel.users.find(user => user.userId === userId);
 				return {
 					name: channel.name,
+					direct: channel.direct,
 					invited: user?.invited,
 					banned: user?.banned
 				};
@@ -248,6 +249,293 @@ export class ChatService {
 				throw new HttpException(`Prisma error : ${error.code}`, HttpStatus.INTERNAL_SERVER_ERROR);
 			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
-}
+
+	async createPrivateMessage(user: string, userId: number, target: string){
+		let channelName: string;
+		if (user.toLowerCase() < target.toLowerCase())
+			channelName = `${user}_${target}`
+		else
+			channelName = `${target}_${user}`
+		try {
+			const channel = await this.prisma.channel.findUnique({
+				where:{
+					name: channelName
+				}
+			})
+			if (!channel){
+				const channel = await this.prisma.channel.create({
+					data: {
+						name: channelName,
+						direct: true,
+						private: true,
+					}
+				})
+				const user = await this.prisma.user.findUnique({
+					where:{
+						name: target,
+					}
+				})
+				if (!user)
+					throw new Error('Private message target does not exists');
+				const privateMessage = await this.prisma.channelUser.createMany({
+					data: [
+						{channelId: channel.id, userId: userId},
+						{channelId: channel.id, userId: user.id},
+					],
+				})
+				return channelName
+			}
+			return channelName
+		}
+		catch (error){
+			throw error
+		}
+	}
+
+	async createMessage(message: MessageDto) {
+		try {
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					name: message.target
+				}
+			})
+			const user = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						channelId: channel.id,
+						userId: message.userId,
+					}
+				}
+			})
+			if (!channel || !user)
+				throw new Error('Bad request')
+			if (user.muted || user.banned || user.invited)
+				throw new Error('You can not talk in this channel')
+			const newMessage = await this.prisma.message.create({
+				data: {
+					channelName: message.target,
+					content: message.message,
+					sentByName: message.userName,
+				}
+			})
+			return newMessage
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async checkAuthorization(cmd : ChannelCmdDto) {
+		try {
+			if (cmd.userId === cmd.targetId)
+				throw new Error('You can not target yourself.')
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					name: cmd.channel,
+				}
+			})
+			if (!channel)
+				throw new Error('Bad Request')
+			const user = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId:
+					{
+						userId: Number(cmd.userId),
+						channelId: channel.id
+					}
+				}
+			})
+			if (!user || (!user.admin && !user.owner))
+				throw new Error('Not authorized to do it.')
+			const target = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				}
+			})
+			if (!target || target.owner)
+				throw new Error ('Can not target channel owner.')
+			return channel
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async kickUser(cmd: ChannelCmdDto) {
+		try {
+			if (cmd.targetId === cmd.userId)
+				throw new Error('You can not kick or ban yourself.')
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					name: cmd.channel,
+				}
+			})
+			const user = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						userId: Number(cmd.userId),
+						channelId: channel.id,
+					}
+				}
+			})
+			const target = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				}
+			})
+			if (!channel || !user || !target)
+				throw new Error('Bad request')
+			if (!user.admin && !user.owner)
+				throw new Error('You are not authorized to do this.')
+			if (user.admin && (target.owner || target.admin || target.invited || target.banned))
+				throw new Error('You can not kick or ban this target.')
+			const deletedUser = await this.prisma.channelUser.delete({
+				where: {
+					channelId_userId: {
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				}
+			})
+			return deletedUser
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async banUser(cmd: ChannelCmdDto) {
+		try {
+			const kickedUser = await this.kickUser(cmd)
+			const bannedUser = await this.prisma.channelUser.create({
+				data: {
+					channelId: kickedUser.channelId,
+					userId: kickedUser.userId,
+					banned: true,					
+				}
+			})
+			return bannedUser			
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async unbanUser(cmd: ChannelCmdDto) {
+		try {
+			const channel = await this.checkAuthorization(cmd)
+			const unbanUser = await this.prisma.channelUser.update({
+				where: {
+					channelId_userId:
+					{
+						userId: Number(cmd.targetId),
+						channelId: channel.id
+					}
+				},
+				data: {
+					banned: false,
+					member: true,
+				}
+			})
+			return unbanUser
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async setAdmin(cmd: ChannelCmdDto) {
+		try {
+			const channel = await this.checkAuthorization(cmd)
+			const newAdmin = await this.prisma.channelUser.update({
+				where: {
+					channelId_userId:{
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				},
+				data: {
+					owner: false,
+					admin: true,
+					member: false,
+					muted: false,
+					banned: false,
+					invited: false,
+				}
+			})
+			return newAdmin
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async setMember(cmd: ChannelCmdDto) {
+		try {
+			const channel = await this.checkAuthorization(cmd)
+			const newMember = await this.prisma.channelUser.update({
+				where: {
+					channelId_userId:{
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				},
+				data: {
+					owner: false,
+					admin: false,
+					member: true,
+					muted: false,
+					banned: false,
+					invited: false,
+				}
+			})
+			return newMember
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async muteUser(cmd: ChannelCmdDto) {
+		try {
+			const channel = await this.checkAuthorization(cmd)
+			const muted = await this.prisma.channelUser.update({
+				where: {
+					channelId_userId:{
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				},
+				data: {
+					member: false,
+					muted: true,
+				}
+			})
+			return muted
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async unmuteUser(cmd: ChannelCmdDto) {
+		try {
+			const channel = await this.checkAuthorization(cmd)
+			const unmuted = await this.prisma.channelUser.update({
+				where: {
+					channelId_userId:{
+						userId: Number(cmd.targetId),
+						channelId: channel.id,
+					}
+				},
+				data: {
+					member: true,
+					muted: false,
+				}
+			})
+			return unmuted
+		} catch (error) {
+			throw error
+		}
+	}
+
+}	

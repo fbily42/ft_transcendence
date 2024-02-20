@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react'
 
 export type Channel = {
 	name: string
+	direct: boolean
 	invited: boolean
 	banned: boolean
 }
@@ -29,6 +30,17 @@ export type JoinChannelProps = {
     onClose: () => void
 }
 
+export interface CardInviteProps {
+    onClose: () => void
+    channel: string
+}
+
+export type InviteFormValues = {
+    sentBy: string
+    name: string
+    channel: string
+}
+
 export type UserInChannel = {
 	userId: number,
 	name: string,
@@ -49,4 +61,18 @@ export type Message = {
     sentByName: string
     channelName: string
     content: string
+}
+
+export type DropdownChannelUserProps = {
+    targetId: string
+    targetName: string
+    role: string
+    targetRole: string
+}
+
+export type CmdData = {
+    userId: string | undefined
+    targetId: string
+    targetName: string
+    channel: string | null
 }
