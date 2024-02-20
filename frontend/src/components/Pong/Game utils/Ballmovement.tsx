@@ -1,10 +1,10 @@
-import { GameStat, imageForGame } from '@/lib/Game/Game.types'
+import { GameStats, imageForGame } from '@/lib/Game/Game.types'
 import { BallObj, PaddleObj } from './data'
 import { WebSocketContextType } from '@/context/webSocketContext'
 
 export function BallMovement(
     ctx: CanvasRenderingContext2D,
-    gameInfo: GameStat,
+    gameInfo: GameStats,
     gameImages: imageForGame,
     socket: WebSocketContextType,
     room: string
@@ -60,7 +60,7 @@ export function BallMovement(
 }
 
 export function Paddle_Collision(
-    gameInfo: GameStat,
+    gameInfo: GameStats,
     paddle: PaddleObj,
     socket: WebSocketContextType,
     room: string
@@ -70,7 +70,7 @@ export function Paddle_Collision(
 
 function updatescore(
     gameImages: imageForGame,
-    gameInfo: GameStat,
+    gameInfo: GameStats,
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement
 ) {
@@ -115,16 +115,16 @@ function updatescore(
         }
     }
     ctx.fillText(
-        `${gameInfo.gamestatus.score_2}`,
+        `${gameInfo.gameStatus.scoreTwo}`,
         canvas.width / 4,
         80,
         canvas.width / 10
     )
-    ctx.fillText(`${gameInfo.gamestatus.score_1}`, (3 * canvas.width) / 4, 80)
+    ctx.fillText(`${gameInfo.gameStatus.scoreOne}`, (3 * canvas.width) / 4, 80)
 }
 
 export function WallCollision(
-    gameInfo: GameStat,
+    gameInfo: GameStats,
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     gameImages: imageForGame,
@@ -138,7 +138,7 @@ export function WallCollision(
 }
 
 /* 
-function ResetBall(gameInfo: GameStat, canvas: HTMLCanvasElement, direction: number) {
+function ResetBall(gameInfo: GameStats, canvas: HTMLCanvasElement, direction: number) {
     // Réinitialise la position de la balle au centre du terrain
     gameInfo.ball.x = canvas.width / 2;
     gameInfo.ball.y = canvas.height / 2;

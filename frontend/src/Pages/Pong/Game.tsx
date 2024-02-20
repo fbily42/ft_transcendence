@@ -21,7 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
-import { GameStat, imageForGame } from '@/lib/Game/Game.types'
+import { GameStats, imageForGame } from '@/lib/Game/Game.types'
 // import { Image } from "@/components/Pong/Game utils/data";
 
 //creer une map room pour lier l'ID de la room avec un objec, pour a chaque fois renvoyer l'objet modifier
@@ -34,7 +34,7 @@ export default function Board() {
     const socket = useWebSocket()
 
     const [roomName, setRoomName] = useState<string>('false')
-    const [gameInfo, setGameInfo] = useState<GameStat>()
+    const [gameInfo, setGameInfo] = useState<GameStats>()
 
     const gameImages = new imageForGame()
 
@@ -56,8 +56,8 @@ export default function Board() {
 
             socket?.webSocket?.emit('CreateGameinfo', room)
         })
-        socket?.webSocket?.on('UpdateKey', (Game_stat: GameStat) => {
-            setGameInfo(Game_stat)
+        socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
+            setGameInfo(gameStats)
         })
         window.addEventListener('keydown', handleKeyDown)
         window.addEventListener('keyup', handleKeyUp)
@@ -84,11 +84,11 @@ export default function Board() {
         const render = () => {
             const canvas = canvasRef.current
             if (canvas && gameInfo) {
-                gameInfo.paddle_2.x = canvas?.width - 70
+                gameInfo.paddleTwo.x = canvas?.width - 70
                 const ctx = canvas.getContext('2d')
                 if (!ctx) return
 
-                if (gameInfo.gamestatus.Gamestate === 'playing') {
+                if (gameInfo.gameStatus.gameState === 'playing') {
                     // if (img_fishRef.current)
                     // 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
                     ctx?.clearRect(0, 0, canvas.width, canvas.height)
@@ -116,7 +116,7 @@ export default function Board() {
                             gameImages,
                             socket,
                             roomName
-                        ) //envoie un update si Arrowup ou ArrowDown utilise
+                        ) //envoie un update si Arrowup ou ArrowDown utilise, gerer l'image
                     }
                     if (
                         socket &&
@@ -133,31 +133,27 @@ export default function Board() {
                     if (socket) {
                         Paddle_Collision(
                             gameInfo,
-                            gameInfo.paddle_1,
+                            gameInfo.paddleOne,
                             socket,
                             roomName
                         )
-                        // Paddle_Collision(gameInfo, gameInfo.paddle_2)
+                        // Paddle_Collision(gameInfo, gameInfo.paddleTwo)
                     }
+                } else if (gameInfo.gameStatus.gameState === 'finish') {
+                    socket?.webSocket?.emit('endGame', roomName)
+                    console.log(
+                        'Winner: ',
+                        gameInfo.gameStatus.winner,"looser : ",gameInfo.gameStatus.looser
+                    )
+                    cancelAnimationFrame(animationFrameId)
+                    // return //mettre le modal victoire joueur 1 et defaite joueur 2
                 }
-				else if (gameInfo.gamestatus.Gamestate === 'finish 1')
-				{
-					// console.log("joueur 1 gagne")
-					cancelAnimationFrame(animationFrameId)
-					return ;//mettre le modal victoire joueur 1 et defaite joueur 2
-				}
-				else if (gameInfo.gamestatus.Gamestate === "finish 2")
-				{
-					// console.log("joueur 2 gagne")
-					cancelAnimationFrame(animationFrameId)
-					return;//mettre le modal victoire joueur 2 et defaite joueur 1
-				}
             }
             animationFrameId = requestAnimationFrame(render)
         }
         render()
         return () => {
-            // socket?.webSocket?.emit('leaveRoom', roomName)// faire un autre else if gameInfo.gamestatus.Gamestate === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
+            // socket?.webSocket?.emit('leaveRoom', roomName) // faire un autre else if gameInfo.gameStatus.gameState === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
             // window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationFrameId)
         }

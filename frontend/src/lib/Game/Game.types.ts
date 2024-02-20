@@ -1,8 +1,8 @@
-export class GameStat {
+export class GameStats {
 	ball: BallObj;
-	paddle_1 : PaddleObj;
-	paddle_2 : PaddleObj;
-	gamestatus: GameStatus;
+	paddleOne : PaddleObj;
+	paddleTwo : PaddleObj;
+	gameStatus: GameStatus;
 
 
 	canvas : {height:number; width :number;};
@@ -21,7 +21,7 @@ export class GameStat {
 			speed: 10,//15
 			last : 0,
 		}
-		this.paddle_1 = {
+		this.paddleOne = {
 			x: 10,
 			y: 20,
 			height : 160,
@@ -29,29 +29,33 @@ export class GameStat {
 			color : '#FFA62b',
 
 		}
-		this.paddle_2 ={
+		this.paddleTwo ={
 			x: 1490,
 			y: 20,
 			height : 160,
 			width : 60,
 			color : '#FFA62b',
 		}
-		this.gamestatus = {
-			score_1: 0,
-			score_2: 0,
-			Gamestate: 'playing',
+		this.gameStatus = {
+			scoreOne: 0,
+			scoreTwo: 0,
+			gameState: 'playing',
 			img: 'not ready',
 			int: 0,
+			winner:'',
+			looser:'',
 		}
 	}
   }
 
   export type GameStatus = {
-	score_1: number;
-	score_2: number;
-	Gamestate: string;
+	scoreOne: number;
+	scoreTwo: number;
+	gameState: string;
 	img: string;
 	int : number;
+	winner:string;
+	looser:string;
   }
   
   export type BallObj = {

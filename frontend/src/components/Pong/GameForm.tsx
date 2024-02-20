@@ -88,7 +88,7 @@ function GameForm({ closeDialog }) {
                 })
                 socket.webSocket?.emit('JoinRoom', roomName)
             } else if (currentRoom.current) {
-                socket?.webSocket?.emit('leaveRoom', currentRoom.current)
+                socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
             }
             // socket.emit('JoinRoom', roomName);
         }
@@ -101,7 +101,7 @@ function GameForm({ closeDialog }) {
 
             if (loading && !processingMessage.current) {
                 setLoading(false)
-                socket?.webSocket?.emit('leaveRoom', currentRoom.current)
+                socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
             }
         }
     }, [loading])

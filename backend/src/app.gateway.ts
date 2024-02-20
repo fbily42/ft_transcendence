@@ -18,7 +18,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js
 import * as cookie from 'cookie';
 import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
 import { ChatService } from './chat/chat.service';
-import { GameStat } from './Game/Game.types';
+import { GameStats, RoomInfo } from './Game/Game.types';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -36,8 +36,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	clients = new Map<string, string[]>();
-	games_room = new Map<string, string[]>();
-	games_info = new Map<string , GameStat>();
+	gamesRoom = new Map<string, RoomInfo[]>();
+	gamesInfo = new Map<string , GameStats>();
 	
 
 	constructor (private jwtService: JwtService,
@@ -145,27 +145,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try{
-			for (let [key, value] of this.games_room)
+			for (let [key, value] of this.gamesRoom)
 			{
-				let stringcount = 0;
-				for (let item of value){
-					if (typeof item === 'string')
-						stringcount++;
-					if (stringcount === 2)
-						break;
-				}
-				if (stringcount < 2)
+				// let stringcount = 0;
+				// for (let item of value){
+				// 	if (typeof item === 'string')
+				// 		stringcount++;
+				// 	if (stringcount === 2)
+				// 		break;
+				// }
+				if (value.length < 2)
 				{
-					if (value[0] != client.id)
+					if (value[0].websocket != client.id && value[0].id != client.data.userId)
 					{
 						client.join(key);
-						let array = this.games_room.get(key);
-						array.push(client.id);
-						this.games_room.set(key, array);
+						let array = this.gamesRoom.get(key);
+						array.push({id:client.data.userId , websocket: client.id });
+						this.gamesRoom.set(key, array);
 						this.server.to(client.id).emit('JoinParty', `You have joined room : ${key}`)
 						// console.log("nom de la room", key);
 						this.server.to(key).emit('Ready', key);
-						this.server.to(value[0]).emit('JoinParty', 'Ready');
+						this.server.to(value[0].websocket).emit('JoinParty', 'Ready');
 						return ;
 	
 					}
@@ -173,7 +173,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						return;
 				}
 			}
-			this.games_room.set(room, [client.id]);
+			this.gamesRoom.set(room, [{id: client.data.userId, websocket: client.id}]);
 			client.join(room);
 			// console.log(`room : ${room}`)
 			this.server.to(client.id).emit('JoinParty', `You have created a room : ${room}`);
@@ -191,13 +191,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	{
 		try{
 
-			if (this.games_info.has(room)){
+			if (this.gamesInfo.has(room)){
 				// console.log('la data existe');
-				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
 			}
 			else{
-				this.games_info.set(room, new GameStat());
-				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+				this.gamesInfo.set(room, new GameStats());
+				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
 			}
 		}
 		catch(error)
@@ -214,20 +214,87 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			// const now = Date.now();
 			// const delay = 10;
-			let gamestat:GameStat = this.games_info.get(room);
-			// if (now - gamestat.ball.last > delay)
+			let gameStats:GameStats = this.gamesInfo.get(room);
+			// if (now - gameStats.ball.last > delay)
 			// {
-				// gamestat.ball.last = now;
-				gamestat.ball.x += gamestat.ball.dx * gamestat.ball.speed;
-				gamestat.ball.y += gamestat.ball.dy * gamestat.ball.speed;
+				// gameStats.ball.last = now;
+				gameStats.ball.x += gameStats.ball.dx * gameStats.ball.speed;
+				gameStats.ball.y += gameStats.ball.dy * gameStats.ball.speed;
 				
-				gamestat.WallCollision();
+				gameStats.WallCollision();
 			// }
-			// gamestat.PaddleCollision(gamestat.paddle_1);
-			// gamestat.PaddleCollision(gamestat.paddle_2);
+			// gameStats.PaddleCollision(gameStats.paddleOne);
+			// gameStats.PaddleCollision(gameStats.paddleTwo);
 	
-			this.games_info.set(room, gamestat);
-			this.server.to(room).emit('UpdateKey', gamestat);
+			this.gamesInfo.set(room, gameStats);
+			this.server.to(room).emit('UpdateKey', gameStats);
+		}
+		catch(error)
+		{
+			console.log(error)
+			// throw new WsException('Internal Server Error')
+		}
+
+	}
+	@SubscribeMessage('endGame')
+	endGame(@ConnectedSocket() client: Socket, @MessageBody() room:string)
+	{
+		try{
+			let gameStats:GameStats = this.gamesInfo.get(room);
+			let gamesRoom = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+
+			for (let [key , value ] of this.gamesRoom)
+			{
+				if (key === room)
+				{
+					if (gameStats.gameStatus.scoreOne === 10)
+					{
+						console.log("who win: 1")
+						gameStats.gameStatus.winner = value[0].id
+						gameStats.gameStatus.looser = value[1].id
+						this.gamesInfo.set(room, gameStats);
+						this.server.to(key).emit('UpdateKey', gameStats);
+					}
+					else 
+					{
+						console.log("who win : 2")
+						gameStats.gameStatus.winner = value[1].id
+						gameStats.gameStatus.gameState = value[0].id
+						this.gamesInfo.set(room, gameStats);
+						this.server.to(key).emit('UpdateKey', gameStats);
+					}
+					//mettre a jour la db avant de tout delete
+					// this.gamesRoom.delete(room);
+					// this.gamesInfo.delete(room);
+				}	
+			}
+		} catch(error){
+			console.log(error)
+			// throw new WsException('Internal Server Error')
+
+		}
+	}
+
+
+	@SubscribeMessage('leaveRoomBefore')
+	leaveRoombefore(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		try {
+
+			let gamestat:GameStats = this.gamesInfo.get(room);//il faut supprimer la roomm et le Gamestat
+			let games_room = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+			let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
+			
+			// for (let [key , value ] of this.games_room)
+			// {
+			// 	if (key == room)
+			// 	{
+					
+			// 	}
+				
+			// }
+			this.gamesRoom.delete(room);
+			this.gamesInfo.delete(room);
 		}
 		catch(error)
 		{
@@ -242,21 +309,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
-
-			let gamestat:GameStat = this.games_info.get(room);//il faut supprimer la roomm et le Gamestat
-			let games_room = this.games_room;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
-			let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
+			//tout delete uniquement si la room est vide, donc verifier que
+			let gameStats:GameStats = this.gamesInfo.get(room);//il faut supprimer la roomm et le Gamestat
+			let gamesRoom = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+			let clients  = this.clients;//utilie les clientid dans gamesRoom pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
 			
-			// for (let [key , value ] of this.games_room)
-			// {
-			// 	if (key == room)
-			// 	{
-					
-			// 	}
 				
-			// }
-			this.games_room.delete(room);
-			this.games_info.delete(room);
+			for (let [key , value ] of this.gamesRoom)
+			{
+				if (key === room)
+				{
+					if (client.id === value[0].websocket)
+					{
+						value.splice(0,1)
+						gameStats.gameStatus.gameState = "Win";
+						this.server.to(room).emit('UpdateKey', gameStats);
+					}
+					else if(client.id === value[1].websocket)
+					{
+						gameStats.gameStatus.gameState = "Win";
+						this.server.to(room).emit('UpdateKey', gameStats);
+						value.splice(1 , 1)
+					}
+					if (value.length === 0 )
+					{
+						this.gamesRoom.delete(room);
+						this.gamesInfo.delete(room);
+					}
+				}	
+			}
+
 		}
 		catch(error)
 		{
@@ -269,16 +351,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	paddllColl(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
-
-			let gamestat:GameStat = this.games_info.get(room);
-			gamestat.PaddleCollision(gamestat.paddle_1);
-			gamestat.PaddleCollision(gamestat.paddle_2);
-			this.games_info.set(room, gamestat);
-			this.server.to(room).emit('UpdateKey', gamestat);
+			if (this.gamesInfo.has(room))
+			{
+				let gameStats:GameStats = this.gamesInfo.get(room);
+				
+				if (gameStats !== undefined && gameStats.PaddleCollision !== undefined)
+				{
+					gameStats.PaddleCollision(gameStats.paddleOne);
+					gameStats.PaddleCollision(gameStats.paddleTwo);
+					
+				}
+				this.gamesInfo.set(room, gameStats);
+				this.server.to(room).emit('UpdateKey', gameStats);
+			}
 		}
 		catch(error)
 		{
-			throw new WsException('Internal Server Error')
+			console.log(error)
+			// throw new WsException('Internal Server Error')
 		}
 		
 
@@ -289,20 +379,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	{
 		try {
 
-			let gamestat:GameStat = this.games_info.get(data.roomId)
-			let array = this.games_room.get(data.roomId);
+			let gameStats:GameStats = this.gamesInfo.get(data.roomId)
+			let array = this.gamesRoom.get(data.roomId);
 			// if(array[0] == client.id)
 			// {
 	
 				if (data.key === "a") {
-					if ((gamestat.paddle_1.y - 10) > 0 )
-						gamestat.paddle_1.y -= 5;
+					if ((gameStats.paddleOne.y - 10) > 0 )
+						gameStats.paddleOne.y -= 5;
 					}
 	
 				else if (data.key === "d") {
-					if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
+					if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
 					{
-						gamestat.paddle_1.y += 5;
+						gameStats.paddleOne.y += 5;
 					}
 				}
 				// else
@@ -312,14 +402,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// if(array[1] == client.id)
 			// {
 				if (data.key === "ArrowUp" ) {
-					if ((gamestat.paddle_2.y - 10) > 0 )
-						gamestat.paddle_2.y -= 5;
+					if ((gameStats.paddleTwo.y - 10) > 0 )
+						gameStats.paddleTwo.y -= 5;
 					}
 		
 				else if (data.key === "ArrowDown") {
-					if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
+					if ((gameStats.paddleTwo.y + 10 + 60) < gameStats.canvas.height )
 					{
-						gamestat.paddle_2.y += 5;
+						gameStats.paddleTwo.y += 5;
 					}
 				}
 				// else
@@ -327,8 +417,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 			// }
 	
-			this.games_info.set(data.roomId, gamestat);
-			this.server.to(data.roomId).emit('UpdateKey', gamestat);
+			this.gamesInfo.set(data.roomId, gameStats);
+			this.server.to(data.roomId).emit('UpdateKey', gameStats);
 		}
 		catch (error)
 		{
