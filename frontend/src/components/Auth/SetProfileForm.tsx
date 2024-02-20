@@ -16,18 +16,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 
 type SetProfileFormprops = {
-    children: React.ReactNode
+    submitButtonText: string
+    currentAvatar: string
 }
-
-// type ProfileFormValues = {
-//     pseudo: string
-// }
-
-// type ImageObject = {
-//     id: number
-//     imageProfile: string
-//     imageBackground: string | undefined
-// }
 
 const zodSchema = z.object({
     pseudo: z
@@ -39,7 +30,10 @@ const zodSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof zodSchema>
 
-const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
+const SetProfileForm: React.FC<SetProfileFormprops> = ({
+    submitButtonText,
+    currentAvatar,
+}) => {
     const {
         register,
         handleSubmit,
@@ -49,14 +43,13 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
     })
     const [errorMessage, setErrorMessage] = useState<string>('')
     const [openAvatars, setOpenAvatars] = useState<boolean>(false)
-    const initialAvatar: string = Photo42()
-    const [selectedAvatar, setSelectedAvatar] = useState<string>(initialAvatar)
+    const [selectedAvatar, setSelectedAvatar] = useState<string>(currentAvatar)
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
     const navigate = useNavigate()
 
     useEffect(() => {
-        setSelectedAvatar(initialAvatar)
-    }, [initialAvatar])
+        setSelectedAvatar(currentAvatar)
+    }, [currentAvatar])
 
     async function onSubmit(data: ProfileFormValues) {
         try {
@@ -103,96 +96,74 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
     }
 
     return (
-        <div className="flex flex-col  justify-center text-center space-y-5">
-            <div className="flex flex-col  justify-center text-center">
-                <div>
-                    <p className="text-5xl font-bold">
-                        WELCOME TO PINGUCENDENCE
-                    </p>
-                </div>
-                <div>
-                    <p className="text-2xl">
-                        Choose an avatar and a noot username
-                    </p>
-                </div>
-            </div>
-            <div className="w-full h-full flex flex-col justify-center items-center">
-                <form
-                    className="flex flex-col justify-center items-center space-y-4"
-                    onSubmit={handleSubmit(onSubmit)}
+        <form
+            className="flex flex-col justify-center items-center space-y-4"
+            onSubmit={handleSubmit(onSubmit)}
+        >
+            <div className="flex flex-col justify-center items-center space-y-3">
+                <Label htmlFor="avatar" hidden>
+                    Avatar
+                </Label>
+                <div
+                    className="relative bg-background w-[150px] h-[150px] border-[3px] border-customYellow rounded-full"
+                    style={{
+                        backgroundImage: `url(${selectedAvatar})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                    }}
                 >
-                    <div className="flex flex-col justify-center items-center space-y-3">
-                        <Label htmlFor="avatar" hidden>
-                            Avatar
-                        </Label>
-                        <div
-                            className="relative bg-background w-[150px] h-[150px] border-[3px] border-customYellow rounded-full"
-                            style={{
-                                backgroundImage: `url(${selectedAvatar})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                            }}
-                        >
-                            <div className="absolute bottom-[3px] right-[3px]">
-                                <Button
-                                    className="bg-customYellow rounded-full w-[30px] h-[30px] text-lg hover:bg-customDarkBlue"
-                                    onClick={onAvatarButtonClick}
-                                >
-                                    <div className="text-white">
-                                        {openAvatars ? (
-                                            <Check className="h-[15px] w-[15px]" />
-                                        ) : (
-                                            <Pencil className="h-[15px] w-[15px]" />
-                                        )}
-                                    </div>
-                                </Button>
-                            </div>
-                        </div>
-                        <div className={openAvatars ? 'flex' : 'flex hidden'}>
-                            <div>
-                                <AvatarImg
-                                    onSelect={(selectedImage) => {
-                                        setSelectedAvatar(selectedImage)
-                                        setUploadedImage(null)
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <ImageInput
-                                    onChange={handleImageChange}
-                                    size={70}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <Label htmlFor="pseudo" hidden>
-                            Name
-                        </Label>
-                        <Input
-                            id="pseudo"
-                            placeholder="Noot's name"
-                            {...register('pseudo')}
-                        />
-                        <div className="text-red-600 text-sm">
-                            {errorMessage}
-                        </div>
-                        <div className="text-red-600 text-sm">
-                            {errors.pseudo && <p>{errors.pseudo.message}</p>}
-                        </div>
-                    </div>
-                    <div>
+                    <div className="absolute bottom-[3px] right-[3px]">
                         <Button
-                            type="submit"
-                            className="bg-customYellow text-lg font-semi-bold"
+                            className="bg-customYellow rounded-full w-[30px] h-[30px] text-lg hover:bg-customDarkBlue"
+                            onClick={onAvatarButtonClick}
                         >
-                            I'm ready to noot!
+                            <div className="text-white">
+                                {openAvatars ? (
+                                    <Check className="h-[15px] w-[15px]" />
+                                ) : (
+                                    <Pencil className="h-[15px] w-[15px]" />
+                                )}
+                            </div>
                         </Button>
                     </div>
-                </form>
-                {children}
+                </div>
+                <div className={openAvatars ? 'flex' : 'flex hidden'}>
+                    <div>
+                        <AvatarImg
+                            onSelect={(selectedImage) => {
+                                setSelectedAvatar(selectedImage)
+                                setUploadedImage(null)
+                            }}
+                        />
+                    </div>
+                    <div>
+                        <ImageInput onChange={handleImageChange} size={70} />
+                    </div>
+                </div>
             </div>
-        </div>
+            <div>
+                <Label htmlFor="pseudo" hidden>
+                    Name
+                </Label>
+                <Input
+                    id="pseudo"
+                    placeholder="Noot's name"
+                    {...register('pseudo')}
+                />
+                <div className="text-red-600 text-sm">{errorMessage}</div>
+                <div className="text-red-600 text-sm">
+                    {errors.pseudo && <p>{errors.pseudo.message}</p>}
+                </div>
+            </div>
+            <div>
+                <Button
+                    type="submit"
+                    className="bg-customYellow text-lg font-semi-bold"
+                >
+                    {submitButtonText}
+                </Button>
+            </div>
+        </form>
     )
 }
 
