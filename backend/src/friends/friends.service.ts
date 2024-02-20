@@ -43,7 +43,7 @@ export class FriendsService {
 			if (friend.friendId === friendId)
 				return friend.user;
 			return friend.friend;
-		})
+		})42login
 		return test;
 	}
 

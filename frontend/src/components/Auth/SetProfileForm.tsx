@@ -23,11 +23,11 @@ type SetProfileFormprops = {
 //     pseudo: string
 // }
 
-type ImageObject = {
-    id: number
-    imageProfile: string
-    imageBackground: string | undefined
-}
+// type ImageObject = {
+//     id: number
+//     imageProfile: string
+//     imageBackground: string | undefined
+// }
 
 const zodSchema = z.object({
     pseudo: z
@@ -49,16 +49,14 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
     })
     const [errorMessage, setErrorMessage] = useState<string>('')
     const [openAvatars, setOpenAvatars] = useState<boolean>(false)
-    const initialAvatar: ImageObject = Photo42()
-    const [selectedAvatar, setSelectedAvatar] = useState<string>(
-        initialAvatar.imageProfile
-    )
+    const initialAvatar: string = Photo42()
+    const [selectedAvatar, setSelectedAvatar] = useState<string>(initialAvatar)
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
     const navigate = useNavigate()
 
     useEffect(() => {
-        setSelectedAvatar(initialAvatar.imageProfile)
-    }, [initialAvatar.imageProfile])
+        setSelectedAvatar(initialAvatar)
+    }, [initialAvatar])
 
     async function onSubmit(data: ProfileFormValues) {
         try {
