@@ -140,12 +140,24 @@ export default function Board() {
                         // Paddle_Collision(gameInfo, gameInfo.paddle_2)
                     }
                 }
+				else if (gameInfo.gamestatus.Gamestate === 'finish 1')
+				{
+					// console.log("joueur 1 gagne")
+					cancelAnimationFrame(animationFrameId)
+					return ;//mettre le modal victoire joueur 1 et defaite joueur 2
+				}
+				else if (gameInfo.gamestatus.Gamestate === "finish 2")
+				{
+					// console.log("joueur 2 gagne")
+					cancelAnimationFrame(animationFrameId)
+					return;//mettre le modal victoire joueur 2 et defaite joueur 1
+				}
             }
             animationFrameId = requestAnimationFrame(render)
         }
         render()
         return () => {
-            // socket?.webSocket?.emit('leaveRoom')
+            // socket?.webSocket?.emit('leaveRoom', roomName)// faire un autre else if gameInfo.gamestatus.Gamestate === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
             // window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationFrameId)
         }

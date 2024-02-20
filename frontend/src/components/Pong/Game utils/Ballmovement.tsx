@@ -9,7 +9,7 @@ export function BallMovement(
     socket: WebSocketContextType,
     room: string
 ) {
-	if (gameImages.image.img_fish.complete) {
+    if (gameImages.image.img_fish.complete) {
         // ctx.beginPath()
         ctx.drawImage(
             gameImages.image.img_fish,
@@ -76,57 +76,51 @@ function updatescore(
 ) {
     ctx.font = '80px Arial'
     ctx.fillStyle = '#45A0E3'
-	if(gameImages.image.img_pingu_score.complete)
-	{
-
-		ctx.drawImage(
-			gameImages.image.img_pingu_score,
-			canvas.width / 4 - (canvas.width / canvas.width) * 90,
-			(canvas.height / canvas.height) * 15,
-			(canvas.width / canvas.width) * 82,
-			(canvas.height / canvas.height) * 82
-		)
-	}
-	else {
-		gameImages.image.img_pingu_score.onload = function () {
-			ctx.drawImage(
-				gameImages.image.img_pingu_score,
-				canvas.width / 4 - (canvas.width / canvas.width) * 90,
-				(canvas.height / canvas.height) * 15,
-				(canvas.width / canvas.width) * 82,
-				(canvas.height / canvas.height) * 82
-			)
-		}
-	}
-	if(gameImages.image.img_grey_score.complete)
-	{
-
-		ctx.drawImage(
-			gameImages.image.img_grey_score,
-			canvas.width / 4 - (canvas.width / canvas.width) * 90,
-			(canvas.height / canvas.height) * 15,
-			(canvas.width / canvas.width) * 82,
-			(canvas.height / canvas.height) * 82
-		)
-	}
-	else {
-		gameImages.image.img_grey_score.onload = function () {
-			ctx.drawImage(
-				gameImages.image.img_grey_score,
-				canvas.width / 4 - (canvas.width / canvas.width) * 90,
-				(canvas.height / canvas.height) * 15,
-				(canvas.width / canvas.width) * 82,
-				(canvas.height / canvas.height) * 82
-			)
-		}
-	}
+    if (gameImages.image.img_pingu_score.complete) {
+        ctx.drawImage(
+            gameImages.image.img_pingu_score,
+            canvas.width / 4 - (canvas.width / canvas.width) * 90,
+            (canvas.height / canvas.height) * 15,
+            (canvas.width / canvas.width) * 82,
+            (canvas.height / canvas.height) * 82
+        )
+    } else {
+        gameImages.image.img_pingu_score.onload = function () {
+            ctx.drawImage(
+                gameImages.image.img_pingu_score,
+                canvas.width / 4 - (canvas.width / canvas.width) * 90,
+                (canvas.height / canvas.height) * 15,
+                (canvas.width / canvas.width) * 82,
+                (canvas.height / canvas.height) * 82
+            )
+        }
+    }
+    if (gameImages.image.img_grey_score.complete) {
+        ctx.drawImage(
+            gameImages.image.img_grey_score,
+            (3 * canvas.width) / 4 - (canvas.width / canvas.width) * 90,
+            (canvas.height / canvas.height) * 15,
+            (canvas.width / canvas.width) * 82,
+            (canvas.height / canvas.height) * 82
+        )
+    } else {
+        gameImages.image.img_grey_score.onload = function () {
+            ctx.drawImage(
+                gameImages.image.img_grey_score,
+                (3 * canvas.width) / 4 - (canvas.width / canvas.width) * 90,
+                (canvas.height / canvas.height) * 15,
+                (canvas.width / canvas.width) * 82,
+                (canvas.height / canvas.height) * 82
+            )
+        }
+    }
     ctx.fillText(
-        `${gameInfo.gamestatus.score_1}`,
+        `${gameInfo.gamestatus.score_2}`,
         canvas.width / 4,
         80,
         canvas.width / 10
     )
-    ctx.fillText(`${gameInfo.gamestatus.score_2}`, (3 * canvas.width) / 4, 80)
+    ctx.fillText(`${gameInfo.gamestatus.score_1}`, (3 * canvas.width) / 4, 80)
 }
 
 export function WallCollision(

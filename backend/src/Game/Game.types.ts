@@ -20,7 +20,7 @@ export class GameStat {
 			dx: 1,
 			dy: 1,
 			rad: 40,
-			speed: 1,//15
+			speed: 4,//15
 			last : 0,
 		}
 		this.paddle_1 = {
@@ -77,19 +77,22 @@ export class GameStat {
 		
 		if (this.ball.x - this.ball.rad <= 0) {
 		   this.gamestatus.score_1++; // But pour le joueur 1
-		   this.gamestatus.Gamestate = 'score';
+		//    this.gamestatus.Gamestate = 'score';
 		//    setTimeout(() => {
 			this.gamestatus.Gamestate = 'playing';
+			if (this.gamestatus.score_1 === 10)
+				this.gamestatus.Gamestate = 'finish 1'
 			this.ResetBall(1);
 		// }, 1000);
 			
 		} else if (this.ball.x + this.ball.rad >= this.canvas.width) {
-			this.gamestatus.Gamestate = 'score';
+			// this.gamestatus.Gamestate = 'score';
 			this.gamestatus.score_2++; // But pour le joueur 
 			// setTimeout(() => {
 				this.gamestatus.Gamestate = 'playing';
-		
-				this.ResetBall(-1);
+			if(this.gamestatus.score_2 === 10)
+				this.gamestatus.Gamestate = 'finish 2';
+			this.ResetBall(-1);
 			// }, 1000);
 			
 		}
