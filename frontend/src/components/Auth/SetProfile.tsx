@@ -1,11 +1,14 @@
 import { Photo42 } from '@/assets/avatarAssociation'
 import SetProfileForm from './SetProfileForm'
+import { useNavigate } from 'react-router'
 
 type SetProfileprops = {
     children: React.ReactNode
 }
 
 const SetProfile: React.FC<SetProfileprops> = ({ children }) => {
+    const navigate = useNavigate()
+
     return (
         <div className="flex flex-col  justify-center text-center space-y-5">
             <div className="flex flex-col  justify-center text-center">
@@ -24,6 +27,7 @@ const SetProfile: React.FC<SetProfileprops> = ({ children }) => {
                 <SetProfileForm
                     submitButtonText="I'm ready to noot"
                     currentAvatar={Photo42()}
+                    onClose={() => navigate('/')}
                 />
                 {children}
             </div>

@@ -1,24 +1,16 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import AvatarImg from '../User/userAvatar/AvatarImg'
-import { Photo42, Pingu } from '@/assets/avatarAssociation'
-import { useQuery } from '@tanstack/react-query'
-import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
-import { Check, Pencil, Plus } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Check, Pencil } from 'lucide-react'
 import ImageInput from './ImageInput'
-import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from 'react-router-dom'
-
-type SetProfileFormprops = {
-    submitButtonText: string
-    currentAvatar: string
-}
+import { SetProfileFormprops, ProfileFormProps } from '@/lib/Auth/auth.types'
+import { setProfileFn } from '@/lib/Auth/auth.request'
 
 const zodSchema = z.object({
     pseudo: z
@@ -33,6 +25,7 @@ type ProfileFormValues = z.infer<typeof zodSchema>
 const SetProfileForm: React.FC<SetProfileFormprops> = ({
     submitButtonText,
     currentAvatar,
+    onClose,
 }) => {
     const {
         register,
@@ -45,37 +38,33 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
     const [openAvatars, setOpenAvatars] = useState<boolean>(false)
     const [selectedAvatar, setSelectedAvatar] = useState<string>(currentAvatar)
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
-    const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const mutation = useMutation({
+        mutationFn: (data: ProfileFormProps) =>
+            setProfileFn(
+                data.pseudo,
+                data.avatar,
+                data.file,
+                data.setErrorMessage,
+                data.onClose
+            ),
+        onSuccess: (_, data) => {
+            queryClient.invalidateQueries({ queryKey: ['me'] })
+        },
+    })
 
     useEffect(() => {
         setSelectedAvatar(currentAvatar)
     }, [currentAvatar])
 
     async function onSubmit(data: ProfileFormValues) {
-        try {
-            const formData = new FormData()
-
-            if (uploadedImage) formData.append('file', uploadedImage)
-            else {
-                formData.append('avatar', selectedAvatar)
-            }
-            formData.append('pseudo', data.pseudo)
-
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/uploads`,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    withCredentials: true,
-                }
-            )
-
-            navigate('/')
-        } catch (error) {
-            setErrorMessage(error.response.data.message)
-        }
+        mutation.mutate({
+            pseudo: data.pseudo,
+            avatar: selectedAvatar,
+            file: uploadedImage,
+            setErrorMessage,
+            onClose,
+        })
     }
 
     const onAvatarButtonClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -143,7 +132,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
             </div>
             <div>
                 <Label htmlFor="pseudo" hidden>
-                    Name
+                    Pseudo
                 </Label>
                 <Input
                     id="pseudo"
