@@ -36,7 +36,7 @@ const SelfMessage: React.FC<MessageProps> = ({ message, picture }) => {
                         </div>
                     </div>
                     <div id="time" className="flex justify-start">
-                        <p className="text-sm">{formattedDate}</p>
+                        <p className="text-xs text-gray-400">{formattedDate}</p>
                     </div>
                 </div>
             </div>

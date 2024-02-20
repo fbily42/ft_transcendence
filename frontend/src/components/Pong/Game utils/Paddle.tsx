@@ -1,80 +1,80 @@
-import { PaddleObj } from "./data";
+import { WebSocketContextType } from '@/context/webSocketContext'
 
-// let paddle: PaddleObj;
-export  function Paddle_2(ctx: CanvasRenderingContext2D , canvas: HTMLCanvasElement,  paddle_2: PaddleObj, keys: {[key:string]: boolean}, img_grey: HTMLImageElement) {
-	
-	// if (!paddle)
-	// paddle = {
-	// 	x: 10,
-	// 	y: 20,
-	// 	height : 20,
-	// 	width : 30,
-	// 	color : '#FFA62b',
-
-	// }
-	// console.log('jkg');
-	if (keys['ArrowUp']) {
-		if ((paddle_2.y - 10) > 0 )
-			paddle_2.y -= 10;
-		}
-	else if (keys['ArrowDown']) {
-		if ((paddle_2.y + 10 + 60) < canvas.height )
-		{
-			paddle_2.y += 10;
-		}
-	}
-	
-
-	ctx.beginPath();
-	ctx.drawImage(img_grey, paddle_2.x, paddle_2.y, paddle_2.width, paddle_2.height);
-	// ctx.rect(paddle_2.x, paddle_2.y, paddle_2.width, paddle_2.height);
-	ctx.fillStyle = paddle_2.color;
-	ctx.strokeStyle = paddle_2.color;
-	ctx.lineWidth = 1;
-	ctx.fillStyle = paddle_2.color;
-	ctx.shadowBlur = 0;
-	ctx.shadowColor = "blue";
-	ctx.strokeRect(paddle_2.x, paddle_2.y, paddle_2.width, paddle_2.height);
-	ctx.fill();
+import { GameStat, imageForGame } from '@/lib/Game/Game.types'
 
 
+
+type keyData = {
+	key: string,
+	roomId: string,
+}
+export function Paddle_2(
+    ctx: CanvasRenderingContext2D,
+    gameInfo: GameStat,
+    keys: { [key: string]: boolean },
+    gameImages: imageForGame,
+    socket: WebSocketContextType,
+    roomName: string,
+) {
+
+    if (keys['ArrowUp']) {
+		const data: keyData = {key: 'ArrowUp', roomId: roomName}
+        socket?.webSocket?.emit('key', data)}
+
+    else if (keys['ArrowDown']) {
+        socket?.webSocket?.emit('key', { key: 'ArrowDown', roomId: roomName })
+    }
+
+    ctx.beginPath()
+    ctx.drawImage(
+        gameImages.image.img_grey,
+        gameInfo.paddle_2.x,
+        gameInfo.paddle_2.y,
+        gameInfo.paddle_2.width,
+        gameInfo.paddle_2.height
+    )
+    // ctx.rect(gameInfo.paddle_2.x, gameInfo.paddle_2.y, gameInfo.paddle_2.width, gameInfo.paddle_2.height);
+    ctx.fillStyle = gameInfo.paddle_2.color
+    ctx.strokeStyle = gameInfo.paddle_2.color
+    ctx.lineWidth = 1
+    ctx.fillStyle = gameInfo.paddle_2.color
+    ctx.shadowBlur = 0
+    ctx.shadowColor = 'blue'
+    ctx.strokeRect(gameInfo.paddle_2.x, gameInfo.paddle_2.y, gameInfo.paddle_2.width, gameInfo.paddle_2.height)
+    ctx.fill()
 }
 
-export function Paddle_1(ctx: CanvasRenderingContext2D , canvas: HTMLCanvasElement, paddle_1: PaddleObj, keys: {[key:string]: boolean}, img_pingu: HTMLImageElement) {
-	
-	// if (!paddle)
-	// paddle = {
-	// 	x: 10,
-	// 	y: 20,
-	// 	height : 20,
-	// 	width : 30,
-	// 	color : '#FFA62b',
+export function Paddle_1(
+    ctx: CanvasRenderingContext2D,
+    gameInfo: GameStat,
+    keys: { [key: string]: boolean },
+    gameImages: imageForGame,
+    socket: WebSocketContextType,
+    roomName: string,
+) {
 
-	// }
+    if (keys['a']) {
+        socket?.webSocket?.emit('key', { key: 'a', roomId: roomName })
+    }
 
-	if (keys['a']) {
-		if ((paddle_1.y - 10) > 0 )
-			paddle_1.y -= 10;
-		}
-
-	else if (keys['d']) {
-		if ((paddle_1.y + 10 + 60) < canvas.height )
-		{
-			paddle_1.y += 10;
-		}
-	}
-
-	ctx.beginPath();
-	ctx.drawImage(img_pingu, paddle_1.x, paddle_1.y, paddle_1.width, paddle_1.height);
-	// ctx.rect(paddle_1.x, paddle_1.y, paddle_1.width, paddle_1.height);
-	ctx.fillStyle = paddle_1.color;
-	ctx.strokeStyle = paddle_1.color;
-	ctx.lineWidth = 1;
-	ctx.fillStyle = paddle_1.color;
-	ctx.shadowBlur = 0;
-	ctx.shadowColor = "blue";
-	ctx.strokeRect(paddle_1.x, paddle_1.y, paddle_1.width, paddle_1.height);
-	ctx.fill();
-
-
+    else if (keys['d']) {
+        socket?.webSocket?.emit('key', { key: 'd', roomId: roomName })
+    }
+    ctx.beginPath()
+    ctx.drawImage(
+        gameImages.image.img_pingu,
+        gameInfo.paddle_1.x,
+        gameInfo.paddle_1.y,
+        gameInfo.paddle_1.width,
+        gameInfo.paddle_1.height
+    )
+    // ctx.rect(gameInfo.paddle_1.x, gameInfo.paddle_1.y, gameInfo.paddle_1.width, gameInfo.paddle_1.height);
+    ctx.fillStyle = gameInfo.paddle_1.color
+    ctx.strokeStyle = gameInfo.paddle_1.color
+    ctx.lineWidth = 1
+    ctx.fillStyle = gameInfo.paddle_1.color
+    ctx.shadowBlur = 0
+    ctx.shadowColor = 'blue'
+    ctx.strokeRect(gameInfo.paddle_1.x, gameInfo.paddle_1.y, gameInfo.paddle_1.width, gameInfo.paddle_1.height)
+    ctx.fill()
 }

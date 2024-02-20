@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreateChannelProps, CreateFormValues } from '@/lib/Chat/chat.types'
 import { createChannel } from '@/lib/Chat/chat.requests'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 interface CardCreateProps {
     onClose: () => void
@@ -23,11 +24,13 @@ function CardCreate({ onClose }: CardCreateProps) {
     const { register, handleSubmit } = useForm<CreateFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const queryClient = useQueryClient()
+	const socket = useWebSocket() as WebSocketContextType
     const mutation = useMutation({
-        mutationFn: (data: CreateChannelProps) =>
+        mutationFn: (data: CreateChannelProps) => 
             createChannel(data.data, data.setErrorMessage, data.onClose),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['channels'] })
+			socket?.webSocket?.emit('newChannel')
         },
     })
 
