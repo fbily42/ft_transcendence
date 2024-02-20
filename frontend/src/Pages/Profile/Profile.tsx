@@ -1,42 +1,46 @@
 // import SetUp2FAModal from '@/components/Profile/SetUp2FAModal';
-import UserCards from '@/components/User/userCards/UserCards'
-import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
-import { FriendData } from '@/lib/Dashboard/dashboard.types'
+import { getMyFriends, getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
-import { Skeleton } from '@/components/ui/skeleton'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
-import { Photo42 } from '@/assets/avatarAssociation'
+// import { useParams } from 'react-router-dom'
+import FriendsList from '@/components/Profile/FriendsList'
+import FriendRequest from '@/components/Profile/FriendRequest'
 
 function Profile() {
-    const { data } = useQuery({ queryKey: ['me'], queryFn: getUserMe })
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
-    const selectedAvatar = Photo42().imageBackground || ''
-
+    // const param = useParams()
+    const { data: friends } = useQuery({
+        queryKey: ['myFriends'],
+        queryFn: () => getMyFriends(),
+    })
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
     }
-
     useEffect(() => {
         handleResize()
         window.addEventListener('resize', handleResize)
-
-        // Cleanup the event listener on component unmount
         return () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
 
-    // const queryClient = useQueryClient()
-    // const user: UserData = await queryClient.ensureQueryData({
-    //     queryKey: ['me'],
-    //     queryFn: getUserMe,
-    // })
-    const friends = data?.friends
+    const { data, isError, isLoading } = useQuery({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
+    if (isError) {
+        return <div>Error</div>
+    }
+    if (isLoading) {
+        return <div>Loading...</div>
+    }
+
+    const selectedAvatar = data?.photo42
+
     return (
         <div
             className={`flex ${isMobile ? 'flex-col h-screen overflow-y-auto' : 'justify-between'} pl-[102px] md:pl-[112px] lg:pl-[122px] pb-[36px] pr-[16px] md:pr-[26px] lg:pr-[36px] h-[90vh] gap-[16px] md:gap-[26px] lg:gap-[36px]`}
@@ -58,7 +62,6 @@ function Profile() {
                             className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'}`}
                         >
                             <UserAvatar selectedAvatar={selectedAvatar} />
-                            {/* <img src={data?.photo42} alt="Avatar Image" /> */}
                         </div>
                         <div
                             id="User informations"
@@ -84,28 +87,8 @@ function Profile() {
                         Noot Friends
                     </h1>
                 </div>
-                <div className="bg-white w-full h-full rounded-[26px] md:rounded-[30px] lg:rounded-[36px] gap-[36px]">
-                    {friends && friends.length > 0 ? (
-                        friends.map((friend: FriendData) => (
-                            <UserCards
-                                key={friend.id}
-                                bgColor="white"
-                                userName={friend.name} // Adjust accordingly
-                                userPicture={friend.avatar || PinguAvatar}
-                                userStatus={friend.status || 'Status undifined'}
-                                variant="USER_PROFILE"
-                            />
-                        ))
-                    ) : (
-                        <div className="flex items-center justify-center w-full h-[68px] px-[6px] sm:px-[16px] md:px-[26px] gap-[10px]">
-                            <Skeleton className="h-12 w-12 rounded-full" />
-                            <div className="w-full h-full flex flex-col justify-center gap-1">
-                                <Skeleton className="h-4 w-full" />
-                                <Skeleton className="h-4 w-[100px]" />
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <FriendRequest />
+                <FriendsList friends={friends} />
             </div>
         </div>
     )

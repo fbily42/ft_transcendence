@@ -15,10 +15,18 @@ type ImageSelectorProps = {
 
 const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
     const images: {
-        id: number
+        id: string
         imageProfile: string
         imageBackground: string | undefined
-    }[] = [Pingu(), Pinga(), Mama(), Papa(), Pingi(), Robby(), Photo42()]
+    }[] = [
+        Pingu(),
+        Pinga(),
+        Mama(),
+        Papa(),
+        Pingi(),
+        Robby(),
+        Photo42(),
+    ]
 
     const handleImageClick = (image: string) => {
         onSelect(image)

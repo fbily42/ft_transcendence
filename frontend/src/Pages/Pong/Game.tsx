@@ -1,104 +1,170 @@
-import { BallMovement, WallCollision , Paddle_Collision, Paddle_hit} from "@/components/Pong/Game utils/Ballmovement";
-import { Paddle_1, Paddle_2 } from "@/components/Pong/Game utils/Paddle";
+import {
+    BallMovement,
+    WallCollision,
+    Paddle_Collision,
+    Paddle_hit,
+} from '@/components/Pong/Game utils/Ballmovement'
+import { Paddle_1, Paddle_2 } from '@/components/Pong/Game utils/Paddle'
 // import Paddle_2 from "@/components/Pong/Game utils/Paddle";
-import data from "@/components/Pong/Game utils/data";
-import React, { useEffect, useRef, useState } from "react";
+import data from '@/components/Pong/Game utils/data'
+import React, { useEffect, useRef, useState } from 'react'
 import fish from './../../assets/Game/fish.svg'
 import filet from './../../assets/Game/filet.svg'
 import grey from './../../assets/Game/grey.svg'
 import pingu from './../../assets/Game/pingu.svg'
-import Static_image from "@/components/Pong/Game utils/design";
+import Static_image from '@/components/Pong/Game utils/design'
 import pingu_score from './../../assets/Game/pingu_score.svg'
 import grey_score from './../../assets/Game/grey_score.svg'
-import { useQuery } from "@tanstack/react-query";
-import { getUserMe } from "@/lib/Dashboard/dashboard.requests";
+import ice from './../../assets/Game/ice.svg'
+import ice_bottom from './../../assets/Game/ice_bottom.svg'
+import { useQuery } from '@tanstack/react-query'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { useWebSocket } from '@/context/webSocketContext'
+import { Socket } from 'socket.io-client'
+import { GameStat, imageForGame } from '@/lib/Game/Game.types'
+// import { Image } from "@/components/Pong/Game utils/data";
 
-export default function Board(){
-	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const imgRef = useRef<HTMLImageElement | null>(null);
-	const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
-	const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
+//creer une map room pour lier l'ID de la room avec un objec, pour a chaque fois renvoyer l'objet modifier
 
-	
-	useEffect(() => {
-		let {ballObj, paddle_1,paddle_2, Game_stat}= data;
-		// imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
-		
-		
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (keys[event.key]) {
-				return;
-			}
-			setKeys(prevKeys => ({ ...prevKeys, [event.key]: true }));
-		};
-		
-		const handleKeyUp = (event: KeyboardEvent) => {
-			setKeys(prevKeys => ({ ...prevKeys, [event.key]: false }));
-		};
-		window.addEventListener('keydown', handleKeyDown);
-		
-		window.addEventListener('keyup', handleKeyUp);
-		let animationFrameId: number;
-		const img_fish = new Image();
-		const img_filet = new Image();
-		const img_grey = new Image();
-		const img_pingu = new Image();
-		const img_pingu_score = new Image();
-		const img_grey_score = new Image();
-		
-		const render = () => {
-			const canvas = canvasRef.current;
-			if (canvas)
-			{
-					paddle_2.x = canvas?.width - 70;
-					const ctx =  canvas.getContext("2d")
-					if (!ctx)
-					return;
-				
-				if (Game_stat.Gamestate === 'playing')
+export default function Board() {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    // const imgRef = useRef<HTMLImageElement | null>(null);
+    const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
+    // const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
+    const socket = useWebSocket()
+
+    const [roomName, setRoomName] = useState<string>('false')
+    const [gameInfo, setGameInfo] = useState<GameStat>()
+
+    const gameImages = new imageForGame()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (keys[event.key]) {
+            return
+        }
+        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
+    }
+
+    useEffect(() => {
+        socket?.webSocket?.on('Ready', (room: string) => {
+            const roomName = room
+            setRoomName(roomName)
+
+            socket?.webSocket?.emit('CreateGameinfo', room)
+        })
+        socket?.webSocket?.on('UpdateKey', (Game_stat: GameStat) => {
+            setGameInfo(Game_stat)
+        })
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+            socket?.webSocket?.off('UpdateKey')
+            window.removeEventListener('keyup', handleKeyUp)
+            socket?.webSocket?.emit('leaveRoom')
+        }
+    }, [])
+    gameImages.image.img_ice_bottom.src = ice_bottom
+    gameImages.image.img_ice.src = ice
+    gameImages.image.img_fish.src = fish
+    gameImages.image.img_filet.src = filet
+    gameImages.image.img_grey.src = grey
+    gameImages.image.img_pingu.src = pingu
+    gameImages.image.img_pingu_score.src = pingu_score
+    gameImages.image.img_grey_score.src = grey_score
+
+    useEffect(() => {
+        // imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
+        let animationFrameId: number
+
+        const render = () => {
+            const canvas = canvasRef.current
+            if (canvas && gameInfo) {
+                gameInfo.paddle_2.x = canvas?.width - 70
+                const ctx = canvas.getContext('2d')
+                if (!ctx) return
+
+                if (gameInfo.gamestatus.Gamestate === 'playing') {
+                    // if (img_fishRef.current)
+                    // 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
+                    ctx?.clearRect(0, 0, canvas.width, canvas.height)
+                    Static_image(ctx, canvas, gameImages)
+                    if (socket && gameInfo) {
+                        BallMovement(
+                            ctx,
+                            gameInfo,
+                            gameImages,
+                            socket,
+                            roomName
+                        ) //envoie un update
+                        Paddle_1(
+                            ctx,
+                            gameInfo,
+                            keys,
+                            gameImages,
+                            socket,
+                            roomName
+                        ) //envoie un update si a ou d utilise
+                        Paddle_2(
+                            ctx,
+                            gameInfo,
+                            keys,
+                            gameImages,
+                            socket,
+                            roomName
+                        ) //envoie un update si Arrowup ou ArrowDown utilise
+                    }
+                    if (
+                        socket &&
+                        WallCollision(
+                            gameInfo,
+                            canvas,
+                            ctx,
+                            gameImages,
+                            socket,
+                            roomName
+                        ) == 1
+                    )
+                        console.log(' tu as marque')
+                    if (socket) {
+                        Paddle_Collision(
+                            gameInfo,
+                            gameInfo.paddle_1,
+                            socket,
+                            roomName
+                        )
+                        // Paddle_Collision(gameInfo, gameInfo.paddle_2)
+                    }
+                }
+				else if (gameInfo.gamestatus.Gamestate === 'finish 1')
 				{
-					img_fish.src = fish;
-					img_filet.src = filet;
-					img_grey.src = grey;
-					img_pingu.src = pingu;
-					img_pingu_score.src = pingu_score;
-					img_grey_score.src = grey_score;
-					
-					// if (img_fishRef.current)
-					// 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
-					ctx?.clearRect(0, 0, canvas.width, canvas.height);
-					Static_image(ctx, canvas, img_filet);
-					BallMovement(ctx, ballObj,img_fish);
-	
-					Paddle_1(ctx, canvas, paddle_1, keys, img_pingu);
-					Paddle_2(ctx, canvas, paddle_2, keys, img_grey);
-					if (WallCollision(ballObj, canvas, ctx, Game_stat, img_grey_score, img_pingu_score) == 1)
-						// console.log(' tu as marque');
-					Paddle_Collision(ballObj, paddle_1);
-					Paddle_Collision(ballObj, paddle_2);
+					// console.log("joueur 1 gagne")
+					cancelAnimationFrame(animationFrameId)
+					return ;//mettre le modal victoire joueur 1 et defaite joueur 2
 				}
-				
-				
-					// if (ballObj.y - ballObj.rad > 0)
-			}
-			// console.log("frame");
-			animationFrameId = requestAnimationFrame(render);
+				else if (gameInfo.gamestatus.Gamestate === "finish 2")
+				{
+					// console.log("joueur 2 gagne")
+					cancelAnimationFrame(animationFrameId)
+					return;//mettre le modal victoire joueur 2 et defaite joueur 1
+				}
+            }
+            animationFrameId = requestAnimationFrame(render)
+        }
+        render()
+        return () => {
+            // socket?.webSocket?.emit('leaveRoom', roomName)// faire un autre else if gameInfo.gamestatus.Gamestate === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
+            // window.removeEventListener('keydown', handleKeyDown);
+            cancelAnimationFrame(animationFrameId)
+        }
+        // }
+    })
 
-		}
-		render();
-
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-			window.removeEventListener('keyup', handleKeyUp);
-			// window.removeEventListener('keydown', handleKeyDown);
-			cancelAnimationFrame(animationFrameId);
-		}
-	}, )
-
-
-	return (
-	
-		<canvas id="canvas_pong" ref={canvasRef} height={1000} width="1600px" />
-	 );
-		
+    return (
+        <canvas id="canvas_pong" ref={canvasRef} height={1600} width="1600px" />
+    )
 }

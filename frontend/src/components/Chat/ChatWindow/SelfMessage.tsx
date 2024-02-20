@@ -9,7 +9,7 @@ interface MessageProps {
     picture: string
 }
 
-const SelfMessage: React.FC<MessageProps> = ({ message, picture}) => {
+const SelfMessage: React.FC<MessageProps> = ({ message, picture }) => {
     const formattedDate = format(message.sentAt, 'hh:mm a')
     return (
         <div id="full-div" className="flex justify-end w-full">
@@ -18,13 +18,10 @@ const SelfMessage: React.FC<MessageProps> = ({ message, picture}) => {
                 className="flex justify-end gap-[10px] w-[50%]"
             >
                 <div className="flex flex-col gap-[5px] w-fit">
-                    <div
-                        id="photo+message"
-                        className="flex gap-[20px]"
-                    >
+                    <div id="photo+message" className="flex gap-[20px]">
                         <div
                             id="message"
-                            className="bg-[#FFE6AF] p-[8px] rounded-[12px]"
+                            className="bg-[#FFE6AF] p-[8px] rounded-[12px] break-words max-w-[425px]"
                         >
                             <p>{message.content}</p>
                         </div>
@@ -39,7 +36,7 @@ const SelfMessage: React.FC<MessageProps> = ({ message, picture}) => {
                         </div>
                     </div>
                     <div id="time" className="flex justify-start">
-                        <p className="text-sm">{formattedDate}</p>
+                        <p className="text-xs text-gray-400">{formattedDate}</p>
                     </div>
                 </div>
             </div>

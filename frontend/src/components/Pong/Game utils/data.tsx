@@ -40,6 +40,17 @@ export default {
 	
 };
 
+export interface Image {
+	img_fish : HTMLImageElement;
+	img_filet : HTMLImageElement;
+	img_grey : HTMLImageElement;
+	img_pingu : HTMLImageElement;
+	img_pingu_score : HTMLImageElement;
+	img_grey_score : HTMLImageElement;
+	img_ice : HTMLImageElement;
+	img_ice_bottom : HTMLImageElement;
+}
+
 export interface BallObj {
 	x: number;
 	y: number;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useWebSocket } from '@/context/webSocketContext'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { getChannelUsers, getMessages } from '@/lib/Chat/chat.requests'
 import MessageBubble from './MessageBubble'
 import Placeholder from '../../../assets/empty-state/empty-chat.png'
 import Modal from '@/components/Modal'
-import TabsChannel from '../ChannelPanel/Channels/TabsChannel'
+import TabsChannel from '../ChannelPanel/TabsChannel'
 import SelfMessage from './SelfMessage'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 
@@ -29,7 +29,7 @@ interface ChatWindowProps {
 const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     const [open, setOpen] = useState<boolean>(false)
     const { register, handleSubmit, reset } = useForm<MessageFormValues>()
-    const socket = useWebSocket() as Socket
+    const socket = useWebSocket() as WebSocketContextType
     const queryClient = useQueryClient()
 
     const { data: messages } = useQuery({
@@ -56,36 +56,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         return Pingu
     }
 
-    //Call for each event 'newMessage' and invalidate the query 'messages' to update it
-    const messageListener = (message: string) => {
-        if (message === 'newMessage')
+    useEffect(() => {
+        socket.webSocket?.on('messageToRoom', () => {
             queryClient.invalidateQueries({
                 queryKey: ['messages', currentChannel],
             })
-    }
-
-    const updateListener = () => {
-        queryClient.invalidateQueries({
-            queryKey: ['channelUsers', currentChannel],
         })
-    }
-
-    //On = Listen to the event 'message' then call messageListener() with the given arguments
-    //Off = Stop listenning when component is unmount
-    useEffect(() => {
-        socket?.on('messageToRoom', messageListener)
-        socket?.on('update', updateListener)
         return () => {
-            socket?.off('messageToRoom', messageListener)
-            socket?.off('update', updateListener)
+            socket.webSocket?.off('messageToRoom')
         }
-    }, [socket, messageListener, updateListener])
+    }, [socket])
 
     async function onSubmit(data: MessageFormValues) {
         data.target = currentChannel
         data.userName = me?.name || ''
         data.userId = me?.id || 0
-        socket?.emit('messageToRoom', data)
+        socket.webSocket?.emit('messageToRoom', data)
         reset({ message: '' })
     }
 

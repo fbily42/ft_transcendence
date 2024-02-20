@@ -8,8 +8,14 @@ import {
 import { MoreHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-function DropdownCard({ variant }: { variant: 'USER_PROFILE' | 'CHAT' }) {
+type DropdownCardProps = {
+    variant: 'USER_PROFILE' | 'CHAT'
+    id: string
+}
+
+const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
     const navigate = useNavigate()
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -25,7 +31,7 @@ function DropdownCard({ variant }: { variant: 'USER_PROFILE' | 'CHAT' }) {
                     <Button
                         className="w-full"
                         onClick={() => {
-                            navigate('/')
+                            navigate(`/profile/${id}`)
                         }}
                     >
                         See Profile
@@ -35,6 +41,9 @@ function DropdownCard({ variant }: { variant: 'USER_PROFILE' | 'CHAT' }) {
                     <>
                         <DropdownMenuItem asChild>
                             <Button className="w-full">Delete</Button>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Button className="w-full">Chat</Button>
                         </DropdownMenuItem>
                     </>
                 ) : (

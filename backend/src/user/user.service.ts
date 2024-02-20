@@ -1,27 +1,98 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 import { LeaderboardDTO } from './dto/leaderboard.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
-		private jwtService: JwtService,
 	) {}
 
-	async getInfo(jwt: any) {
-		const jwtPayload = this.jwtService.decode(jwt);
-
+	async getInfo(name: string) {
 		const user = await this.prisma.user.findUnique({
 			where: {
-				name: jwtPayload.login,
+				name: name,
 			},
 		});
 		if (!user) return null;
 		delete user.token42;
 		delete user.jwt;
 		return user;
+	}
+
+	async getUsers() {
+		const user = await this.prisma.user.findMany({
+			// select: {
+			// 	name: true,
+			// 	pseudo: true,
+			// 	score: true,
+			// 	avatar: true,
+			// 	rank: true,
+			// },
+		});
+		if (!user) return null;
+		return user;
+	}
+	
+	async getUserById(id: string) {
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: Number(id),
+			},
+			select: {
+				id: true,
+				name: true,
+				pseudo: true,
+				score: true,
+				avatar: true,
+				rank: true,
+				photo42: true,
+				friends: true,
+			},
+		});
+		if (!user) return null;
+		return user;
+	}
+
+	async getOtherInfo(pseudo, currentUser) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					pseudo: pseudo,
+				},
+				select: {
+					name: true,
+					pseudo: true,
+					score: true,
+					avatar: true,
+					rank: true,
+				},
+			});
+
+			if (!user && user.name == currentUser)
+				throw new HttpException(
+					'This user does not exist',
+					HttpStatus.BAD_REQUEST,
+				);
+
+			// delete user.token42;
+			// delete user.jwt;
+			return user;
+		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			} else if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
 	async getLeaderboard() {
@@ -36,7 +107,6 @@ export class UserService {
 				score: true,
 			},
 		});
-		//console.log('Leaderboard Data:', leaderboardData);
 
 		return leaderboardData;
 	}
