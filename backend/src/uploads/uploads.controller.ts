@@ -21,24 +21,28 @@ export class UploadsController {
 
 	@Post()
 	@UseInterceptors(FileInterceptor('file'))
-	uploadFile(
+	async setProfile(
 		@UploadedFile() file: Express.Multer.File,
 		@Body('pseudo') pseudo: string,
-		@Body('avatar') avatar: string,
-		@Req() req: Request
+		@Body('avatar') url: string,
+		@Req() req: Request,
 	) {
-		if (!file && !avatar) {
-			throw new HttpException('Missing an avatar or a file', HttpStatus.BAD_REQUEST)
-		}
 		try {
-			
-		}
-		catch(error){
-			throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
+			if (!file && !url) {
+				throw new HttpException(
+					'Missing an avatar or a file',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+			return await this.uploadsService.setProfile(file, url, pseudo, req);
+		} catch (error) {
+			if (error instanceof HttpException)
+				throw error
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
 
-		console.log('FILE', file);
-		console.log('PSEUDO', pseudo);
-		console.log('AVATAR', avatar);
 	}
 }

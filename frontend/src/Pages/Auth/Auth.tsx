@@ -39,8 +39,9 @@ function Auth(): JSX.Element {
 
     const onProfileSet = () => setIsProfileSet(true)
 
-    if (isAuth && isProfileSet) return <Navigate to="/" />
-    else {
+    if (isAuth && isProfileSet) {
+        return <Navigate to="/" />
+    } else {
         return (
             <Login isAuth={isAuth}>
                 <Outlet></Outlet>

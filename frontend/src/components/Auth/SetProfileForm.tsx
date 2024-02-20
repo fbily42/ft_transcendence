@@ -13,6 +13,7 @@ import ImageInput from './ImageInput'
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from 'react-router-dom'
 
 type SetProfileFormprops = {
     children: React.ReactNode
@@ -53,13 +54,13 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
         initialAvatar.imageProfile
     )
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         setSelectedAvatar(initialAvatar.imageProfile)
     }, [initialAvatar.imageProfile])
 
     async function onSubmit(data: ProfileFormValues) {
-        setErrorMessage('data pseudo = ' + data.pseudo)
         try {
             const formData = new FormData()
 
@@ -68,8 +69,6 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                 formData.append('avatar', selectedAvatar)
             }
             formData.append('pseudo', data.pseudo)
-
-            console.log(...formData)
 
             const response = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/uploads`,
@@ -81,8 +80,10 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
                     withCredentials: true,
                 }
             )
+
+            navigate('/')
         } catch (error) {
-            console.log('Error uploading file', error)
+            setErrorMessage(error.response.data.message)
         }
     }
 
@@ -97,17 +98,12 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({ children }) => {
 
         if (file && file.type == 'image/svg+xml') {
             const url = URL.createObjectURL(file)
-            // You can perform additional checks or validations here if needed
-            console.log('file', file)
-            // console.log(url)
-            // Update state with the selected image file
+
             setUploadedImage(file)
             setSelectedAvatar(url)
         }
     }
 
-    // console.log('selected avatar ', selectedAvatar)
-    // console.log('uploaded img ', uploadedImage)
     return (
         <div className="flex flex-col  justify-center text-center space-y-5">
             <div className="flex flex-col  justify-center text-center">

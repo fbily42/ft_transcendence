@@ -9,6 +9,10 @@ function ProtectedRoute(): JSX.Element {
     const navigate = useNavigate()
     const location = useLocation()
     const [auth, setAuth] = useState<boolean>(false)
+    const { data: me } = useQuery({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
 
     useEffect(() => {
         async function checkIsAuth(): Promise<void> {
@@ -20,11 +24,9 @@ function ProtectedRoute(): JSX.Element {
                     }
                 )
                 setAuth(true)
-                const { data: me } = useQuery({
-                    queryKey: ['me'],
-                    queryFn: getUserMe,
-                })
-                if (!me?.avatar || !me?.pseudo) navigate('/auth')
+                if (!me?.avatar || !me?.pseudo) {
+                    throw new Error()
+                }
             } catch (error) {
                 setAuth(false)
                 navigate('/auth')

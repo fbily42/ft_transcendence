@@ -110,7 +110,7 @@ export class AuthService {
 			const signedrefreshToken: string = await this.jwt.signAsync(payload, {expiresIn: '7h'});
 
 			//Pas sur d'avoir besoin d'avoir ce call si on a plus de jwt a stocker et qu'on stocke plus non plus le refresh
-			const updateUser: User= await this.prisma.user.update({
+			const updateUser: User = await this.prisma.user.update({
 				where: {
 					id: user.id,
 				},
