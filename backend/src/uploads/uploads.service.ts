@@ -16,8 +16,10 @@ export class UploadsService {
 
 			//updates
 			let avatar;
-			if (file)
-				avatar = file.buffer.toString('base64')
+
+			if (file) {
+				avatar = "data:image/svg+xml;base64," + file.buffer.toString('base64')
+			}
 			else
 				avatar = url
 

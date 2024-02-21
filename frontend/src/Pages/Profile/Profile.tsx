@@ -39,7 +39,7 @@ function Profile() {
         return <div>Loading...</div>
     }
 
-    const selectedAvatar = data?.photo42
+    const selectedAvatar = data?.avatar
 
     return (
         <div

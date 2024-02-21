@@ -103,6 +103,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
                 >
                     <div className="absolute bottom-[3px] right-[3px]">
                         <Button
+                            type="button"
                             className="bg-customYellow rounded-full w-[30px] h-[30px] text-lg hover:bg-customDarkBlue"
                             onClick={onAvatarButtonClick}
                         >
