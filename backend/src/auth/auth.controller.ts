@@ -88,7 +88,6 @@ export class AuthController {
 			}
 			res.redirect(`${process.env.FRONTEND_URL}`);
 		} catch (error) {
-			console.log(error);
 			res.redirect(`${process.env.FRONTEND_URL}/auth`);
 			throw error;
 		}
