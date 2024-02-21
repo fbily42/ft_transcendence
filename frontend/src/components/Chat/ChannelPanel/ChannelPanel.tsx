@@ -33,14 +33,16 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     const queryClient = useQueryClient()
     const socket = useWebSocket() as WebSocketContextType
 
-    const { data: channels } = useQuery<Channel[]>({
+    const { data: channels, error: channelError } = useQuery<Channel[]>({
         queryKey: ['channels'],
         queryFn: getChannels,
+        retry: 1,
     })
 
-    const { data: me } = useQuery<UserData>({
+    const { data: me, error: meError } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
+        retry: 1,
     })
 
     function handleClick(name: string) {
@@ -84,12 +86,21 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         }
     })
 
+    useEffect(() => {
+        if (
+            meError?.message.includes('403') ||
+            channelError?.message.includes('403')
+        ) {
+            navigate('/auth')
+        }
+    }, [channelError, meError])
+
     if (!hide) {
         return (
             <div className="flex h-full inner-block">
                 <div className=" bg-white w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
                     <div className="flex flex-col h-full">
-                        <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                        <div className="bg-customBlue flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
                             <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
                                 Channels
                             </h1>
@@ -124,7 +135,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? '[#C1E2F7]'
+                                                        ? 'customBlue'
                                                         : 'white'
                                                 }
                                                 userName={getDirectName(
@@ -158,7 +169,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? '[#C1E2F7]'
+                                                        ? 'customBlue'
                                                         : 'white'
                                                 }
                                                 userName={channel.name}
@@ -173,8 +184,8 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                         </div>
                     </div>
                 </div>
-                <div className="bg-[#C1E2F7] w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
-                    <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                <div className="bg-customBlue w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
+                    <div className="bg-customBlue flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
                         <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
                             {getDirectName(currentChannel, me?.name!)}
                         </h1>
@@ -209,7 +220,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
             <div className="flex h-full inner-block">
                 <div className=" bg-white w-[290px] rounded-[36px] overflow-hidden ">
                     <div className="flex flex-col h-full">
-                        <div className="bg-[#C1E2F7] flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                        <div className="bg-customBlue flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
                             <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
                                 Channels
                             </h1>
@@ -244,7 +255,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? '[#C1E2F7]'
+                                                        ? 'customBlue'
                                                         : 'white'
                                                 }
                                                 userName={getDirectName(

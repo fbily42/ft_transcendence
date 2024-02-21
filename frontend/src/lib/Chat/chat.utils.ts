@@ -44,7 +44,7 @@ export function getMyrole(name: string, users: UserInChannel[]): string {
 	return ''
 }
 
-export function getBorderColor(role: string){
+export function getAvatarBorderColor(role: string){
 	switch (role) {
 		case 'admin':
 			return 'border-customGreen'
@@ -70,15 +70,28 @@ export function getTextColor(role: string) {
 	}
 }
 
-export function getBgColor(role: string) {
+export function getMessageBgColor(role: string) {
 	switch (role) {
 		case 'admin':
-			return 'bg-customGreen'
+			return 'bg-customLightGreen'
 		case 'owner':
-			return 'bg-[#FFE6AF]'
+			return 'bg-customLightYellow'
 		case 'member':
-			return 'bg-customLightBlue'
+			return 'bg-customBlue'
 		default:
 			return 'bg-grey-500'
+	}
+}
+
+export function getMessageBorderColor(role: string){
+	switch (role) {
+		case 'admin':
+			return 'border-customLightGreen'
+		case 'owner':
+			return 'border-customLightYellow'
+		case 'member':
+			return 'border-customBlue'
+		default:
+			return 'border-grey-500'
 	}
 }

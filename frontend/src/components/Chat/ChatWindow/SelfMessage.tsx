@@ -3,12 +3,12 @@ import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import React from 'react'
 import { format } from 'date-fns'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import { getBgColor, getBorderColor } from '@/lib/Chat/chat.utils'
+import { getAvatarBorderColor, getMessageBgColor } from '@/lib/Chat/chat.utils'
 
 interface MessageProps {
     message: Message
     picture: string
-	role: string
+    role: string
 }
 
 const SelfMessage: React.FC<MessageProps> = ({ message, picture, role }) => {
@@ -23,15 +23,14 @@ const SelfMessage: React.FC<MessageProps> = ({ message, picture, role }) => {
                     <div id="photo+message" className="flex gap-[20px]">
                         <div
                             id="message"
-							
-                            className={`${getBgColor(role)} p-[8px] rounded-[12px] break-words max-w-[425px]`}
+                            className={`${getMessageBgColor(role)} p-[8px] rounded-[12px] break-words max-w-[425px]`}
                         >
                             <p>{message.content}</p>
                         </div>
                         <div className="flex items-center">
                             <Avatar className="w-[48px] h-[48px]">
                                 <AvatarImage
-                                    className={`border-[3px] ${getBorderColor(role)} rounded-full object-cover w-[40px] h-[40px]`}
+                                    className={`border-[3px] ${getAvatarBorderColor(role)} rounded-full object-cover w-[40px] h-[40px]`}
                                     src={picture}
                                 />
                                 <AvatarFallback>{Pingu}</AvatarFallback>

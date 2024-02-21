@@ -38,7 +38,10 @@ module.exports = {
 				'5xl': '3rem',      // 5X Large
 			},
 			colors: {
+				customBlue: "#C1E2F7",
+				customLightGreen: "#A0F4C7",
 				customLightBlue: "#F1F8FD",
+				customLightYellow: "#FFE6AF",
         		customDarkBlue: "#45A0E3",
         		customYellow: "#F5BC41",
 				customGreen: "#14AE5C",
