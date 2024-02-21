@@ -4,31 +4,35 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
-import { Photo42 } from '@/assets/avatarAssociation'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import UserAvatar from '../userAvatar/UserAvatar'
 import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
-import AvatarImg from '../userAvatar/AvatarImg'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import SetProfileForm from '@/components/Auth/SetProfileForm'
+import { useQuery } from '@tanstack/react-query'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
 export default function UserActionsBtns() {
     // const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
-    const param = useParams()
-
-    const initialAvatar = Photo42(param.id as string)
-    const [selectedAvatar, setSelectedAvatar] = useState<string>(
-        initialAvatar.imageProfile
-    )
-    function handleChangeImage() {
-        return ''
+    const {
+        data: currentUser,
+        isError,
+        isLoading,
+    } = useQuery({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
+    if (isError) {
+        return <div>Error</div>
     }
+    if (isLoading) {
+        return <div>Loading...</div>
+    }
+
+    const initialAvatar = currentUser?.avatar
 
     // const handleResize = () => {
     //     setIsMobile(window.innerWidth < 900)
@@ -43,11 +47,12 @@ export default function UserActionsBtns() {
     //         window.removeEventListener('resize', handleResize)
     //     }
     // }, [])
+    const navigate = useNavigate()
 
     return (
         <div
             id="Buttons"
-            className={`w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px]`}
+            className={`w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar`}
         >
             <Dialog>
                 <DialogTrigger asChild>
@@ -62,35 +67,11 @@ export default function UserActionsBtns() {
                             Make changes to your profile here.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="flex items-center flex-col gap-4 py-4">
-                        <div className="w-[80%]">
-                            <UserAvatar selectedAvatar={selectedAvatar} />
-                        </div>
-                        <div className="flex flex-col w-full max-w-sm items-start gap-2">
-                            <Label htmlFor="username" className="text-right">
-                                Username
-                            </Label>
-                            <Input
-                                id="username"
-                                defaultValue="42login"
-                                placeholder="42login"
-                                className="col-span-3"
-                            />
-                            <AvatarImg
-                                onSelect={(selectedImage) =>
-                                    setSelectedAvatar(selectedImage)
-                                }
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            onClick={() => handleChangeImage()}
-                            type="submit"
-                        >
-                            Save changes
-                        </Button>
-                    </DialogFooter>
+                    <SetProfileForm
+                        submitButtonText="I'm ready to noot"
+                        currentAvatar={initialAvatar || ''}
+                        onClose={() => navigate('/profile/me')}
+                    />
                 </DialogContent>
             </Dialog>
             <Button

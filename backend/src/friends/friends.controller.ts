@@ -41,7 +41,7 @@ export class FriendsController {
 	}
 
 	@Get('/me/pending')
-	getMyPendings(@Param() params: {friendId:string}){
-		return this.friendsService.getPendingInvitations(params.friendId)
+	getMyPendings(@User() user){
+		return this.friendsService.getPendingInvitations(user.id)
 	}
 }

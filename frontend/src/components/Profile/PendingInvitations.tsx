@@ -4,41 +4,31 @@ import { useQuery } from '@tanstack/react-query'
 import UserCards from '../User/userCards/UserCards'
 
 export default function PendingInvitations() {
-    const {
-        data: friendInvites,
-        isLoading,
-        isError,
-    } = useQuery<FriendData[]>({
+    const { data: friendInvites } = useQuery<FriendData[]>({
         queryKey: ['pending'],
         queryFn: getPendingInvitations,
     })
-    if (isError) {
-        return <div>Error</div>
-    }
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
-
     return (
         <div>
-            <h2 className="p-[20px] text-gray-500">Pending Invitations</h2>
-            {/* <div>
-                {friendInvites ? (
-                    friendInvites.map((friend: FriendData) => (
+            {friendInvites && friendInvites.length > 0 ? (
+                friendInvites.map((friend: FriendData) => (
+                    <div key={friend.id}>
+                        <h2 className="p-[20px] text-gray-500">
+                            Pending Invitations
+                        </h2>
                         <UserCards
-                            id={friend.id.toString()}
-                            key={friend.id}
+                            id={friend.id}
                             bgColor="white"
                             userName={friend.name}
-                            userPicture={friend.avatar || ""}
+                            userPicture={friend.avatar || ''}
                             userStatus=""
                             variant="USER_PROFILE"
                         />
-                    ))
-                ) : (
-                    <div>No pending friend invitations</div>
-                )}
-            </div> */}
+                    </div>
+                ))
+            ) : (
+                <div>No pending friend invitations</div>
+            )}
         </div>
     )
 }

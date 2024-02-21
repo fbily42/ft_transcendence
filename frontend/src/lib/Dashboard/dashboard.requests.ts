@@ -22,7 +22,7 @@ export async function getOtherUser(pseudo: string): Promise<UserData> {
     return response.data
 }
 
-export async function getUsers(): Promise<UserData> {
+export async function getUsers(): Promise<UserData[]> {
     const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/user/all`,
         {
@@ -107,6 +107,16 @@ export async function getFriendRequest() {
 export async function getPendingInvitations() {
     const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/friends/me/pending`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function acceptFriend(friendId: string) {
+    const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/accept/${friendId}`, {},
         {
             withCredentials: true
         }

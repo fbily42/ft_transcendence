@@ -2,22 +2,17 @@
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
-import { getMyFriends, getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
-// import { useParams } from 'react-router-dom'
-import FriendsList from '@/components/Profile/FriendsList'
 import FriendRequest from '@/components/Profile/FriendRequest'
 import PendingInvitations from '@/components/Profile/PendingInvitations'
+import MyFriendList from '@/components/Profile/MyFriendList'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
-    // const param = useParams()
-    const { data: friends } = useQuery({
-        queryKey: ['myFriends'],
-        queryFn: () => getMyFriends(),
-    })
+
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
     }
@@ -40,11 +35,11 @@ function Profile() {
         return <div>Loading...</div>
     }
 
-    const selectedAvatar = data?.photo42
+    const selectedAvatar = data?.avatar
 
     return (
         <div
-            className={`flex ${isMobile ? 'flex-col h-screen overflow-y-auto' : 'justify-between'} pl-[102px] md:pl-[112px] lg:pl-[122px] pb-[36px] pr-[16px] md:pr-[26px] lg:pr-[36px] h-[90vh] gap-[16px] md:gap-[26px] lg:gap-[36px]`}
+            className={`flex ${isMobile ? 'flex-col h-screen no-scrollbar' : 'justify-between'} pl-[102px] md:pl-[112px] lg:pl-[122px] pb-[36px] pr-[16px] md:pr-[26px] lg:pr-[36px] h-[90vh] gap-[16px] md:gap-[26px] lg:gap-[36px]`}
         >
             <div
                 id="User infos"
@@ -90,17 +85,10 @@ function Profile() {
                 </div>
                 <FriendRequest />
                 <PendingInvitations />
-                <FriendsList friends={friends} />
+                <MyFriendList />
             </div>
         </div>
     )
 }
 
 export default Profile
-
-// <div>
-//     <SetUp2FAModal
-//         open={openSetUp2FA}
-//         onClose={() => {setOpenSetUp2FA(false)}}
-//     />
-// </div>

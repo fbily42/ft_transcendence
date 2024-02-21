@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FriendData } from './types/friend.types';
 
@@ -25,14 +25,14 @@ export class FriendsService {
 					select:{
 						id:true,
 						name:true,
-						photo42:true,
+						avatar:true,
 					}
 				},
 				friend:{
 					select:{
 						id:true,
 						name:true,
-						photo42:true,
+						avatar:true,
 					}
 				}
 			}
@@ -65,47 +65,15 @@ export class FriendsService {
 				}
 			}
 		})
-		const friendRequest: FriendData[] = friends.friends.map(friendData => ({
-			id: friendData.userId,
-			name: friendData.user.name,
-			avatar: friendData.user.avatar,
-			accepted: friendData.accepted,
-		}))
+		const friendRequest: FriendData[] = friends.friends
+			.filter(friendData => !friendData.accepted)
+    		.map(friendData => ({
+        		id: friendData.user.id,
+        		name: friendData.user.name,
+        		avatar: friendData.user.avatar,
+        		accepted: friendData.accepted,
+    	}))
 		return friendRequest
-		// const friends = await this.prisma.friendShip.findMany({
-		// 	where: {
-		// 		OR:[
-		// 			{
-		// 				friendId: userId
-		// 			},{
-		// 				userId: userId
-		// 			}
-		// 		],
-		// 		accepted:false,
-		// 	},
-		// 	include:{
-		// 		user:{
-		// 			select:{
-		// 				id:true,
-		// 				name:true,
-		// 				photo42:true,
-		// 			}
-		// 		},
-		// 		friend:{
-		// 			select:{
-		// 				id:true,
-		// 				name:true,
-		// 				photo42:true,
-		// 			}
-		// 		}
-		// 	}
-		// })
-		// const test = friends.map((friend) => {
-		// 	if (friend.friendId === userId)
-		// 		return friend.user;
-		// 	return friend.friend;
-		// })
-		// return test;
 	}
 
 	async getPendingInvitations(userId: string) : Promise<FriendData[]> {
@@ -129,13 +97,14 @@ export class FriendsService {
 			}
 		})
 	
-		const sentInvitations: FriendData[] = user.friendship.map(friendData => ({
-			id: friendData.friend.id,
-			name: friendData.friend.name,
-			avatar: friendData.friend.avatar,
-			accepted: friendData.accepted,
-		}))
-	
+		const sentInvitations: FriendData[] = user.friendship
+			.filter(friendData => !friendData.accepted)
+    		.map(friendData => ({
+        		id: friendData.friend.id,
+        		name: friendData.friend.name,
+        		avatar: friendData.friend.avatar,
+        		accepted: friendData.accepted,
+    	}))
 		return sentInvitations
 	}
 

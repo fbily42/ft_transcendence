@@ -1,6 +1,6 @@
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
-import { getFriends, getUserById } from '@/lib/Dashboard/dashboard.requests'
+import { getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
@@ -8,17 +8,13 @@ import { useParams } from 'react-router-dom'
 import FriendsList from '@/components/Profile/FriendsList'
 import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 import { Button } from '@/components/ui/button'
-import { directMessage } from '@/lib/Chat/chat.utils'
+// import { directMessage } from '@/lib/Chat/chat.utils'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
     const param = useParams()
-    const { data: friends } = useQuery({
-        queryKey: ['userFriend', param.id],
-        queryFn: () => getFriends(param.id!),
-    })
-	  const socket = useWebSocket() as WebSocketContextType;
+    const socket = useWebSocket() as WebSocketContextType
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
     }
@@ -41,15 +37,15 @@ function Profile() {
         return <div>Loading...</div>
     }
 
-    const selectedAvatar = data?.photo42
+    const selectedAvatar = data?.avatar
 
-	function directMessage(name: string) {
-		socket.webSocket?.emit('privateMessage', name)
-	}
+    function directMessage(name: string) {
+        socket.webSocket?.emit('privateMessage', name)
+    }
 
     return (
         <div
-            className={`flex ${isMobile ? 'flex-col h-screen overflow-y-auto' : 'justify-between'} pl-[102px] md:pl-[112px] lg:pl-[122px] pb-[36px] pr-[16px] md:pr-[26px] lg:pr-[36px] h-[90vh] gap-[16px] md:gap-[26px] lg:gap-[36px]`}
+            className={`flex ${isMobile ? 'flex-col h-screen no-scrollbar' : 'justify-between'} pl-[102px] md:pl-[112px] lg:pl-[122px] pb-[36px] pr-[16px] md:pr-[26px] lg:pr-[36px] h-[90vh] gap-[16px] md:gap-[26px] lg:gap-[36px]`}
         >
             <div
                 id="User infos"
@@ -75,7 +71,6 @@ function Profile() {
                         >
                             <UserScoreCard />
                             <UserStatsCard />
-                            {/* <UserActionsBtns /> */}
                             <OtherActionsBtns />
                         </div>
                     </div>
@@ -84,7 +79,9 @@ function Profile() {
                     id="User bottom info"
                     className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
                 >
-                    <Button onClick={() => directMessage(data?.name!)}>CHAT WITH ME</Button>
+                    <Button onClick={() => directMessage(data?.name!)}>
+                        CHAT WITH ME
+                    </Button>
                 </div>
             </div>
             <div
@@ -96,17 +93,10 @@ function Profile() {
                         Noot Friends
                     </h1>
                 </div>
-                <FriendsList friends={friends} />
+                <FriendsList />
             </div>
         </div>
     )
 }
 
 export default Profile
-
-// <div>
-//     <SetUp2FAModal
-//         open={openSetUp2FA}
-//         onClose={() => {setOpenSetUp2FA(false)}}
-//     />
-// </div>
