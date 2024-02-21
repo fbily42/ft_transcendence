@@ -23,6 +23,7 @@ function GameForm({ closeDialog }) {
     const [loading, setLoading] = useState(false)
     const currentRoom = useRef<string | null>(null)
     const processingMessage = useRef(false)
+    const [isPreselected, setIsPreselected] = useState(false)
 
     // const [results, setResults] = useState([]);
 
@@ -56,12 +57,12 @@ function GameForm({ closeDialog }) {
     }
     const navigate = useNavigate()
     useEffect(() => {
-
         //mettre fin au matchmaking des qu'il ferme le modal
         if (socket) {
             if (loading) {
                 const roomName: string = generateUniqueRoomId()
                 currentRoom.current = roomName
+                socket.webSocket?.emit('JoinRoom', roomName)
                 socket.webSocket?.on('JoinParty', (message: string) => {
                     let words = message.split(' ')
                     let lastWord = words[words.length - 1]
@@ -69,34 +70,20 @@ function GameForm({ closeDialog }) {
                         processingMessage.current = true
                         closeDialog()
                         navigate('/pong')
-                        // console.log('join :', lastWord);//faire rejoindre la partie
-                    } else if (message.startsWith('You have created')) {
-
-                        // closeDialog()
-                        // processingMessage.current = true;
-                    }
-                    if (message.startsWith('Ready')) {
-
-                        //possiblement faire un emit pour ensuite pouvoir le recuperer dans le game pour avoir le nom de la room
+                    } else if (message.startsWith('Go')) {
                         processingMessage.current = true
                         closeDialog()
                         navigate('/pong')
-                        // console.log('Start the Game');//faire rejoindre la partie
                     } else return //error
-                    // setMatchmaking(true)
-
                 })
-                socket.webSocket?.emit('JoinRoom', roomName)
             } else if (currentRoom.current) {
                 socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
             }
-            // socket.emit('JoinRoom', roomName);
         }
         //verifier qu'il y a une personne en ligne au moins autre que le client
         // socket.emit('game invitation random');
-        // setMatchmaking(false)
+
         return () => {
-            // setLoading(false)
             socket?.webSocket?.off('JoinParty')
 
             if (loading && !processingMessage.current) {
@@ -108,16 +95,14 @@ function GameForm({ closeDialog }) {
     async function handleMatchmaking(event: any) {
         event.preventDefault() //a quoi cela sert
         if (!loading) {
-
             setLoading(true)
         } else {
-
             setLoading(false)
         }
     }
 
     return (
-        <div className=" p-5">
+        <div className=" p-5 bg-blue-800 ">
             <div className="fixed-0 ">
                 <img
                     src={pingu_duo}
@@ -156,14 +141,30 @@ function GameForm({ closeDialog }) {
 					<li key={index}>{result}</li>
 				))}
 			</ul> */}
-            <div className="mb-[20px] bg-blue-300" style={{ height: '50%' }}>
+            <div className="mb-[20px] " style={{ height: '50%' }}>
                 <p className="mb-[14px]">Or find a random player </p>
-                <form onSubmit={handleMatchmaking}>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        if (!isPreselected) setIsPreselected(true)
+                        else setIsPreselected(false)
+                    }}
+                >
                     <button
-                        className="w-full flex justify-center border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 mb-4"
+                        className="w-full flex justify-center border-2  border-black rounded-xl p-2 pr-2 mb-4" //border-blue-500
                         type="submit"
                     >
-                        {loading ? 'Matchmaking...(just wait)' : 'Submit'}
+                        {isPreselected ? 'click on next' : 'Submit'}
+                    </button>
+                </form>
+            </div>
+            <div className="">
+                <form onSubmit={handleMatchmaking}>
+                    <button
+                        className="absolute bottom-0 right-0 border-2  border-blue-500 rounded-xl " //border-blue-500
+                        type="submit"
+                    >
+                        Next
                     </button>
                 </form>
             </div>

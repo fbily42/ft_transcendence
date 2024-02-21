@@ -20,7 +20,7 @@ export class GameStats {
 			dx: 1,
 			dy: 1,
 			rad: 40,
-			speed: 4,//15
+			speed: 1,//15
 			last : 0,
 		}
 		this.paddleOne = {

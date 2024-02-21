@@ -144,6 +144,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('JoinRoom')
 	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
+		console.log('JoinRoomEvent : ', client.id)
 		try{
 			for (let [key, value] of this.gamesRoom)
 			{
@@ -154,28 +155,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				// 	if (stringcount === 2)
 				// 		break;
 				// }
-				if (value.length < 2)
+				if (value.length == 1)
 				{
-					if (value[0].websocket != client.id && value[0].id != client.data.userId)
+					if (value[0].websocket != client.id && value[0].id != client.data.userName)
 					{
 						client.join(key);
+						console.log(`room joined : ${key}`)
 						let array = this.gamesRoom.get(key);
-						array.push({id:client.data.userId , websocket: client.id });
+						array.push({id:client.data.userName , websocket: client.id });
 						this.gamesRoom.set(key, array);
 						this.server.to(client.id).emit('JoinParty', `You have joined room : ${key}`)
+						this.server.to(value[0].websocket).emit('JoinParty', 'Go');
 						// console.log("nom de la room", key);
+						console.log("websocket : ", value[0].websocket, value[1].websocket, client.id, key)
 						this.server.to(key).emit('Ready', key);
-						this.server.to(value[0].websocket).emit('JoinParty', 'Ready');
+						// this.server.to(value[0].websocket).emit('Ready', key);
+						// this.server.to(value[1].websocket).emit('Ready', key);
+						// this.server.to(client.id).emit('Ready', key);
 						return ;
 	
 					}
-					else
-						return;
 				}
 			}
-			this.gamesRoom.set(room, [{id: client.data.userId, websocket: client.id}]);
+			this.gamesRoom.set(room, [{id: client.data.userName, websocket: client.id}]);
 			client.join(room);
-			// console.log(`room : ${room}`)
+			console.log(`room created : ${room}`)
 			this.server.to(client.id).emit('JoinParty', `You have created a room : ${room}`);
 			return ;
 
@@ -192,13 +196,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		try{
 
 			if (this.gamesInfo.has(room)){
-				// console.log('la data existe');
+				console.log('la data existe');
+				
 				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
 			}
-			else{
+			else {
 				this.gamesInfo.set(room, new GameStats());
+				console.log('la data est cree');
 				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
 			}
+
 		}
 		catch(error)
 		{
@@ -211,23 +218,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
+			if(this.gamesInfo.has(room))
+			{
 
-			// const now = Date.now();
-			// const delay = 10;
-			let gameStats:GameStats = this.gamesInfo.get(room);
-			// if (now - gameStats.ball.last > delay)
-			// {
-				// gameStats.ball.last = now;
-				gameStats.ball.x += gameStats.ball.dx * gameStats.ball.speed;
-				gameStats.ball.y += gameStats.ball.dy * gameStats.ball.speed;
-				
-				gameStats.WallCollision();
-			// }
-			// gameStats.PaddleCollision(gameStats.paddleOne);
-			// gameStats.PaddleCollision(gameStats.paddleTwo);
-	
-			this.gamesInfo.set(room, gameStats);
-			this.server.to(room).emit('UpdateKey', gameStats);
+				// const now = Date.now();
+				// const delay = 10;
+				let gameStats:GameStats = this.gamesInfo.get(room);
+				// if (now - gameStats.ball.last > delay)
+				// {
+					// gameStats.ball.last = now;
+					gameStats.ball.x += gameStats.ball.dx * gameStats.ball.speed;
+					gameStats.ball.y += gameStats.ball.dy * gameStats.ball.speed;
+					
+					gameStats.WallCollision();
+				// }
+				// gameStats.PaddleCollision(gameStats.paddleOne);
+				// gameStats.PaddleCollision(gameStats.paddleTwo);
+		
+				this.gamesInfo.set(room, gameStats);
+				this.server.to(room).emit('UpdateKey', gameStats);
+			}
 		}
 		catch(error)
 		{
@@ -240,33 +250,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	endGame(@ConnectedSocket() client: Socket, @MessageBody() room:string)
 	{
 		try{
-			let gameStats:GameStats = this.gamesInfo.get(room);
-			let gamesRoom = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
-
-			for (let [key , value ] of this.gamesRoom)
+			if (this.gamesInfo.has(room))
 			{
-				if (key === room)
+
+				let gameStats:GameStats = this.gamesInfo.get(room);
+				let gamesRoom = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+	
+				for (let [key , value ] of this.gamesRoom)
 				{
-					if (gameStats.gameStatus.scoreOne === 10)
+					if (key === room)
 					{
-						console.log("who win: 1")
-						gameStats.gameStatus.winner = value[0].id
-						gameStats.gameStatus.looser = value[1].id
-						this.gamesInfo.set(room, gameStats);
-						this.server.to(key).emit('UpdateKey', gameStats);
-					}
-					else 
-					{
-						console.log("who win : 2")
-						gameStats.gameStatus.winner = value[1].id
-						gameStats.gameStatus.gameState = value[0].id
-						this.gamesInfo.set(room, gameStats);
-						this.server.to(key).emit('UpdateKey', gameStats);
-					}
-					//mettre a jour la db avant de tout delete
-					// this.gamesRoom.delete(room);
-					// this.gamesInfo.delete(room);
-				}	
+						if (gameStats.gameStatus.scoreOne === 10)
+						{
+							console.log("who win: 1")
+							gameStats.gameStatus.winner = value[0].id
+							console.log("le premier id :", value[0].id)
+							console.log("le premier websoket :", value[0].websocket)
+							gameStats.gameStatus.looser = value[1].id
+							console.log("le second id :" , value[1].id)
+							console.log("le second websocket :" ,  value[1].websocket)
+							this.gamesInfo.set(room, gameStats);
+							this.server.to(key).emit('UpdateKey', gameStats);
+						}
+						else if (gameStats.gameStatus.scoreTwo === 10)
+						{
+							console.log("who win : 2")
+							gameStats.gameStatus.winner = value[1].id
+							console.log("le premier id :", value[0].id)
+							console.log("le premier websoket :", value[0].websocket)
+							gameStats.gameStatus.looser = value[0].id
+							console.log("le second id :" , value[1].id)
+							console.log("le second websocket :" ,  value[1].websocket)
+							this.gamesInfo.set(room, gameStats);
+							this.server.to(key).emit('UpdateKey', gameStats);
+						}
+						//mettre a jour la db avant de tout delete
+						// this.gamesRoom.delete(room);
+						// this.gamesInfo.delete(room);
+					}	
+				}
 			}
 		} catch(error){
 			console.log(error)
@@ -378,47 +400,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	UpdateKey(@ConnectedSocket() client: Socket, @MessageBody() data: { key: string; roomId: string })
 	{
 		try {
+			if (this.gamesInfo.has(data.roomId) && this.gamesRoom.has(data.roomId))
+			{
 
-			let gameStats:GameStats = this.gamesInfo.get(data.roomId)
-			let array = this.gamesRoom.get(data.roomId);
-			// if(array[0] == client.id)
-			// {
-	
-				if (data.key === "a") {
-					if ((gameStats.paddleOne.y - 10) > 0 )
-						gameStats.paddleOne.y -= 5;
-					}
-	
-				else if (data.key === "d") {
-					if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
-					{
-						gameStats.paddleOne.y += 5;
-					}
-				}
-				// else
-				// 	return;
-	
-			// }
-			// if(array[1] == client.id)
-			// {
-				if (data.key === "ArrowUp" ) {
-					if ((gameStats.paddleTwo.y - 10) > 0 )
-						gameStats.paddleTwo.y -= 5;
-					}
+				let gameStats:GameStats = this.gamesInfo.get(data.roomId)
+				let array = this.gamesRoom.get(data.roomId);
+				// if(array[0] == client.id)
+				// {
 		
-				else if (data.key === "ArrowDown") {
-					if ((gameStats.paddleTwo.y + 10 + 60) < gameStats.canvas.height )
-					{
-						gameStats.paddleTwo.y += 5;
+					if (data.key === "a") {
+						if ((gameStats.paddleOne.y - 10) > 0 )
+							gameStats.paddleOne.y -= 5;
+						}
+		
+					else if (data.key === "d") {
+						if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
+						{
+							gameStats.paddleOne.y += 5;
+						}
 					}
-				}
-				// else
-				// return;
-	
-			// }
-	
-			this.gamesInfo.set(data.roomId, gameStats);
-			this.server.to(data.roomId).emit('UpdateKey', gameStats);
+					// else
+					// 	return;
+		
+				// }
+				// if(array[1] == client.id)
+				// {
+					if (data.key === "ArrowUp" ) {
+						if ((gameStats.paddleTwo.y - 10) > 0 )
+							gameStats.paddleTwo.y -= 5;
+						}
+			
+					else if (data.key === "ArrowDown") {
+						if ((gameStats.paddleTwo.y + 10 + 60) < gameStats.canvas.height )
+						{
+							gameStats.paddleTwo.y += 5;
+						}
+					}
+					// else
+					// return;
+		
+				// }
+		
+				this.gamesInfo.set(data.roomId, gameStats);
+				this.server.to(data.roomId).emit('UpdateKey', gameStats);
+			}
 		}
 		catch (error)
 		{

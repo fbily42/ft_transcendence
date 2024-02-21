@@ -53,10 +53,12 @@ export default function Board() {
         socket?.webSocket?.on('Ready', (room: string) => {
             const roomName = room
             setRoomName(roomName)
-
+            console.log('Ready')
             socket?.webSocket?.emit('CreateGameinfo', room)
         })
+        console.log('etape 4')
         socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
+            console.log('je suis mis a jour')
             setGameInfo(gameStats)
         })
         window.addEventListener('keydown', handleKeyDown)
@@ -64,10 +66,12 @@ export default function Board() {
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
             socket?.webSocket?.off('UpdateKey')
+            socket?.webSocket?.off('Ready')
             window.removeEventListener('keyup', handleKeyUp)
             socket?.webSocket?.emit('leaveRoom')
         }
-    }, [])
+    }, [socket])
+
     gameImages.image.img_ice_bottom.src = ice_bottom
     gameImages.image.img_ice.src = ice
     gameImages.image.img_fish.src = fish
@@ -76,19 +80,21 @@ export default function Board() {
     gameImages.image.img_pingu.src = pingu
     gameImages.image.img_pingu_score.src = pingu_score
     gameImages.image.img_grey_score.src = grey_score
-
     useEffect(() => {
+		let animationFrameId: number
         // imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
-        let animationFrameId: number
+        const canvas = canvasRef.current
+        if (!canvas) return
 
         const render = () => {
-            const canvas = canvasRef.current
-            if (canvas && gameInfo) {
+            console.log('etape 3', gameInfo)
+            const ctx = canvas.getContext('2d')
+            if (!ctx) return
+            if (gameInfo) {
                 gameInfo.paddleTwo.x = canvas?.width - 70
-                const ctx = canvas.getContext('2d')
-                if (!ctx) return
 
                 if (gameInfo.gameStatus.gameState === 'playing') {
+                    console.log('etape 2')
                     // if (img_fishRef.current)
                     // 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
                     ctx?.clearRect(0, 0, canvas.width, canvas.height)
@@ -141,24 +147,37 @@ export default function Board() {
                     }
                 } else if (gameInfo.gameStatus.gameState === 'finish') {
                     socket?.webSocket?.emit('endGame', roomName)
+                    console.log('finish')
                     console.log(
-                        'Winner: ',
-                        gameInfo.gameStatus.winner,"looser : ",gameInfo.gameStatus.looser
+                        'avant le if Winner: ',
+                        gameInfo.gameStatus.winner,
+                        'avant le looser : ',
+                        gameInfo.gameStatus.looser
                     )
-                    cancelAnimationFrame(animationFrameId)
+                    if (gameInfo.gameStatus.winner) {
+                        console.log(
+                            'Winner: ',
+                            gameInfo.gameStatus.winner,
+                            'looser : ',
+                            gameInfo.gameStatus.looser
+                        )
+
+                        cancelAnimationFrame(animationFrameId)
+                    }
                     // return //mettre le modal victoire joueur 1 et defaite joueur 2
                 }
             }
             animationFrameId = requestAnimationFrame(render)
         }
         render()
+        // requestAnimationFrame(render)
         return () => {
             // socket?.webSocket?.emit('leaveRoom', roomName) // faire un autre else if gameInfo.gameStatus.gameState === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
             // window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationFrameId)
         }
         // }
-    })
+    }, [Date.now()])
 
     return (
         <canvas id="canvas_pong" ref={canvasRef} height={1600} width="1600px" />

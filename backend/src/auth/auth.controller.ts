@@ -336,12 +336,10 @@ export class AuthController {
 	async refreshToken(@Req() req: Request, @Res() res: Response) {
 		try {
 			const token_refresh = req.cookies['jwt_refresh'] as string;
-			const token = req.cookies['jwt'] as string;
 			res.clearCookie('jwt', { path: '/' });
 
 			const signNewToken: string = await this.authService.refreshTheToken(
-				token_refresh,
-				token,
+				token_refresh
 			);
 			res.cookie('jwt', signNewToken, {
 				path: '/',
