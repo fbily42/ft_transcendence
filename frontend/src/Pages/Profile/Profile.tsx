@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 // import { useParams } from 'react-router-dom'
 import FriendsList from '@/components/Profile/FriendsList'
 import FriendRequest from '@/components/Profile/FriendRequest'
+import PendingInvitations from '@/components/Profile/PendingInvitations'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -88,6 +89,7 @@ function Profile() {
                     </h1>
                 </div>
                 <FriendRequest />
+                <PendingInvitations />
                 <FriendsList friends={friends} />
             </div>
         </div>

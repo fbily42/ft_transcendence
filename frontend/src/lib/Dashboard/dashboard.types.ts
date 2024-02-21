@@ -1,7 +1,8 @@
 export type FriendData = {
     id: string
     name: string
-    avatar?: string
+    avatar: string
+    accepted: boolean
     status: string
 }
 

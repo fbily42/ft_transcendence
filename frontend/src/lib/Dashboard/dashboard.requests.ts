@@ -93,3 +93,23 @@ export async function getMyFriends() {
     )
     return response.data
 }
+
+export async function getFriendRequest() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/me/request`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function getPendingInvitations() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/me/pending`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
