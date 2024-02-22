@@ -88,15 +88,7 @@ export function Photo42() {
         queryFn: getUserMe,
     })
 
-    const result: {
-        id: string
-        imageProfile: string
-        imageBackground: string | undefined
-    } = {
-        id: '775346546564',
-        imageProfile: data?.photo42 || '',
-        imageBackground: data?.photo42 || '',
-    }
+    const result: string = data?.photo42 || ''
 
     return result
 }

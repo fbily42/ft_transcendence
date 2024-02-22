@@ -35,8 +35,13 @@ export class FriendsController {
 		return this.friendsService.getFriends(user.id)
 	}
 
-	@Get('/me/invite')
+	@Get('/me/request')
 	getMyInvitation(@User() user){
-		return this.friendsService.getInvite(user.id)
+		return this.friendsService.getFriendRequest(user.id)
+	}
+
+	@Get('/me/pending')
+	getMyPendings(@User() user){
+		return this.friendsService.getPendingInvitations(user.id)
 	}
 }

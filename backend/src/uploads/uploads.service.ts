@@ -6,18 +6,20 @@ import { User } from '@prisma/client';
 export class UploadsService {
 	constructor(private prisma: PrismaService) {}
 
-	async setProfile(file: Express.Multer.File, url: string, pseudo: string, req: Request) {
+	async setProfile(file: Express.Multer.File | undefined, url: string | undefined, pseudo: string, req: Request) {
 		try{
 			//check if pseudo already exists
-			const pseudoExists : boolean = await this.pseudoExists(pseudo);
+			const pseudoExists : boolean = await this.pseudoExists(pseudo, req['userID']);
 			if (pseudoExists){
 				throw new HttpException('Pseudo already used', HttpStatus.CONFLICT)
 			}
 
 			//updates
 			let avatar;
-			if (file)
-				avatar = file.buffer.toString('base64')
+
+			if (file) {
+				avatar = "data:image/svg+xml;base64," + file.buffer.toString('base64')
+			}
 			else
 				avatar = url
 
@@ -36,14 +38,14 @@ export class UploadsService {
 		}
 	}
 
-	async pseudoExists(pseudo: string) {
+	async pseudoExists(pseudo: string, id: string) {
 		try {
 			const user: User = await this.prisma.user.findUnique({
 				where:{
 					pseudo: pseudo,
 				}
 			});
-			if (user)
+			if (user && user.id != id)
 				return (true);
 			else
 				return (false)

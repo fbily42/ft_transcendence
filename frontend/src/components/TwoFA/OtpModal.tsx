@@ -8,8 +8,6 @@ type OtpModalProps = {
     open: boolean
     uuid: string
     onClose: () => void
-    redirect: string
-    verify: boolean
 }
 
 type TokenData = {
@@ -41,7 +39,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ open, uuid, onClose }) => {
             )
             if (response.status === 202) {
                 navigate('/')
-			}
+            }
         } catch (error) {
             if (error.response.status === 401)
                 setIsTokValid('Token is not valid')

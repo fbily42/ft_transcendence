@@ -1,35 +1,33 @@
-import { getFriendRequest } from '@/lib/Dashboard/dashboard.requests'
+import { getPendingInvitations } from '@/lib/Dashboard/dashboard.requests'
 import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
 import UserCards from '../User/userCards/UserCards'
-import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 
-export default function FriendRequest() {
-    const { data: friendRequest } = useQuery<FriendData[]>({
-        queryKey: ['request'],
-        queryFn: getFriendRequest,
+export default function PendingInvitations() {
+    const { data: friendInvites } = useQuery<FriendData[]>({
+        queryKey: ['pending'],
+        queryFn: getPendingInvitations,
     })
-
     return (
         <div>
-            {friendRequest && friendRequest.length > 0 ? (
-                friendRequest.map((friend: FriendData) => (
+            {friendInvites && friendInvites.length > 0 ? (
+                friendInvites.map((friend: FriendData) => (
                     <div key={friend.id}>
                         <h2 className="p-[20px] text-gray-500">
-                            Friend Request
+                            Pending Invitations
                         </h2>
                         <UserCards
                             id={friend.id}
                             bgColor="white"
                             userName={friend.name}
-                            userPicture={friend.avatar || PinguAvatar}
+                            userPicture={friend.avatar || ''}
                             userStatus=""
                             variant="OTHER"
                         />
                     </div>
                 ))
             ) : (
-                <div>No pending friend requests</div>
+                <div>No pending friend invitations</div>
             )}
         </div>
     )

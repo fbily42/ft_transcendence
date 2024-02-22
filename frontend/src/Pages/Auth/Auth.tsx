@@ -24,7 +24,7 @@ function Auth(): JSX.Element {
                 setIsAuth(true)
                 setIsProfileSet(true)
             } catch (error) {
-                if (error.response.status == 404) {
+                if (error.response.status == 401) {
                     setIsProfileSet(false)
                     setIsAuth(true)
                 } else {

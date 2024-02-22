@@ -1,23 +1,19 @@
+import { getMyFriends, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
-import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
-import UserCards from '../User/userCards/UserCards'
-import { Skeleton } from '../ui/skeleton'
-import { getFriends, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
+import UserCards from '../User/userCards/UserCards'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import { useParams } from 'react-router-dom'
+import { Skeleton } from '../ui/skeleton'
+// import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 
-export default function FriendsList() {
-    const param = useParams()
-
-    const { data, isLoading, isError } = useQuery<UserData[]>({
+export default function MyFriendList() {
+    const { data } = useQuery<UserData[]>({
         queryKey: ['users'],
         queryFn: getUsers,
     })
-
-    const { data: friends } = useQuery({
+    const { data: myFriends } = useQuery<FriendData[]>({
         queryKey: ['userFriend'],
-        queryFn: () => getFriends(param.id!),
+        queryFn: getMyFriends,
     })
 
     const webSocket = useWebSocket() as WebSocketContextType
@@ -33,13 +29,7 @@ export default function FriendsList() {
         }
         return friendStatus
     }
-
-    if (isError) {
-        return <div>Error</div>
-    }
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
+    console.log(myFriends)
 
     return (
         <div>
@@ -48,11 +38,11 @@ export default function FriendsList() {
                 {data ? (
                     data.map((data: UserData) => (
                         <UserCards
-                            id={data.id.toString()}
+                            id={data.id}
                             key={data.id}
                             bgColor="white"
                             userName={data.pseudo}
-                            userPicture={data.avatar || PinguAvatar}
+                            userPicture={data.avatar!}
                             userStatus={getStatus(data.name)}
                             variant="OTHER"
                         />
@@ -69,16 +59,16 @@ export default function FriendsList() {
             </div>
             <h2 className="p-[20px] text-gray-500">Friends</h2>
             <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {friends ? (
-                    friends.map((friend: FriendData) => (
+                {myFriends ? (
+                    myFriends.map((friend: FriendData) => (
                         <UserCards
-                            id={friend.id.toString()}
+                            id={friend.id}
                             key={friend.id}
                             bgColor="white"
                             userName={friend.pseudo}
-                            userPicture={friend.avatar || PinguAvatar}
+                            userPicture={friend.avatar!}
                             userStatus={getStatus(friend.name)}
-                            variant="OTHER"
+                            variant="FRIEND"
                         />
                     ))
                 ) : (

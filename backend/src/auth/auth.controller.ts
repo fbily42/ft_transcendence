@@ -88,7 +88,6 @@ export class AuthController {
 			}
 			res.redirect(`${process.env.FRONTEND_URL}`);
 		} catch (error) {
-			console.log(error);
 			res.redirect(`${process.env.FRONTEND_URL}/auth`);
 			throw error;
 		}
@@ -115,8 +114,8 @@ export class AuthController {
 					message: 'User profile is set',
 				});
 			} else {
-				res.status(HttpStatus.NOT_FOUND).send({
-					status: 'NOT FOUND',
+				res.status(HttpStatus.UNAUTHORIZED).send({
+					status: 'NOT SET',
 					message: 'User profile is not set',
 				});
 			}

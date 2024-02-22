@@ -1,14 +1,12 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { FriendData } from './types/friend.types';
 
 @Injectable()
 export class FriendsService {
 	constructor(
 		private prisma:PrismaService,
 	) {}
-
-	// Todo: get Friends
-	// Todo: get Invitations
 
 	async getFriends(friendId: string) {
 		const friends = await this.prisma.friendShip.findMany({
@@ -27,14 +25,16 @@ export class FriendsService {
 					select:{
 						id:true,
 						name:true,
-						photo42:true,
+						avatar:true,
+						pseudo: true,
 					}
 				},
 				friend:{
 					select:{
 						id:true,
 						name:true,
-						photo42:true,
+						avatar:true,
+						pseudo: true,
 					}
 				}
 			}
@@ -47,41 +47,71 @@ export class FriendsService {
 		return test;
 	}
 
-	async getInvite(friendId: string) {
-		const friends = await this.prisma.friendShip.findMany({
+	async getFriendRequest(userId: string) : Promise<FriendData[]> {
+
+		const friends = await this.prisma.user.findUnique({
 			where: {
-				OR:[
-					{
-						friendId: friendId
-					},{
-						userId: friendId
-					}
-				],
-				accepted:false,
+				id: userId,
 			},
-			include:{
-				user:{
-					select:{
-						id:true,
-						name:true,
-						photo42:true,
-					}
-				},
-				friend:{
-					select:{
-						id:true,
-						name:true,
-						photo42:true,
+			select: {
+				friends: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								avatar: true,
+								pseudo: true,
+							}
+						},
 					}
 				}
 			}
 		})
-		const test = friends.map((friend) => {
-			if (friend.friendId === friendId)
-				return friend.user;
-			return friend.friend;
+		const friendRequest: FriendData[] = friends.friends
+			.filter(friendData => !friendData.accepted)
+    		.map(friendData => ({
+        		id: friendData.user.id,
+        		name: friendData.user.name,
+        		avatar: friendData.user.avatar,
+				pseudo: friendData.user.pseudo,
+        		accepted: friendData.accepted,
+    	}))
+		return friendRequest
+	}
+
+	async getPendingInvitations(userId: string) : Promise<FriendData[]> {
+
+		const user = await this.prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+			select: {
+				friendship: {
+					include: {
+						friend: {
+							select: {
+								id: true,
+								name: true,
+								avatar: true,
+								pseudo: true,
+							}
+						},
+					}
+				}
+			}
 		})
-		return test;
+	
+		const sentInvitations: FriendData[] = user.friendship
+			.filter(friendData => !friendData.accepted)
+    		.map(friendData => ({
+        		id: friendData.friend.id,
+        		name: friendData.friend.name,
+        		avatar: friendData.friend.avatar,
+				pseudo: friendData.friend.pseudo,
+        		accepted: friendData.accepted,
+    	}))
+		return sentInvitations
 	}
 
 	async addNewFriend(userId:string, friendId:string) {
