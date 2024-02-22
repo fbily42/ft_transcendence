@@ -76,17 +76,15 @@ export default function OtherActionsBtns() {
             )}
             {isFriend && (
                 <>
-                    <div>
-                        <Button>Private Message</Button>
-                    </div>
-                    <div>
+                    <div className="w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar">
+                        <Button>Send PM</Button>
                         <Button
                             variant={'destructive'}
                             onClick={() =>
                                 removeFriendMutation.mutate(param.id!)
                             }
                         >
-                            Remove Friend
+                            Remove
                         </Button>
                     </div>
                 </>

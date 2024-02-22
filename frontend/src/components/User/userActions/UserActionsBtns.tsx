@@ -57,7 +57,7 @@ export default function UserActionsBtns() {
             <Dialog>
                 <DialogTrigger asChild>
                     <Button className="w-full" variant={'default'}>
-                        Change Avatar
+                        Settings
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px] flex flex-col items-center">
