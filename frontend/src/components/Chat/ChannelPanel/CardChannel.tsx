@@ -130,7 +130,7 @@ const CardChannel: React.FC<CardChannel> = ({
                             <CardHeader className="w-full h-full flex justify-center p-0">
                                 <CardTitle>{getPseudo()}</CardTitle>
                                 <CardDescription>
-                                    {getUserStatus(socket, getPseudo())
+                                    {getUserStatus(socket, getDirectName(channelName, me?.name!))
                                         ? 'Online'
                                         : 'Offline'}
                                 </CardDescription>

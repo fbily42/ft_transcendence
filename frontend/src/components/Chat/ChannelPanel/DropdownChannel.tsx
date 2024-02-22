@@ -9,6 +9,7 @@ import {
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { DropdownChannelProps, LeaveChannelData } from '@/lib/Chat/chat.types'
 import { MoreHorizontal } from 'lucide-react'
+import LeaveChannel from './LeaveChannel'
 
 const DropdownChannel: React.FC<DropdownChannelProps> = ({
     userName,
@@ -37,11 +38,11 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
                     </DialogTrigger>
                     {role === 'owner' ? (
                         <DialogContent>
-                            Owner have to choose a new owner
+                            <LeaveChannel cmd={cmd} variant='Owner'></LeaveChannel>
                         </DialogContent>
                     ) : (
                         <DialogContent>
-                            You are about to leave this channel
+                            <LeaveChannel cmd={cmd} variant='Other'></LeaveChannel>
                         </DialogContent>
                     )}
                 </Dialog>
