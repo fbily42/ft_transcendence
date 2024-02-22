@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction } from "react"
 export type SetProfileFormprops = {
     submitButtonText: string
     currentAvatar: string
+    currentPseudo: string
 	onClose: () => void
 }
 

@@ -27,6 +27,7 @@ const SetProfile: React.FC<SetProfileprops> = ({ children }) => {
                 <SetProfileForm
                     submitButtonText="I'm ready to noot"
                     currentAvatar={Photo42()}
+                    currentPseudo=""
                     onClose={() => navigate('/')}
                 />
                 {children}
