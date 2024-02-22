@@ -25,6 +25,8 @@ import {
     PersonIcon,
 } from '@radix-ui/react-icons'
 import { CommandShortcut } from '../ui/command'
+import UserCards from '../User/userCards/UserCards'
+import SearchbarCards from '../User/userCards/SearchbarCards'
 
 export default function SecondNavbar(): JSX.Element {
     const navigate = useNavigate()
@@ -102,12 +104,20 @@ export default function SecondNavbar(): JSX.Element {
                 </div>
                 {isFocused && (
                     <div
-                        className="z-50 p-[20px] flex flex-col w-fit h-fit absolute top-full left-0 bg-white overflow-auto rounded-md border-input shadow-lg gap-[10px]"
+                        className="z-50 p-[20px] flex flex-col w-fit h-fit absolute top-full left-0 bg-white overflow-auto rounded-[36px] border-input shadow-lg gap-[10px]"
                         id="searchbar on focus"
                     >
                         {filteredUsers?.map((user) => (
-                            <div key={user.id}>{user.name}</div>
-                            // <CommandList></CommandList>
+                            // <div key={user.id}>{user.name}</div>
+                            <SearchbarCards
+                            id={user.id.toString()}
+                            key={user.id}
+                            bgColor="white"
+                            userName={user.name}
+                            userPicture={user.avatar}
+                            userStatus={''}
+                            variant="OTHER"
+                        />
                         ))}
                     </div>
                 )}

@@ -13,7 +13,7 @@ export default function MyFriendList() {
     })
     const { data: myFriends } = useQuery<FriendData[]>({
         queryKey: ['userFriend'],
-        queryFn: () => getMyFriends(),
+        queryFn: getMyFriends,
     })
 
     const webSocket = useWebSocket() as WebSocketContextType
@@ -29,7 +29,7 @@ export default function MyFriendList() {
         }
         return friendStatus
     }
-	console.log(myFriends)
+    console.log(myFriends)
 
     return (
         <div>
@@ -41,10 +41,10 @@ export default function MyFriendList() {
                             id={data.id}
                             key={data.id}
                             bgColor="white"
-                            userName={data.name}
+                            userName={data.pseudo}
                             userPicture={data.avatar!}
                             userStatus={getStatus(data.name)}
-                            variant="USER_PROFILE"
+                            variant="OTHER"
                         />
                     ))
                 ) : (
@@ -65,10 +65,10 @@ export default function MyFriendList() {
                             id={friend.id}
                             key={friend.id}
                             bgColor="white"
-                            userName={friend.name}
+                            userName={friend.pseudo}
                             userPicture={friend.avatar!}
                             userStatus={getStatus(friend.name)}
-                            variant="USER_PROFILE"
+                            variant="FRIEND"
                         />
                     ))
                 ) : (

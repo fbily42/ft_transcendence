@@ -4,12 +4,14 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuGroup,
+    DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { MoreHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 type DropdownCardProps = {
-    variant: 'USER_PROFILE' | 'CHAT'
+    variant?: 'FRIEND' | 'OTHER'
     id: string
 }
 
@@ -24,37 +26,36 @@ const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex flex-col gap-1">
-                <DropdownMenuItem asChild>
-                    <Button className="w-full">PLay Pingu</Button>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Button
-                        className="w-full"
-                        onClick={() => {
-                            navigate(`/profile/${id}`)
-                        }}
-                    >
-                        See Profile
-                    </Button>
-                </DropdownMenuItem>
-                {variant === 'USER_PROFILE' ? (
+                <DropdownMenuGroup>
+                    <DropdownMenuItem asChild>
+                        <div
+                            className="w-full"
+                            onClick={() => {
+                                navigate(`/profile/${id}`)
+                            }}
+                        >
+                            See Profile
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <div className="w-full">PLay Pingu</div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <div className="w-full">Chat</div>
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+
+                {variant === 'FRIEND' ? (
                     <>
-                        <DropdownMenuItem asChild>
-                            <Button className="w-full">Delete</Button>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Button className="w-full">Chat</Button>
-                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="" />
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem asChild>
+                                <div className="w-full">Remove</div>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
                     </>
                 ) : (
-                    <>
-                        <DropdownMenuItem asChild>
-                            <Button className="w-full">Kick</Button>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Button className="w-full">Ban</Button>
-                        </DropdownMenuItem>
-                    </>
+                    <></>
                 )}
             </DropdownMenuContent>
         </DropdownMenu>

@@ -26,6 +26,7 @@ export class FriendsService {
 						id:true,
 						name:true,
 						avatar:true,
+						pseudo: true,
 					}
 				},
 				friend:{
@@ -33,6 +34,7 @@ export class FriendsService {
 						id:true,
 						name:true,
 						avatar:true,
+						pseudo: true,
 					}
 				}
 			}
@@ -59,6 +61,7 @@ export class FriendsService {
 								id: true,
 								name: true,
 								avatar: true,
+								pseudo: true,
 							}
 						},
 					}
@@ -71,6 +74,7 @@ export class FriendsService {
         		id: friendData.user.id,
         		name: friendData.user.name,
         		avatar: friendData.user.avatar,
+				pseudo: friendData.user.pseudo,
         		accepted: friendData.accepted,
     	}))
 		return friendRequest
@@ -90,6 +94,7 @@ export class FriendsService {
 								id: true,
 								name: true,
 								avatar: true,
+								pseudo: true,
 							}
 						},
 					}
@@ -103,6 +108,7 @@ export class FriendsService {
         		id: friendData.friend.id,
         		name: friendData.friend.name,
         		avatar: friendData.friend.avatar,
+				pseudo: friendData.friend.pseudo,
         		accepted: friendData.accepted,
     	}))
 		return sentInvitations

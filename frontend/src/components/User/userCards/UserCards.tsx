@@ -9,6 +9,9 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import PinguAvatar from '../../../assets/empty-state/pingu-face.svg'
 import DropdownCard from './DropdownCard'
+import { useQuery } from '@tanstack/react-query'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 interface UserCards {
     id: string
@@ -16,7 +19,7 @@ interface UserCards {
     userName: string
     userStatus: string
     bgColor: string
-    variant: 'USER_PROFILE' | 'CHAT'
+    variant: 'FRIEND' | 'OTHER'
 }
 
 const UserCards: React.FC<UserCards> = ({
@@ -27,6 +30,11 @@ const UserCards: React.FC<UserCards> = ({
     variant,
     bgColor,
 }) => {
+    const { data: currentUser } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
+
     return (
         <div className="h-full w-full">
             <Card
@@ -36,7 +44,7 @@ const UserCards: React.FC<UserCards> = ({
                     <Avatar className="w-[48px] h-[48px]">
                         <AvatarImage
                             className="rounded-full object-cover w-[40px] h-[40px]"
-                            src={userPicture} //change whith userPicture when merged
+                            src={userPicture}
                         />
                         <AvatarFallback>{PinguAvatar}</AvatarFallback>
                     </Avatar>
@@ -45,9 +53,11 @@ const UserCards: React.FC<UserCards> = ({
                         <CardDescription>{userStatus}</CardDescription>
                     </CardHeader>
                 </div>
-                <div>
-                    <DropdownCard variant={variant} id={id} />
-                </div>
+                {currentUser?.pseudo !== userName && (
+                    <div>
+                        <DropdownCard variant={variant} id={id} />
+                    </div>
+                )}
             </Card>
         </div>
     )

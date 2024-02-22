@@ -22,7 +22,7 @@ export default function PendingInvitations() {
                             userName={friend.name}
                             userPicture={friend.avatar || ''}
                             userStatus=""
-                            variant="USER_PROFILE"
+                            variant="OTHER"
                         />
                     </div>
                 ))

@@ -24,7 +24,7 @@ export default function FriendRequest() {
                             userName={friend.name}
                             userPicture={friend.avatar || PinguAvatar}
                             userStatus=""
-                            variant="USER_PROFILE"
+                            variant="OTHER"
                         />
                     </div>
                 ))

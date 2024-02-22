@@ -51,10 +51,10 @@ export default function FriendsList() {
                             id={data.id.toString()}
                             key={data.id}
                             bgColor="white"
-                            userName={data.name}
+                            userName={data.pseudo}
                             userPicture={data.avatar || PinguAvatar}
                             userStatus={getStatus(data.name)}
-                            variant="USER_PROFILE"
+                            variant="OTHER"
                         />
                     ))
                 ) : (
@@ -75,10 +75,10 @@ export default function FriendsList() {
                             id={friend.id.toString()}
                             key={friend.id}
                             bgColor="white"
-                            userName={friend.name}
+                            userName={friend.pseudo}
                             userPicture={friend.avatar || PinguAvatar}
                             userStatus={getStatus(friend.name)}
-                            variant="USER_PROFILE"
+                            variant="OTHER"
                         />
                     ))
                 ) : (

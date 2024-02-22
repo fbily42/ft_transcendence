@@ -39,16 +39,10 @@ function Profile() {
         queryFn: getPendingInvitations,
     })
 
-    const { data, isError, isLoading } = useQuery({
+    const { data } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
-    if (isError) {
-        return <div>Error</div>
-    }
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
 
     const selectedAvatar = data?.avatar
 
