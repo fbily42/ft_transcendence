@@ -1,8 +1,10 @@
 import {
 	Body,
 	Controller,
+	FileTypeValidator,
 	HttpException,
 	HttpStatus,
+	ParseFilePipe,
 	Post,
 	Req,
 	UploadedFile,
@@ -13,36 +15,47 @@ import { UploadsService } from './uploads.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FormDto } from './uploads.dto';
+import { IsString, Length, MaxLength, MinLength } from 'class-validator';
 
 @Controller('uploads')
 @UseGuards(AuthGuard)
 export class UploadsController {
 	constructor(private uploadsService: UploadsService) {}
 
-	@Post()
 	@UseInterceptors(FileInterceptor('file'))
+	@Post()
 	async setProfile(
-		@UploadedFile() file: Express.Multer.File,
-		@Body('pseudo') pseudo: string,
-		@Body('avatar') url: string,
+		@Body() formDto: FormDto,
+		@UploadedFile(
+			new ParseFilePipe({
+				validators: [
+					new FileTypeValidator({ fileType: 'image/svg' }),
+				],
+				fileIsRequired: false,
+			}),
+		)
+		file: Express.Multer.File,
 		@Req() req: Request,
 	) {
 		try {
-			if (!file && !url) {
+			if (!file && !formDto.avatar) {
 				throw new HttpException(
 					'Missing an avatar or a file',
 					HttpStatus.BAD_REQUEST,
 				);
 			}
-			return await this.uploadsService.setProfile(file, url, pseudo, req);
+			return await this.uploadsService.setProfile(
+				file,
+				formDto.avatar,
+				formDto.pseudo,
+				req,
+			);
 		} catch (error) {
-			if (error instanceof HttpException)
-				throw error
+			if (error instanceof HttpException) throw error;
 			throw new HttpException(
 				'Internal server error',
 				HttpStatus.INTERNAL_SERVER_ERROR,
 			);
 		}
-
 	}
 }
