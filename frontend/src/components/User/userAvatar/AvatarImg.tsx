@@ -12,9 +12,10 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
 type ImageSelectorProps = {
     onSelect: (selectedImage: string) => void
+    children: React.ReactNode
 }
 
-const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
+const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect, children }) => {
     const { data } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
@@ -35,7 +36,7 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
     }
 
     return (
-        <div className="flex">
+        <div className="flex flex-wrap items-center justify-center">
             {images.map((image, idx) => (
                 <div
                     key={idx}
@@ -57,6 +58,7 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
                     ></Button>
                 </div>
             ))}
+            <div>{children}</div>
         </div>
     )
 }

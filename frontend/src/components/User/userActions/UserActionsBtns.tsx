@@ -33,6 +33,7 @@ export default function UserActionsBtns() {
     }
 
     const initialAvatar = currentUser?.avatar
+    const initialPseudo = currentUser?.pseudo
 
     // const handleResize = () => {
     //     setIsMobile(window.innerWidth < 900)
@@ -70,6 +71,7 @@ export default function UserActionsBtns() {
                     <SetProfileForm
                         submitButtonText="I'm ready to noot"
                         currentAvatar={initialAvatar || ''}
+                        currentPseudo={initialPseudo || ''}
                         onClose={() => navigate('/profile/me')}
                     />
                 </DialogContent>

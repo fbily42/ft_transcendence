@@ -25,6 +25,7 @@ type ProfileFormValues = z.infer<typeof zodSchema>
 const SetProfileForm: React.FC<SetProfileFormprops> = ({
     submitButtonText,
     currentAvatar,
+    currentPseudo,
     onClose,
 }) => {
     const {
@@ -33,6 +34,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
         formState: { errors },
     } = useForm<ProfileFormValues>({
         resolver: zodResolver(zodSchema),
+        defaultValues: { pseudo: currentPseudo },
     })
     const [errorMessage, setErrorMessage] = useState<string>('')
     const [openAvatars, setOpenAvatars] = useState<boolean>(false)
@@ -50,6 +52,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
             ),
         onSuccess: (_, data) => {
             queryClient.invalidateQueries({ queryKey: ['me'] })
+            queryClient.invalidateQueries({ queryKey: ['users'] })
         },
     })
 
@@ -58,6 +61,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
     }, [currentAvatar])
 
     async function onSubmit(data: ProfileFormValues) {
+        setErrorMessage('')
         mutation.mutate({
             pseudo: data.pseudo,
             avatar: selectedAvatar,
@@ -124,10 +128,12 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
                                 setSelectedAvatar(selectedImage)
                                 setUploadedImage(null)
                             }}
-                        />
-                    </div>
-                    <div>
-                        <ImageInput onChange={handleImageChange} size={70} />
+                        >
+                            <ImageInput
+                                onChange={handleImageChange}
+                                size={70}
+                            />
+                        </AvatarImg>
                     </div>
                 </div>
             </div>
