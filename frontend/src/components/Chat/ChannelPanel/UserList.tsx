@@ -1,13 +1,13 @@
-import UserCards from '@/components/User/userCards/UserCards'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { getChannelUsers } from '@/lib/Chat/chat.requests'
 import { UserInChannel } from '@/lib/Chat/chat.types'
 import { getMyrole, getRole, getUserStatus } from '@/lib/Chat/chat.utils'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import DropdownChannelUser from './DropdownChannelUser'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useEffect } from 'react'
+import CardChannelUser from './CardChannelUser'
+import { useNavigate } from 'react-router-dom'
 
 interface UserListProps {
     channel: string
@@ -16,14 +16,17 @@ interface UserListProps {
 const UserList: React.FC<UserListProps> = ({ channel }) => {
     const socket = useWebSocket() as WebSocketContextType
     const queryClient = useQueryClient()
-    const { data: users } = useQuery<UserInChannel[]>({
+    const navigate = useNavigate()
+    const { data: users, error: usersError } = useQuery<UserInChannel[]>({
         queryKey: ['channelUsers', channel],
         queryFn: () => getChannelUsers(channel),
+        retry: 1,
     })
 
-    const { data: me } = useQuery<UserData>({
+    const { data: me, error: meError } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
+        retry: 1,
     })
 
     useEffect(() => {
@@ -36,6 +39,15 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
             socket.webSocket?.off('updateChannelUsers')
         }
     }, [socket])
+
+    useEffect(() => {
+        if (
+            meError?.message.includes('403') ||
+            usersError?.message.includes('403')
+        ) {
+            navigate('/auth')
+        }
+    }, [usersError, meError])
 
     return (
         <>
@@ -52,20 +64,14 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                                         : 'opacity-50'
                                 }
                             >
-                                <UserCards
-                                    id={user.userId.toString()}
-                                    bgColor="transparent"
-                                    userName={user.name}
-                                    userPicture={user.photo42}
-                                    userStatus={getRole(user)}
-                                    variant="CHAT"
-                                ></UserCards>
-                                <DropdownChannelUser
-                                    targetId={user.userId.toString()}
+                                <CardChannelUser
+                                    targetPseudo={user.pseudo}
+                                    targetId={user.userId}
                                     targetName={user.name}
-                                    role={getMyrole(me?.name!, users)}
+                                    targetPicture={user.avatar}
                                     targetRole={getRole(user)}
-                                ></DropdownChannelUser>
+                                    userRole={getMyrole(me?.name!, users)}
+                                ></CardChannelUser>
                             </div>
                         ) : null
                     )}
@@ -79,20 +85,17 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                             {users?.map((user, index) =>
                                 user.banned ? (
                                     <div key={index} className={'opacity-50'}>
-                                        <UserCards
-                                            id={user.userId.toString()}
-                                            bgColor="transparent"
-                                            userName={user.name}
-                                            userPicture={user.photo42}
-                                            userStatus={getRole(user)}
-                                            variant="CHAT"
-                                        ></UserCards>
-                                        <DropdownChannelUser
-                                            targetId={user.userId.toString()}
+                                        <CardChannelUser
+                                            targetPseudo={user.pseudo}
+                                            targetId={user.userId}
                                             targetName={user.name}
-                                            role={getMyrole(me?.name!, users)}
+                                            targetPicture={user.avatar}
                                             targetRole={getRole(user)}
-                                        ></DropdownChannelUser>
+                                            userRole={getMyrole(
+                                                me?.name!,
+                                                users
+                                            )}
+                                        ></CardChannelUser>
                                     </div>
                                 ) : null
                             )}

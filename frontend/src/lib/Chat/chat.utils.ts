@@ -32,7 +32,7 @@ export function getRole(user: UserInChannel): string {
     for (let key of statusKeys) {
         if (user[key] === true) return key
     }
-    return 'member'
+    return ''
 }
 
 export function getMyrole(name: string, users: UserInChannel[]): string {
@@ -42,4 +42,56 @@ export function getMyrole(name: string, users: UserInChannel[]): string {
 	if (user)
 		return getRole(user)
 	return ''
+}
+
+export function getAvatarBorderColor(role: string){
+	switch (role) {
+		case 'admin':
+			return 'border-customGreen'
+		case 'owner':
+			return 'border-customYellow'
+		case 'member':
+			return 'border-customDarkBlue'
+		default:
+			return 'border-grey-500'
+	}
+}
+
+export function getTextColor(role: string) {
+	switch (role) {
+		case 'admin':
+			return 'text-customGreen'
+		case 'owner':
+			return 'text-textYellow'
+		case 'member':
+			return 'text-customDarkBlue'
+		default:
+			return 'text-grey-500'
+	}
+}
+
+export function getMessageBgColor(role: string) {
+	switch (role) {
+		case 'admin':
+			return 'bg-customLightGreen'
+		case 'owner':
+			return 'bg-customLightYellow'
+		case 'member':
+			return 'bg-customBlue'
+		default:
+			return 'bg-grey-500'
+	}
+}
+
+export function getMessageBorderColor(role: string){
+	switch (role) {
+		case 'admin':
+			return 'border-customLightGreen'
+		case 'owner':
+			return 'border-customLightYellow'
+		case 'member':
+			return 'border-customBlue'
+		default:
+			return 'border-grey-500'
+	}
 }

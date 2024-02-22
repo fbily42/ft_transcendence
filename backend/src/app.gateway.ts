@@ -19,6 +19,7 @@ import * as cookie from 'cookie';
 import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
 import { ChatService } from './chat/chat.service';
 import { GameStat } from './Game/Game.types';
+import { quitCmdDto } from './chat/dto/quitCmd.dto';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -553,5 +554,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			else
 				throw new WsException('Internal server error')
 		}
+	}
+
+	@SubscribeMessage('quitChannel')
+	async quitChannel(@MessageBody() cmd: quitCmdDto) {
+		
 	}
 }

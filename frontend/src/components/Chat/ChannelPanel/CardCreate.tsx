@@ -24,13 +24,13 @@ function CardCreate({ onClose }: CardCreateProps) {
     const { register, handleSubmit } = useForm<CreateFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const queryClient = useQueryClient()
-	const socket = useWebSocket() as WebSocketContextType
+    const socket = useWebSocket() as WebSocketContextType
     const mutation = useMutation({
-        mutationFn: (data: CreateChannelProps) => 
+        mutationFn: (data: CreateChannelProps) =>
             createChannel(data.data, data.setErrorMessage, data.onClose),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['channels'] })
-			socket?.webSocket?.emit('newChannel')
+            socket?.webSocket?.emit('newChannel')
         },
     })
 
@@ -41,7 +41,7 @@ function CardCreate({ onClose }: CardCreateProps) {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Card className='border-none shadow-none'>
+                <Card className="border-none shadow-none">
                     <CardHeader>
                         <CardTitle>Create</CardTitle>
                         <CardDescription>

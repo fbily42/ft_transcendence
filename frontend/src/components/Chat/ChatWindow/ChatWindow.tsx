@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import { Socket } from 'socket.io-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Plus, Send } from 'lucide-react'
@@ -14,6 +13,8 @@ import Modal from '@/components/Modal'
 import TabsChannel from '../ChannelPanel/TabsChannel'
 import SelfMessage from './SelfMessage'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
+import { getRole } from '@/lib/Chat/chat.utils'
+import { useNavigate } from 'react-router-dom'
 
 type MessageFormValues = {
     userId: string
@@ -30,55 +31,92 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     const [open, setOpen] = useState<boolean>(false)
     const { register, handleSubmit, reset } = useForm<MessageFormValues>()
     const socket = useWebSocket() as WebSocketContextType
+    const navigate = useNavigate()
     const queryClient = useQueryClient()
 
-    const { data: messages } = useQuery({
+    const { data: messages, error: msgError } = useQuery({
         queryKey: ['messages', currentChannel],
         queryFn: () => getMessages(currentChannel),
+        retry: 1,
     })
 
-    const { data: me } = useQuery({
+    const { data: me, error: meError } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
+        retry: 1,
     })
 
-    const { data: users } = useQuery({
+    const { data: users, error: usersError } = useQuery({
         queryKey: ['channelUsers', currentChannel],
         queryFn: () => getChannelUsers(currentChannel),
+        retry: 1,
     })
 
     function getAvatar(name: string): string {
-        for (const user of users || []) {
-            if (user.name === name) {
-                return user.photo42
+        if (users) {
+            for (const user of users) {
+                if (user.name === name) {
+                    return user.avatar
+                }
             }
         }
         return Pingu
     }
 
     useEffect(() => {
-        socket.webSocket?.on('messageToRoom', () => {
+        socket?.webSocket?.on('messageToRoom', () => {
             queryClient.invalidateQueries({
                 queryKey: ['messages', currentChannel],
             })
         })
         return () => {
-            socket.webSocket?.off('messageToRoom')
+            socket?.webSocket?.off('messageToRoom')
         }
     }, [socket])
 
     async function onSubmit(data: MessageFormValues) {
         data.target = currentChannel
-        data.userName = me?.name || ''
-        data.userId = me?.id || 0
+        data.userName = me?.name!
+        data.userId = me?.id!
         socket.webSocket?.emit('messageToRoom', data)
         reset({ message: '' })
     }
 
+    function getSenderRole(name: string): string {
+        if (users) {
+            for (const user of users) {
+                if (user.name === name) {
+                    const role = getRole(user)
+                    return role
+                }
+            }
+        }
+        return ''
+    }
+
+    function getPseudo(name: string): string {
+        if (users) {
+            for (const user of users) {
+                if (user.name === name) return user.pseudo
+            }
+        }
+        return name
+    }
+
+    useEffect(() => {
+        if (
+            msgError?.message.includes('403') ||
+            meError?.message.includes('403') ||
+            usersError?.message.includes('403')
+        ) {
+            navigate('/auth')
+        }
+    }, [msgError, meError, usersError])
+
     return currentChannel ? (
-        <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
+        <div className="flex flex-col justify-between bg-customBlue w-full p-[20px] rounded-[36px] shadow-drop">
             <div className="bg-white flex flex-col justify-between w-full h-full rounded-[16px] p-[20px] shadow-drop">
-                <div className="flex flex-col-reverse gap-[36px] w-full h-full overflow-y-auto">
+                <div className="flex flex-col-reverse gap-[36px] w-full h-full overflow-y-auto no-scrollbar">
                     {messages
                         ?.slice(0)
                         .reverse()
@@ -87,13 +125,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                 <SelfMessage
                                     key={index}
                                     message={message}
-                                    picture={me?.photo42 || ''}
+                                    picture={me?.avatar!}
+                                    role={getSenderRole(me?.name!)}
                                 ></SelfMessage>
                             ) : (
                                 <MessageBubble
                                     key={index}
+                                    pseudo={getPseudo(message.sentByName)}
                                     message={message}
                                     picture={getAvatar(message.sentByName)}
+                                    role={getSenderRole(message.sentByName)}
                                 ></MessageBubble>
                             )
                         )}
@@ -114,7 +155,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
             </div>
         </div>
     ) : (
-        <div className="flex flex-col justify-between bg-[#C1E2F7] w-full p-[20px] rounded-[36px] shadow-drop">
+        <div className="flex flex-col justify-between bg-customBlue w-full p-[20px] rounded-[36px] shadow-drop">
             <div className="bg-white flex flex-col justify-center items-center w-full h-full rounded-[16px] overflow-hidden p-[20px] shadow-drop">
                 <img className="w-[80%]" src={Placeholder}></img>
                 <Button

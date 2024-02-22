@@ -46,7 +46,6 @@ export type UserInChannel = {
 	name: string,
 	pseudo: string,
 	avatar: string,
-	photo42: string,
 	owner: boolean,
 	admin: boolean,
 	member: boolean,
@@ -75,4 +74,17 @@ export type CmdData = {
     targetId: string
     targetName: string
     channel: string | null
+}
+
+export type DropdownChannelProps = {
+    userName: string
+    channelName: string
+    role: string
+}
+
+export type LeaveChannelData = {
+    user: string
+    channel: string
+    role: string
+	newOwner?: string
 }
