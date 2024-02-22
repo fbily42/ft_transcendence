@@ -12,6 +12,9 @@ import { useWebSocket } from '@/context/webSocketContext'
 import pingu_duo from './../../assets/Pong_page/duo.png'
 import { Socket } from 'socket.io-client'
 import { useNavigate } from 'react-router-dom'
+import ImageAllGame from '../../assets/GameForm/ImageAllGame.svg'
+import BasicPong from '../../assets/GameForm/Pong_Image.svg'
+import { Checkbox } from '@/components/ui/checkbox'
 
 // interface GameFormprops {
 // 	onClose: () => void;
@@ -21,67 +24,80 @@ function GameForm({ closeDialog }) {
     const socket = useWebSocket()
     // const [matchmaking, setMatchmaking] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [loadingFriend, setLoadingFriend] = useState(false)
     const currentRoom = useRef<string | null>(null)
+    const currentRoomFriend = useRef<string | null>(null)
     const processingMessage = useRef(false)
-    const [isPreselected, setIsPreselected] = useState(false)
+    const [inputValue, setInputValue] = useState('')
+    const [selectedImage, setSelectedImage] = useState<string>('')
 
-    // const [results, setResults] = useState([]);
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value)
+    }
 
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        //verifier que l'utilisateur existe pour pourvoir derouler
+        setSearch(inputValue)
+    }
     const handleSearch = async (event: any) => {
         event.preventDefault()
         try {
-            //verifier que la personne est en ligne pour envoyer l'invitation
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/game/invitGame/${search}`,
-                {
-                    withCredentials: true,
-                }
-            )
-
-            if (socket) {
-                socket.emit('game invitation', {
-                    to: search,
-                    game: response.data,
-                })
+            if (!loading) {
+                setLoadingFriend(true)
+            } else {
+                setLoadingFriend(false)
             }
+            //verifier que la personne est en ligne pour envoyer l'invitation
+            //verifier que la personne est bien connecte pour envoyer l'invitation
+
+            socket?.webSocket?.emit('game invitation', {
+                to: search,
+                game: response.data,
+            })
         } catch (error) {}
 
         // setResults([search]); // Mettez à jour cette ligne pour afficher les vrais résultats
-        setSearch('')
+        // setSearch('')
     }
+    useEffect(() => {
+        if (loadingFriend) {
+            const roomName: string = generateUniqueRoomId()
+            currentRoomFriend.current = roomName
+            socket?.webSocket?.emit('JoinRoomFriend', roomName)
+            if (search) {
+            }
+        }
+    })
 
     function generateUniqueRoomId() {
         const now = Date.now() // Obtient le timestamp actuel
         const random = Math.random() * 1000 // Génère un nombre aléatoire
         return `room_${now}_${Math.floor(random)}` // Combine les deux pour créer un ID
     }
-    const navigate = useNavigate()
     useEffect(() => {
         //mettre fin au matchmaking des qu'il ferme le modal
-        if (socket) {
-            if (loading) {
-                const roomName: string = generateUniqueRoomId()
-                currentRoom.current = roomName
-                socket.webSocket?.emit('JoinRoom', roomName)
-                socket.webSocket?.on('JoinParty', (message: string) => {
-                    let words = message.split(' ')
-                    let lastWord = words[words.length - 1]
-                    if (message.startsWith('You have joined')) {
-                        processingMessage.current = true
-                        closeDialog()
-                        navigate('/pong')
-                    } else if (message.startsWith('Go')) {
-                        processingMessage.current = true
-                        closeDialog()
-                        navigate('/pong')
-                    } else return //error
-                })
-            } else if (currentRoom.current) {
-                socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
-            }
+
+        if (loading) {
+            const roomName: string = generateUniqueRoomId()
+            currentRoom.current = roomName
+            socket?.webSocket?.emit('JoinRoom', roomName)
+            socket?.webSocket?.on('JoinParty', (message: string) => {
+                let words = message.split(' ')
+                let lastWord = words[words.length - 1]
+                if (message.startsWith('You have joined')) {
+                    processingMessage.current = true
+                    closeDialog()
+                    navigate('/pong')
+                } else if (message.startsWith('Go')) {
+                    processingMessage.current = true
+                    closeDialog()
+                    navigate('/pong')
+                } else return //error
+            })
+        } else if (currentRoom.current) {
+            socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
         }
-        //verifier qu'il y a une personne en ligne au moins autre que le client
-        // socket.emit('game invitation random');
 
         return () => {
             socket?.webSocket?.off('JoinParty')
@@ -93,7 +109,7 @@ function GameForm({ closeDialog }) {
         }
     }, [loading])
     async function handleMatchmaking(event: any) {
-        event.preventDefault() //a quoi cela sert
+        event.preventDefault()
         if (!loading) {
             setLoading(true)
         } else {
@@ -102,7 +118,8 @@ function GameForm({ closeDialog }) {
     }
 
     return (
-        <div className=" p-5 bg-blue-800 ">
+        <div className=" p-5 bg-blue-800 mb-[20px] h-fit">
+            {/* image en haut a droite */}
             <div className="fixed-0 ">
                 <img
                     src={pingu_duo}
@@ -110,20 +127,21 @@ function GameForm({ closeDialog }) {
                     className="absolute top-[-80px] right-0"
                 />
             </div>
-            <div className="mb-[20px] bg-blue-500" style={{ height: '50%' }}>
+            {/* recherche d'amis */}
+            <div className="mb-[20px] bg-white h-fit">
                 <p className="mb-[14px]">
                     Choose an online friend to play with{' '}
                 </p>
                 <form
-                    onSubmit={handleSearch}
+                    onSubmit={handleFormSubmit}
                     className="w-full mb-10 border-2 border-black rounded-xl p-2 pr-2 mb-4 realtive flex items-center "
                 >
                     <Search className="" />
-                    <div className="ml-[10px] bg-red-500">
+                    <div className="ml-[10px] bg-white">
                         <input
                             type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            value={inputValue}
+                            onChange={handleInputChange}
                             placeholder="Rechercher des amis"
                             className="outline-none w-[350px]"
                             onBlur={(e) => {
@@ -134,6 +152,90 @@ function GameForm({ closeDialog }) {
                     </div>
                     <XCircle className="fixed-0 " />
                 </form>
+                {search && (
+                    <div className="">
+                        <div className="flex gap-[20px]">
+                            <p> Choose the level</p>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="terms" />
+                                <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    Easy
+                                </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="terms" />
+                                <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    Normal
+                                </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="text" />
+                                <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 "
+                                >
+                                    Hard
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p> Choose the Map</p>
+                        </div>
+                        <div className="flex justify-between gap-[20px]">
+                            <div
+                                className={`realtive p-2 ${selectedImage === 'ImageAllGame' ? 'rounded border-4 border-blue-500 ' : ''}`}
+                                onClick={() => {
+                                    if (!selectedImage)
+                                        setSelectedImage('ImageAllGame')
+                                    else if (selectedImage === 'BasicPong')
+                                        setSelectedImage('ImageAllGame')
+                                    else setSelectedImage('')
+                                    // Gérer le clic sur l'image ici
+                                }}
+                            >
+                                <img
+                                    src={ImageAllGame}
+                                    width="200px"
+                                    height="200px"
+                                    alt="description_of_the_image"
+                                />
+                                <p className="text-center">
+                                    Our creation ! PinguPlace
+                                </p>
+
+                                {/* Ajoutez plus d'options ici si nécessaire */}
+                            </div>
+                            <div
+                                className={`realtive p-2 ${selectedImage === 'BasicPong' ? 'rounded border-4 border-blue-500 ' : ''}`}
+                                onClick={() => {
+                                    if (!selectedImage)
+                                        setSelectedImage('BasicPong')
+                                    else if (selectedImage === 'ImageAllGame')
+                                        setSelectedImage('BasicPong')
+                                    else setSelectedImage('')
+                                    // Gérer le clic sur l'image ici
+                                }}
+                            >
+                                <img
+                                    src={BasicPong}
+                                    width="250px"
+                                    height="250px"
+                                    alt="description_of_the_image"
+                                />
+                                <p className="text-center">Bad Choice</p>
+
+                                {/* Ajoutez plus d'options ici si nécessaire */}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
             {/* Permet d'avoir un historique des recherchers */}
             {/* <ul>
@@ -141,30 +243,18 @@ function GameForm({ closeDialog }) {
 					<li key={index}>{result}</li>
 				))}
 			</ul> */}
-            <div className="mb-[20px] " style={{ height: '50%' }}>
-                <p className="mb-[14px]">Or find a random player </p>
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault()
-                        if (!isPreselected) setIsPreselected(true)
-                        else setIsPreselected(false)
-                    }}
-                >
-                    <button
-                        className="w-full flex justify-center border-2  border-black rounded-xl p-2 pr-2 mb-4" //border-blue-500
-                        type="submit"
-                    >
-                        {isPreselected ? 'click on next' : 'Submit'}
-                    </button>
-                </form>
-            </div>
-            <div className="">
+            {/* MatchMaking */}
+            <div
+                className="flex flex-col  h-full mb-[20px] bg-yellow-300 justify-end gap-[20px]"
+                style={{ height: '50%' }}
+            >
+                <p>Or find a random player </p>
                 <form onSubmit={handleMatchmaking}>
                     <button
-                        className="absolute bottom-0 right-0 border-2  border-blue-500 rounded-xl " //border-blue-500
+                        className="w-full  border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 gap-[10px]"
                         type="submit"
                     >
-                        Next
+                        {loading ? 'Matchmaking...(just wait)' : 'Submit'}
                     </button>
                 </form>
             </div>
@@ -173,3 +263,4 @@ function GameForm({ closeDialog }) {
 }
 
 export default GameForm
+;('use client')

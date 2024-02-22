@@ -134,6 +134,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('JoinRoomFriend')
+	joinGameRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string })
+	{
+		try {
+			
+			if(this.clients.has(data.friend))//verifier d'abord que l'amis est connecte, faire une deuxieme verification avant d'envoyer l'invitation
+			{
+				
+
+			}
+
+		}
+		catch(error){
+			console.log(error);
+
+		}
+
+	}
+
 
 	//possible probleme
 	//si une personne cree une room elle peut pas en rejoindre une 
@@ -144,7 +163,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('JoinRoom')
 	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
-		console.log('JoinRoomEvent : ', client.id)
+		// console.log('JoinRoomEvent : ', client.id)
 		try{
 			for (let [key, value] of this.gamesRoom)
 			{
