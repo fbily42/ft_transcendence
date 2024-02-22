@@ -10,7 +10,6 @@ import { useQuery } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
-
 type ImageSelectorProps = {
     onSelect: (selectedImage: string) => void
 }
@@ -43,6 +42,7 @@ const AvatarImg: React.FC<ImageSelectorProps> = ({ onSelect }) => {
                     className="bg-[#C1E2F7] flex items-center w-[70px] h-[70px] border-[3px] border-customYellow rounded-full overflow-hidden"
                 >
                     <Button
+                        type="button"
                         onClick={(e: React.MouseEvent<HTMLElement>) => {
                             e.preventDefault()
                             handleImageClick(image)

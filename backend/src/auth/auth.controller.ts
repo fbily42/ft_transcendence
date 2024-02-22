@@ -114,8 +114,8 @@ export class AuthController {
 					message: 'User profile is set',
 				});
 			} else {
-				res.status(HttpStatus.NOT_FOUND).send({
-					status: 'NOT FOUND',
+				res.status(HttpStatus.UNAUTHORIZED).send({
+					status: 'NOT SET',
 					message: 'User profile is not set',
 				});
 			}

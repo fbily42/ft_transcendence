@@ -6,7 +6,7 @@ import { User } from '@prisma/client';
 export class UploadsService {
 	constructor(private prisma: PrismaService) {}
 
-	async setProfile(file: Express.Multer.File, url: string, pseudo: string, req: Request) {
+	async setProfile(file: Express.Multer.File | undefined, url: string | undefined, pseudo: string, req: Request) {
 		try{
 			//check if pseudo already exists
 			const pseudoExists : boolean = await this.pseudoExists(pseudo);
@@ -16,8 +16,10 @@ export class UploadsService {
 
 			//updates
 			let avatar;
-			if (file)
-				avatar = file.buffer.toString('base64')
+
+			if (file) {
+				avatar = "data:image/svg+xml;base64," + file.buffer.toString('base64')
+			}
 			else
 				avatar = url
 
