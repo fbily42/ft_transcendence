@@ -53,13 +53,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     })
 
     function getAvatar(name: string): string {
-		if (users) {
-			for (const user of users) {
-				if (user.name === name) {
-					return user.photo42
-				}
-			}
-		}
+        if (users) {
+            for (const user of users) {
+                if (user.name === name) {
+                    return user.avatar
+                }
+            }
+        }
         return Pingu
     }
 
@@ -94,6 +94,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         return ''
     }
 
+    function getPseudo(name: string): string {
+        if (users) {
+            for (const user of users) {
+                if (user.name === name) return user.pseudo
+            }
+        }
+        return name
+    }
+
     useEffect(() => {
         if (
             msgError?.message.includes('403') ||
@@ -116,12 +125,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                 <SelfMessage
                                     key={index}
                                     message={message}
-                                    picture={me?.photo42!}
+                                    picture={me?.avatar!}
                                     role={getSenderRole(me?.name!)}
                                 ></SelfMessage>
                             ) : (
                                 <MessageBubble
                                     key={index}
+                                    pseudo={getPseudo(message.sentByName)}
                                     message={message}
                                     picture={getAvatar(message.sentByName)}
                                     role={getSenderRole(message.sentByName)}

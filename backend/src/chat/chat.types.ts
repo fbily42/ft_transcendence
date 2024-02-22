@@ -11,7 +11,6 @@ export type UserInChannel = {
 	name: string,
 	pseudo: string,
 	avatar: string,
-	photo42: string,
 	owner: boolean,
 	admin: boolean,
 	member: boolean,

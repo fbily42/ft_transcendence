@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,26 +7,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
+import { DropdownChannelProps, LeaveChannelData } from '@/lib/Chat/chat.types'
 import { MoreHorizontal } from 'lucide-react'
-
-type DropdownChannelProps = {
-    userName: string
-    channelName: string
-    role: string
-}
-
-export type LeaveChannelData = {
-    user: string
-    channel: string
-    role: string
-}
-
-export function leaveChannel(
-    cmd: LeaveChannelData,
-    socket: WebSocketContextType
-) {
-    socket?.webSocket?.emit('quitChannel', cmd)
-}
 
 const DropdownChannel: React.FC<DropdownChannelProps> = ({
     userName,
@@ -46,14 +29,36 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex flex-col gap-1">
-                <DropdownMenuItem
-                    className="w-full"
-                    onClick={() => {
-                        leaveChannel(cmd, socket)
-                    }}
-                >
-                    Leave
-                </DropdownMenuItem>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <DropdownMenuItem className="w-full text-sm" onSelect={(e) => e.preventDefault()}>
+                            Leave
+                        </DropdownMenuItem>
+                    </DialogTrigger>
+                    {role === 'owner' ? (
+                        <DialogContent>
+                            Owner have to choose a new owner
+                        </DialogContent>
+                    ) : (
+                        <DialogContent>
+                            You are about to leave this channel
+                        </DialogContent>
+                    )}
+                </Dialog>
+                <div>
+                    {role === 'owner' ? (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <DropdownMenuItem className="w-full text-sm" onSelect={(e) => e.preventDefault()}>
+                                    Set password
+                                </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent>
+                                You are about to change the password
+                            </DialogContent>
+                        </Dialog>
+                    ) : null}
+                </div>
             </DropdownMenuContent>
         </DropdownMenu>
     )

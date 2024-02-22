@@ -16,6 +16,7 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useNavigate } from 'react-router-dom'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { Channel } from '@/lib/Chat/chat.types'
+import CardChannel from './CardChannel'
 
 interface ChannelPanelProps {
     setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
@@ -45,9 +46,18 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         retry: 1,
     })
 
+    function clickPrivateMessage(name: string) {
+        setHide(true)
+        handleClick(name)
+    }
+
+    function clickGroups(name: string) {
+        setHide(false)
+        handleClick(name)
+    }
+
     function handleClick(name: string) {
         const previousChannel = currentChannel
-        setHide(false)
         setCurrentChannel(name)
         queryClient.invalidateQueries({
             queryKey: ['channelUsers', previousChannel],
@@ -127,25 +137,22 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                         <div
                                             key={index}
                                             onClick={() =>
-                                                handleClick(channel.name)
+                                                clickPrivateMessage(
+                                                    channel.name
+                                                )
                                             }
                                             className="hover:cursor-pointer"
                                         >
-                                            <UserCards
+                                            <CardChannel
+                                                channelName={channel.name}
+                                                variant="PrivateMessage"
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? 'customBlue'
-                                                        : 'white'
+                                                        ? 'bg-customBlue'
+                                                        : 'bg-white'
                                                 }
-                                                userName={getDirectName(
-                                                    channel.name,
-                                                    me?.name!
-                                                )}
-                                                userPicture={Pingu}
-                                                userStatus=""
-                                                variant="CHAT"
-                                            ></UserCards>
+                                            ></CardChannel>
                                         </div>
                                     ) : null
                                 )}
@@ -161,22 +168,20 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                         <div
                                             key={index}
                                             onClick={() =>
-                                                handleClick(channel.name)
+                                                clickGroups(channel.name)
                                             }
                                             className="hover:cursor-pointer"
                                         >
-                                            <UserCards
+                                            <CardChannel
+                                                channelName={channel.name}
+                                                variant="Groups"
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? 'customBlue'
-                                                        : 'white'
+                                                        ? 'bg-customBlue'
+                                                        : 'bg-white'
                                                 }
-                                                userName={channel.name}
-                                                userPicture={PinguFamily}
-                                                userStatus=""
-                                                variant="CHAT"
-                                            ></UserCards>
+                                            ></CardChannel>
                                         </div>
                                     ) : null
                                 )}
@@ -247,25 +252,22 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                         <div
                                             key={index}
                                             onClick={() =>
-                                                handleClick(channel.name)
+                                                clickPrivateMessage(
+                                                    channel.name
+                                                )
                                             }
                                             className="hover:cursor-pointer"
                                         >
-                                            <UserCards
+                                            <CardChannel
+                                                channelName={channel.name}
+                                                variant="PrivateMessage"
                                                 bgColor={
                                                     channel.name ===
                                                     currentChannel
-                                                        ? 'customBlue'
-                                                        : 'white'
+                                                        ? 'bg-customBlue'
+                                                        : 'bg-white'
                                                 }
-                                                userName={getDirectName(
-                                                    channel.name,
-                                                    me?.name!
-                                                )}
-                                                userPicture={Pingu}
-                                                userStatus=""
-                                                variant="CHAT"
-                                            ></UserCards>
+                                            ></CardChannel>
                                         </div>
                                     ) : null
                                 )}
@@ -281,16 +283,19 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                         <div
                                             key={index}
                                             onClick={() =>
-                                                handleClick(channel.name)
+                                                clickGroups(channel.name)
                                             }
                                         >
-                                            <UserCards
-                                                bgColor="white"
-                                                userName={channel.name}
-                                                userPicture={PinguFamily}
-                                                userStatus=""
-                                                variant="CHAT"
-                                            ></UserCards>
+                                            <CardChannel
+                                                channelName={channel.name}
+                                                variant="Groups"
+                                                bgColor={
+                                                    channel.name ===
+                                                    currentChannel
+                                                        ? 'bg-customBlue'
+                                                        : 'white'
+                                                }
+                                            ></CardChannel>
                                         </div>
                                     ) : null
                                 )}

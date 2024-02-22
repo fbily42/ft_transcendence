@@ -153,7 +153,6 @@ export class ChatService {
 									name: true,
 									pseudo: true,
 									avatar: true,
-									photo42: true,
 								}
 							},
 							userId: true,
@@ -174,7 +173,6 @@ export class ChatService {
 				name: channelUser.user.name,
 				pseudo: channelUser.user.pseudo,
 				avatar: channelUser.user.avatar,
-				photo42: channelUser.user.photo42,
 				owner: channelUser.owner,
 				admin: channelUser.admin,
 				member: channelUser.member,
@@ -280,8 +278,8 @@ export class ChatService {
 					throw new Error('Private message target does not exists');
 				const privateMessage = await this.prisma.channelUser.createMany({
 					data: [
-						{channelId: channel.id, userId: userId},
-						{channelId: channel.id, userId: user.id},
+						{channelId: channel.id, userId: userId, member: true},
+						{channelId: channel.id, userId: user.id, member: true},
 					],
 				})
 				return channelName

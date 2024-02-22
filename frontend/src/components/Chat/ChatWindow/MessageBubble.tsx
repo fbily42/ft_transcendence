@@ -9,12 +9,13 @@ import {
 } from '@/lib/Chat/chat.utils'
 
 interface MessageProps {
+	pseudo: string
     message: Message
     picture: string
     role: string
 }
 
-const MessageBubble: React.FC<MessageProps> = ({ message, picture, role }) => {
+const MessageBubble: React.FC<MessageProps> = ({pseudo, message, picture, role }) => {
     const formattedDate = format(message.sentAt, 'hh:mm a')
     return (
         <div id="full-div" className="flex w-full">
@@ -34,7 +35,7 @@ const MessageBubble: React.FC<MessageProps> = ({ message, picture, role }) => {
                             id="message"
                             className={`flex-col gap-[10px] p-[8px] border-[3px] rounded-[12px] ${getMessageBorderColor(role)}`}
                         >
-                            <p className="font-bold">{message.sentByName}</p>
+                            <p className="font-bold">{pseudo}</p>
                             <p>{message.content}</p>
                         </div>
                     </div>

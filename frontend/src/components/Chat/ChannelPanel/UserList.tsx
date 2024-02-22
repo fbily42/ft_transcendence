@@ -65,9 +65,10 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                                 }
                             >
                                 <CardChannelUser
+                                    targetPseudo={user.pseudo}
                                     targetId={user.userId}
                                     targetName={user.name}
-                                    targetPicture={user.photo42}
+                                    targetPicture={user.avatar}
                                     targetRole={getRole(user)}
                                     userRole={getMyrole(me?.name!, users)}
                                 ></CardChannelUser>
@@ -85,9 +86,10 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                                 user.banned ? (
                                     <div key={index} className={'opacity-50'}>
                                         <CardChannelUser
+                                            targetPseudo={user.pseudo}
                                             targetId={user.userId}
                                             targetName={user.name}
-                                            targetPicture={user.photo42}
+                                            targetPicture={user.avatar}
                                             targetRole={getRole(user)}
                                             userRole={getMyrole(
                                                 me?.name!,

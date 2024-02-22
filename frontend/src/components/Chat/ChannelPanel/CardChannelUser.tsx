@@ -11,6 +11,7 @@ import DropdownChannelUser from './DropdownChannelUser'
 import { getAvatarBorderColor, getTextColor } from '@/lib/Chat/chat.utils'
 
 interface CardChannelUser {
+    targetPseudo: string
     targetId: string
     targetPicture: string
     targetName: string
@@ -19,6 +20,7 @@ interface CardChannelUser {
 }
 
 const CardChannelUser: React.FC<CardChannelUser> = ({
+    targetPseudo,
     targetId,
     targetName,
     targetPicture,
@@ -39,7 +41,7 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
                         <AvatarFallback>{PinguAvatar}</AvatarFallback>
                     </Avatar>
                     <CardHeader className="w-full h-full flex justify-center p-0">
-                        <CardTitle>{targetName}</CardTitle>
+                        <CardTitle>{targetPseudo}</CardTitle>
                         <CardDescription className={getTextColor(targetRole)}>
                             {targetRole}
                         </CardDescription>

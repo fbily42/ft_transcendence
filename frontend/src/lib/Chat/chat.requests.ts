@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Channel, CmdData, CreateFormValues, JoinFormValues, Message, UserInChannel } from "./chat.types";
+import { Channel, CmdData, CreateFormValues, JoinFormValues, LeaveChannelData, Message, UserInChannel } from "./chat.types";
 import { Dispatch, SetStateAction } from "react";
 import { WebSocketContextType } from "@/context/webSocketContext";
 
@@ -112,4 +112,8 @@ export function mute(data: CmdData, socket: WebSocketContextType) {
 
 export function unmute(data: CmdData, socket: WebSocketContextType) {
     socket?.webSocket?.emit('channelUnmute', data)
+}
+
+export function leaveChannel(cmd: LeaveChannelData, socket: WebSocketContextType) {
+	socket?.webSocket?.emit('quitChannel', cmd)
 }
