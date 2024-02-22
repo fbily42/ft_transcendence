@@ -3,6 +3,7 @@ import {
     acceptFriend,
     addNewFriend,
     getFriendRequest,
+    getMyFriends,
     getPendingInvitations,
     removeFriend,
 } from '@/lib/Dashboard/dashboard.requests'
@@ -22,17 +23,41 @@ export default function OtherActionsBtns() {
         queryFn: getPendingInvitations,
     })
 
+    const { data: friends } = useQuery<FriendData[]>({
+        queryKey: ['friends'],
+        queryFn: getMyFriends,
+    })
+
     const queryClient = useQueryClient()
-    const mutation = useMutation({
-        mutationFn: (friendId: string) => acceptFriend(friendId),
+
+    const addNewFriendMutation = useMutation({
+        mutationFn: (friendId: string) => addNewFriend(friendId),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['myFriends', 'pending'],
-            })
+            queryClient.invalidateQueries({ queryKey: ['request'] })
+            queryClient.invalidateQueries({ queryKey: ['pending'] })
+            queryClient.invalidateQueries({ queryKey: ['friends'] })
         },
     })
 
-    const isFriend = friendRequest?.some((friend) => friend.id === param.id)
+    const acceptFriendMutation = useMutation({
+        mutationFn: (friendId: string) => acceptFriend(friendId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['request'] })
+            queryClient.invalidateQueries({ queryKey: ['pending'] })
+            queryClient.invalidateQueries({ queryKey: ['friends'] })
+        },
+    })
+
+    const removeFriendMutation = useMutation({
+        mutationFn: (friendId: string) => removeFriend(friendId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['request'] })
+            queryClient.invalidateQueries({ queryKey: ['pending'] })
+            queryClient.invalidateQueries({ queryKey: ['friends'] })
+        },
+    })
+
+    const isFriend = friends?.some((friend) => friend.id === param.id)
     const isPending = friendInvites?.some((invite) => invite.id === param.id)
     const isRequested = friendRequest?.some(
         (request) => request.id === param.id
@@ -42,12 +67,14 @@ export default function OtherActionsBtns() {
         <div>
             {!isFriend && !isPending && !isRequested && (
                 <div>
-                    <Button onClick={() => addNewFriend(param.id!)}>
+                    <Button
+                        onClick={() => addNewFriendMutation.mutate(param.id!)}
+                    >
                         Add Friend
                     </Button>
                 </div>
             )}
-            {isFriend && !isRequested && (
+            {isFriend && (
                 <>
                     <div>
                         <Button>Private Message</Button>
@@ -55,7 +82,9 @@ export default function OtherActionsBtns() {
                     <div>
                         <Button
                             variant={'destructive'}
-                            onClick={() => removeFriend(param.id!)}
+                            onClick={() =>
+                                removeFriendMutation.mutate(param.id!)
+                            }
                         >
                             Remove Friend
                         </Button>
@@ -67,38 +96,15 @@ export default function OtherActionsBtns() {
                     <Button variant={'outline'}>Pending Invitation</Button>
                 </div>
             )}
-            {isRequested && (
+            {isRequested && !isFriend && (
                 <div>
-                    <Button onClick={() => mutation.mutate(param.id!)}>
+                    <Button
+                        onClick={() => acceptFriendMutation.mutate(param.id!)}
+                    >
                         Accept Friendship
                     </Button>
                 </div>
             )}
         </div>
     )
-
-    // return (
-    //     <div>
-    //         <div>
-    //             <Button onClick={() => addNewFriend(param.id!)}>
-    //                 Add Friend
-    //             </Button>
-    //         </div>
-    //         <div>
-    //             <Button variant={'outline'}>Pending Invitation</Button>
-    //         </div>
-    //         <div>
-    //             <Button>Accept Friendship</Button>
-    //         </div>
-    //         <div>
-    //             <Button>Private Message</Button>
-    //             <Button
-    //                 variant={'destructive'}
-    //                 onClick={() => removeFriend(param.id!)}
-    //             >
-    //                 Remove Friend
-    //             </Button>
-    //         </div>
-    //     </div>
-    // )
 }

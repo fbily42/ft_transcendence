@@ -2,13 +2,18 @@
 import UserScoreCard from '@/components/User/userStats/UserScoreCard'
 import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import {
+    getFriendRequest,
+    getPendingInvitations,
+    getUserMe,
+} from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
 import FriendRequest from '@/components/Profile/FriendRequest'
 import PendingInvitations from '@/components/Profile/PendingInvitations'
 import MyFriendList from '@/components/Profile/MyFriendList'
+import { FriendData } from '@/lib/Dashboard/dashboard.types'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -23,6 +28,16 @@ function Profile() {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
+
+    const { data: friendRequest } = useQuery<FriendData[]>({
+        queryKey: ['request'],
+        queryFn: getFriendRequest,
+    })
+
+    const { data: friendInvites } = useQuery<FriendData[]>({
+        queryKey: ['pending'],
+        queryFn: getPendingInvitations,
+    })
 
     const { data, isError, isLoading } = useQuery({
         queryKey: ['me'],
@@ -76,15 +91,23 @@ function Profile() {
             </div>
             <div
                 id="User friends"
-                className={`${isMobile ? 'w-full' : 'w-[40%] sm:w-[40%] md:w-[30%] lg:w-[30%]'} ${isMobile ? 'h-fit' : 'h-full'} flex flex-col bg-white rounded-[26px] md:rounded-[30px] lg:rounded-[36px] gap-[36px] shadow-drop`}
+                className={`${isMobile ? 'w-full' : 'w-[40%] sm:w-[40%] md:w-[30%] lg:w-[30%]'} ${isMobile ? 'h-fit' : 'h-full'} flex flex-col bg-white rounded-[26px] md:rounded-[30px] lg:rounded-[36px] shadow-drop`}
             >
                 <div className="bg-[#C1E2F7] flex justify-start items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
                     <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
                         Noot Friends
                     </h1>
                 </div>
-                <FriendRequest />
-                <PendingInvitations />
+                {friendRequest && friendRequest.length > 0 ? (
+                    <FriendRequest />
+                ) : (
+                    <div />
+                )}
+                {friendInvites && friendInvites.length > 0 ? (
+                    <PendingInvitations />
+                ) : (
+                    <div />
+                )}
                 <MyFriendList />
             </div>
         </div>
