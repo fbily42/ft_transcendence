@@ -12,6 +12,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import TwoFA from './Pages/TwoFA/TwoFA'
 import { TwoFAProvider } from './context/twoFAEnableContext'
 import OtherProfile from './Pages/Profile/OtherProfile'
+import NotFound from './Pages/NotFound/NotFound'
 
 const queryClient = new QueryClient()
 
@@ -52,6 +53,7 @@ function App() {
                             </Route>
                         </Route>
                     </Route>
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </QueryClientProvider>
         </>

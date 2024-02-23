@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { Link } from 'react-router-dom'
 import PinguLogo from '../../assets/welcome-assets/PinguLogo.svg'
 import PinguFamily from '../../assets/welcome-assets/PinguFamily.svg'
 import PinguAnim from '../../assets/welcome-assets/PinguAnim.mp4'
@@ -7,7 +5,6 @@ import SnowCoverTop from '../../assets/welcome-assets/SnowCoverTop.svg'
 import SnowCoverBottom from '../../assets/welcome-assets/SnowCoverBottom.svg'
 import Snow from './Snow'
 import LoginButton from './LoginButton'
-import SetProfileForm from './SetProfileForm'
 import SetProfile from './SetProfile'
 
 type Loginprops = {
