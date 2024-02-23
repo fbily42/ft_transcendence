@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Patch,
+	Post,
+	Req,
+	UseGuards,
+} from '@nestjs/common';
 import { ChannelList, UserInChannel } from './chat.types';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -13,13 +22,19 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Post('add')
-	async addChannel(@Req() req: Request, @Body() dto: NewChannelDto): Promise<string> {
+	async addChannel(
+		@Req() req: Request,
+		@Body() dto: NewChannelDto,
+	): Promise<string> {
 		return await this.chatService.createChannel(req['userID'], dto);
 	}
 
 	@UseGuards(AuthGuard)
 	@Post('join')
-	async joinChannel(@Req() req: Request, @Body() dto: JoinChannelDto): Promise<void> {
+	async joinChannel(
+		@Req() req: Request,
+		@Body() dto: JoinChannelDto,
+	): Promise<void> {
 		return await this.chatService.joinChannel(req['userID'], dto);
 	}
 
@@ -31,7 +46,9 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Get('channel/users/:name')
-	async getChannelUsers(@Param('name') name: string): Promise<UserInChannel[]> {
+	async getChannelUsers(
+		@Param('name') name: string,
+	): Promise<UserInChannel[]> {
 		return await this.chatService.getChannelUsers(name);
 	}
 
@@ -43,7 +60,10 @@ export class ChatController {
 
 	@UseGuards(AuthGuard)
 	@Patch('channel/invite')
-	async inviteToChannel(@Req() req: Request, @Body() dto: InviteChannelDto): Promise<void> {
-		return await this.chatService.inviteUser(req['userID'], dto)
+	async inviteToChannel(
+		@Req() req: Request,
+		@Body() dto: InviteChannelDto,
+	): Promise<void> {
+		return await this.chatService.inviteUser(req['userID'], dto);
 	}
 }

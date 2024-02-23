@@ -6,7 +6,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { DropdownChannelProps, LeaveChannelData } from '@/lib/Chat/chat.types'
 import { MoreHorizontal } from 'lucide-react'
 import LeaveChannel from './LeaveChannel'
@@ -16,11 +15,11 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
     channelName,
     role,
 }) => {
-    const socket = useWebSocket() as WebSocketContextType
     const cmd: LeaveChannelData = {
         user: userName,
         channel: channelName,
         role: role,
+		alone: false,
     }
     return (
         <DropdownMenu>

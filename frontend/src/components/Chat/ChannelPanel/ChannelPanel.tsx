@@ -2,12 +2,9 @@ import { Button } from '@/components/ui/button'
 import React, { useEffect, useState } from 'react'
 import Modal from '../../Modal'
 import TabsChannel from './TabsChannel'
-import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Share } from 'lucide-react'
-import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
-import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import UserList from './UserList'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import CardInvite from './CardInvite'
@@ -89,10 +86,15 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         socket?.webSocket?.on('updateChannelList', () => {
             queryClient.invalidateQueries({ queryKey: ['channels'] })
         })
+        socket?.webSocket?.on('hideChat', () => {
+            setHide(true)
+			setCurrentChannel('')
+        })
         return () => {
             socket?.webSocket?.off('kickedFromChannel')
             socket?.webSocket?.off('activePrivateMessage')
             socket?.webSocket?.off('updateChannelList')
+            socket?.webSocket?.off('hideChat')
         }
     })
 

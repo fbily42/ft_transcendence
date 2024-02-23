@@ -87,4 +87,5 @@ export type LeaveChannelData = {
     channel: string
     role: string
 	newOwner?: string
+	alone: boolean
 }

@@ -97,10 +97,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     function getPseudo(name: string): string {
         if (users) {
             for (const user of users) {
-                if (user.name === name) return user.pseudo
+                if (user.name === name) {
+                    // if (user.banned) return 'banned user'
+                    return user.pseudo
+                }
             }
         }
-        return name
+        return 'unknown'
     }
 
     useEffect(() => {
