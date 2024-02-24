@@ -22,15 +22,15 @@ import { IsString, Length, MaxLength, MinLength } from 'class-validator';
 export class UploadsController {
 	constructor(private uploadsService: UploadsService) {}
 
-	@UseInterceptors(FileInterceptor('file'))
+	@UseInterceptors(
+		FileInterceptor('file', { limits: { fieldSize: 25 * 1024 * 1024 } }),
+	)
 	@Post()
 	async setProfile(
 		@Body() formDto: FormDto,
 		@UploadedFile(
 			new ParseFilePipe({
-				validators: [
-					new FileTypeValidator({ fileType: 'image/svg' }),
-				],
+				validators: [new FileTypeValidator({ fileType: 'image/svg' })],
 				fileIsRequired: false,
 			}),
 		)
