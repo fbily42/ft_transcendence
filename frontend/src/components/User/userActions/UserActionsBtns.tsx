@@ -9,7 +9,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
-import { useNavigate } from 'react-router-dom'
 import SetProfileForm from '@/components/Auth/SetProfileForm'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
@@ -17,6 +16,8 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 export default function UserActionsBtns() {
     // const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
+    const [openProfileSettings, setOpenProfileSettings] =
+        useState<boolean>(false)
     const {
         data: currentUser,
         isError,
@@ -48,14 +49,16 @@ export default function UserActionsBtns() {
     //         window.removeEventListener('resize', handleResize)
     //     }
     // }, [])
-    const navigate = useNavigate()
 
     return (
         <div
             id="Buttons"
             className={`w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar`}
         >
-            <Dialog>
+            <Dialog
+                open={openProfileSettings}
+                onOpenChange={setOpenProfileSettings}
+            >
                 <DialogTrigger asChild>
                     <Button className="w-full" variant={'default'}>
                         Settings
@@ -72,7 +75,7 @@ export default function UserActionsBtns() {
                         submitButtonText="I'm ready to noot"
                         currentAvatar={initialAvatar || ''}
                         currentPseudo={initialPseudo || ''}
-                        onClose={() => navigate('/profile/me')}
+                        onClose={() => setOpenProfileSettings(false)}
                     />
                 </DialogContent>
             </Dialog>
