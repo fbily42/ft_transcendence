@@ -9,12 +9,15 @@ import {
 import { DropdownChannelProps, LeaveChannelData } from '@/lib/Chat/chat.types'
 import { MoreHorizontal } from 'lucide-react'
 import LeaveChannel from './LeaveChannel'
+import CardPassword from './CardPassword'
+import { useState } from 'react'
 
 const DropdownChannel: React.FC<DropdownChannelProps> = ({
     userName,
     channelName,
     role,
 }) => {
+	const [open, setOpen] = useState<boolean>(false);
     const cmd: LeaveChannelData = {
         user: userName,
         channel: channelName,
@@ -47,14 +50,14 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
                 </Dialog>
                 <div>
                     {role === 'owner' ? (
-                        <Dialog>
+                        <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
                                 <DropdownMenuItem className="w-full text-sm" onSelect={(e) => e.preventDefault()}>
                                     Set password
                                 </DropdownMenuItem>
                             </DialogTrigger>
                             <DialogContent>
-                                You are about to change the password
+                                <CardPassword channel={channelName} closeDialog={() => setOpen(false)}/>
                             </DialogContent>
                         </Dialog>
                     ) : null}

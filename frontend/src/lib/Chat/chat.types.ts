@@ -89,3 +89,9 @@ export type LeaveChannelData = {
 	newOwner?: string
 	alone: boolean
 }
+
+export type PasswordCmd = {
+	userId: string
+	channel: string
+	newPassword: string
+}

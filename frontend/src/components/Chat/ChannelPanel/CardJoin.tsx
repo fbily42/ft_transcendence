@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { JoinChannelProps, JoinFormValues } from '@/lib/Chat/chat.types'
 import { joinChannel } from '@/lib/Chat/chat.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
+import ChatCard from '../../../assets/other/chat-modal.svg'
 
 interface CardJoinProps {
     onClose: () => void
@@ -39,7 +40,13 @@ function CardJoin({ onClose }: CardJoinProps) {
     }
 
     return (
-        <div>
+        <div className="h-full w-full justify-between flex flex-col gap-[10px]">
+            <div className="fixed-0">
+                <img
+                    src={ChatCard}
+                    className="absolute top-[-100px]"
+                />
+            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>

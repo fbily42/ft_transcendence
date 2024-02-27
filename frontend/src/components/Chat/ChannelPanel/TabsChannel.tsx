@@ -9,8 +9,8 @@ interface TabsChannelProps {
 
 function TabsChannel({ onClose }: TabsChannelProps) {
     return (
-        <Tabs defaultValue="create" className="w-[400px]">
-            <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="create" className="h-full w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-customBlue">
                 <TabsTrigger value="create">Create</TabsTrigger>
                 <TabsTrigger value="join">Join</TabsTrigger>
             </TabsList>

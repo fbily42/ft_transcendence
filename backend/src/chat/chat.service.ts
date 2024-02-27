@@ -7,6 +7,7 @@ import {
 	JoinChannelDto,
 	MessageDto,
 	NewChannelDto,
+	NewPasswordDto,
 } from './dto';
 import { Channel, ChannelUser, Message, User } from '@prisma/client';
 import { ChannelList, ChannelWithRelation, UserInChannel } from './chat.types';
@@ -218,7 +219,7 @@ export class ChatService {
 					},
 				},
 			});
-
+			if (!channel) return;
 			// Extract and structure the data
 			const users: UserInChannel[] = channel.users.map((channelUser) => ({
 				userId: channelUser.userId,
@@ -269,10 +270,14 @@ export class ChatService {
 
 	async inviteUser(userId: string, dto: InviteChannelDto) {
 		try {
-			const user: User = await this.prisma.user.findUnique({
+			const user = await this.prisma.user.findUnique({
 				where: {
-					name: dto.name,
+					pseudo: dto.name,
 				},
+				select:{
+					id:true,
+					name:true,
+				}
 			});
 			if (!user)
 				throw new HttpException(
@@ -320,7 +325,7 @@ export class ChatService {
 					invited: true,
 				},
 			});
-			return;
+			return user.name;
 		} catch (error) {
 			if (error instanceof HttpException) throw error;
 			else if (error instanceof PrismaClientKnownRequestError)
@@ -688,15 +693,161 @@ export class ChatService {
 
 	async deleteChannel(name: string) {
 		try {
-				console.log('deleted channel')
-				const deletedChannel = await this.prisma.channel.delete({
+			const deletedChannel = await this.prisma.channel.delete({
+				where: {
+					name: name,
+				},
+			});
+			return deletedChannel;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	async blockUser(cmd: ChannelCmdDto) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: cmd.userId,
+				},
+			});
+			if (!user)
+				throw new HttpException(
+					'This user does not exists',
+					HttpStatus.BAD_REQUEST,
+				);
+			if (user.blocked.includes(cmd.targetName)) {
+				return;
+			} else {
+				user.blocked.push(cmd.targetName);
+			}
+			const updatedUser = await this.prisma.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					blocked: user.blocked,
+				},
+				select: {
+					id: true,
+					name: true,
+					blocked: true,
+				},
+			});
+			return updatedUser;
+		} catch (error) {
+			if (error instanceof HttpException) throw error;
+			else if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async unblockUser(cmd: ChannelCmdDto) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: cmd.userId,
+				},
+			});
+			if (!user)
+				throw new HttpException(
+					'This user does not exists',
+					HttpStatus.BAD_REQUEST,
+				);
+			if (user.blocked.includes(cmd.targetName)) {
+				const unblocked = user.blocked.filter(
+					(blocked) => blocked !== cmd.targetName,
+				);
+				const updateUser = await this.prisma.user.update({
 					where: {
-						name: name,
+						id: user.id,
+					},
+					data: {
+						blocked: unblocked,
+					},
+					select: {
+						id: true,
+						name: true,
+						blocked: true,
 					},
 				});
-				return deletedChannel
+				return updateUser;
+			} else {
+				throw new HttpException(
+					'This user is not blocked',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
 		} catch (error) {
-			throw error
+			if (error instanceof HttpException) throw error;
+			else if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async changePassword(dto: NewPasswordDto) {
+		try {
+			const channel = await this.prisma.channel.findUnique({
+				where: {
+					name: dto.channel,
+				},
+			});
+			if (!channel)
+				throw new HttpException(
+					'Channel does not exists',
+					HttpStatus.BAD_REQUEST,
+				);
+			const user = await this.prisma.channelUser.findUnique({
+				where: {
+					channelId_userId: {
+						userId: dto.userId,
+						channelId: channel.id,
+					},
+				},
+			});
+			if (!user || !user.owner)
+				throw new HttpException(
+					'You are not authorized to change the password',
+					HttpStatus.BAD_REQUEST,
+				);
+			const hash = await argon.hash(dto.newPassword)
+			const updatedChannel = await this.prisma.channel.update({
+				where: {
+					id: channel.id,
+				},
+				data: {
+					hash: hash,
+				},
+				select: {
+					name: true,
+				}
+			})
+			return updatedChannel
+		} catch (error) {
+			if (error instanceof HttpException) throw error;
+			else if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 }

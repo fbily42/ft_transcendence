@@ -11,7 +11,7 @@ import {
 import { ChannelList, UserInChannel } from './chat.types';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { NewChannelDto, JoinChannelDto } from './dto';
+import { NewChannelDto, JoinChannelDto, ChannelCmdDto, NewPasswordDto } from './dto';
 import { ChatService } from './chat.service';
 import { Message } from '@prisma/client';
 import { InviteChannelDto } from './dto/inviteChannel.dto';
@@ -63,7 +63,25 @@ export class ChatController {
 	async inviteToChannel(
 		@Req() req: Request,
 		@Body() dto: InviteChannelDto,
-	): Promise<void> {
+	): Promise<string> {
 		return await this.chatService.inviteUser(req['userID'], dto);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/block')
+	async blockUser(@Body() dto: ChannelCmdDto) {
+		return await this.chatService.blockUser(dto);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/unblock')
+	async unblockUser(@Body() dto: ChannelCmdDto) {
+		return await this.chatService.unblockUser(dto);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/password')
+	async updatePassword(@Body() dto: NewPasswordDto) {
+		return await this.chatService.changePassword(dto)
 	}
 }

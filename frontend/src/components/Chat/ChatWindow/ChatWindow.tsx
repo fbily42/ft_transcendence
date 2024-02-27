@@ -98,7 +98,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         if (users) {
             for (const user of users) {
                 if (user.name === name) {
-                    // if (user.banned) return 'banned user'
                     return user.pseudo
                 }
             }
@@ -138,6 +137,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                     message={message}
                                     picture={getAvatar(message.sentByName)}
                                     role={getSenderRole(message.sentByName)}
+                                    blocked={
+                                        me?.blocked.includes(
+                                            message.sentByName
+                                        )!
+                                    }
                                 ></MessageBubble>
                             )
                         )}

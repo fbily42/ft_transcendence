@@ -30,11 +30,14 @@ const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
 
     const socket = useWebSocket() as WebSocketContextType
     const [newOwner, setNewOwner] = useState<string>('')
+	const [error, setError] = useState<string>('')
 
-    function handleClick(cmd: LeaveChannelData, newOwner?: string) {
-        if (newOwner) {
-            cmd.newOwner = newOwner
-        }
+    function handleClick(cmd: LeaveChannelData, newOwner: string) {
+		if (!newOwner){
+			setError('Please select a new owner')
+			return;
+		}
+		cmd.newOwner = newOwner;
         leaveChannel(cmd, socket)
     }
     if (variant === 'Owner') {
@@ -81,6 +84,7 @@ const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
                                 </SelectContent>
                             </Select>
                         </div>
+						<div className='text-red-600'>{error}</div>
                         <div className="flex justify-between gap-[10px]">
                             <DialogClose asChild>
                                 <Button className="w-full">Return</Button>
@@ -109,7 +113,7 @@ const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
                             </DialogClose>
                             <Button
                                 className="w-full"
-                                onClick={() => handleClick({...cmd, alone: true})}
+                                onClick={() => leaveChannel({...cmd, alone: true}, socket)}
                             >
                                 Delete anyways
                             </Button>
@@ -137,7 +141,7 @@ const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
                     </p>
                 </div>
                 <div className="flex justify-between gap-[10px]">
-                    <Button className="w-full" onClick={() => handleClick(cmd)}>
+                    <Button className="w-full" onClick={() => leaveChannel(cmd, socket)}>
                         Quit channel
                     </Button>
                     <DialogClose asChild>
