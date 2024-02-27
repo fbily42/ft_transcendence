@@ -56,17 +56,17 @@ function Profile() {
             >
                 <div
                     id="User top info"
-                    className={`flex ${isMobile ? 'flex-col ' : 'flex-row h-[50%] w-full items-center justify-center'} bg-white rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]`}
+                    className={`flex justify-center ${isMobile ? 'flex-col ' : 'flex-row h-[50%] w-full items-center'} bg-white rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]`}
                 >
                     <div
                         id="User top info + padding"
-                        className={`flex ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full'} w-full p-[36px]`}
+                        className={`flex justify-center gap-10 items-center ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full'} w-full p-[36px]`}
                     >
                         <div
                             id="User avatar"
-                            className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'} w-[150px] h-[150px] border-[3px] border-customDarkBlue rounded-full overflow-hidden`}
+                            className={`flex justify-center items-center w-[150px] h-[150px] md:w-[200px] md:h-[200px] lg:w-[300px] lg:h-[300px] border-[5px] border-customDarkBlue rounded-full overflow-hidden`}
                         >
-                            <UserAvatar  selectedAvatar={selectedAvatar} />
+                            <UserAvatar selectedAvatar={selectedAvatar} />
                         </div>
                         <div
                             id="User informations"

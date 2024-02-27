@@ -14,8 +14,8 @@ function Dashboard(): JSX.Element {
         queryKey: ['me'],
         queryFn: getUserMe,
     })
-    const CloudsArray = new Array(10).fill(Clouds) // Change the number for more or fewer clouds
-    const MountainsArray = new Array(10).fill(Mountains) // Change the number for more or fewer mountains
+    const CloudsArray = new Array(10).fill(Clouds)
+    const MountainsArray = new Array(10).fill(Mountains)
 
     return (
         <>
@@ -79,30 +79,30 @@ function Dashboard(): JSX.Element {
                     </div>
                     <div
                         id="stat cards"
-                        className="flex flex-col w-[20%] h-[100%] justify-between gap-[20px]"
+                        className="flex flex-col w-[20%] h-[100%] justify-between gap-4"
                     >
-                        <div id="rank card" className="bg-yellow-100 h-[30%]">
+                        <div id="rank card" className="h-full">
                             <CardsDashboard
                                 title="My Rank"
                                 icon={<Award />}
-                                //content={user ? user.rank : 0}
                                 content={data?.rank || 0}
+                                backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>
-                        <div id="game card" className="bg-yellow-100 h-[30%]">
+                        <div id="game card" className="h-full">
                             <CardsDashboard
                                 title="Game Played"
                                 icon={<Gamepad2 />}
-                                // content={user ? user.games : 0}
                                 content={data?.games || 0}
+                                backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>
-                        <div id="win card" className="bg-yellow-100 h-[30%]">
+                        <div id="win card" className="h-full">
                             <CardsDashboard
                                 title="Game Won"
                                 icon={<Crown />}
-                                // content={user ? user.wins : 0}
                                 content={data?.wins || 0}
+                                backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>
                     </div>
