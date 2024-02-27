@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { CalendarIcon, Music2, RocketIcon } from 'lucide-react'
+import { Music2 } from 'lucide-react'
 import { TwoFAContext } from '@/context/twoFAEnableContext'
 import axios from 'axios'
 import { toast } from 'sonner'
@@ -11,28 +11,14 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import {
-    CommandEmpty,
-    CommandGroup,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from 'cmdk'
-import {
-    EnvelopeClosedIcon,
-    FaceIcon,
-    GearIcon,
-    PersonIcon,
-} from '@radix-ui/react-icons'
-import { CommandShortcut } from '../ui/command'
-import UserCards from '../User/userCards/UserCards'
 import SearchbarCards from '../User/userCards/SearchbarCards'
+import { Searchbar } from './Searchbar'
 
 export default function SecondNavbar(): JSX.Element {
     const navigate = useNavigate()
     const { twoFAenabled, enableTwoFA, disableTwoFA, twoFAverified } =
         useContext(TwoFAContext)
-    const [searchTerm, setSearchTerm] = useState('')
+    // const [searchTerm, setSearchTerm] = useState('')
     const [isFocused, setIsFocused] = useState(false)
 
     const { data: users } = useQuery<UserData[]>({
@@ -40,13 +26,13 @@ export default function SecondNavbar(): JSX.Element {
         queryFn: getUsers,
     })
 
-    const filteredUsers = users?.filter((user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    // const filteredUsers = users?.filter((user) =>
+    //     user.pseudo.toLowerCase().includes(searchTerm.toLowerCase())
+    // )
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value)
-    }
+    // const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setSearchTerm(event.target.value)
+    // }
 
     const onCheckedChange = async () => {
         if (twoFAenabled) {
@@ -91,7 +77,7 @@ export default function SecondNavbar(): JSX.Element {
     return (
         <div className="flex justify-between align-center pl-[122px] pr-[36px] gap-[50px] h-[10vh]">
             <div className="flex flex-col w-auto justify-center items-start relative">
-                <div id="searchbar" className="flex flex-col">
+                {/* <div id="searchbar" className="flex flex-col">
                     <Input
                         className="focus-visible:ring-1 focus-visible:ring-customDarkBlue bg-white shadow-boxShadow hover:border-[#45A0E3] hover:border-2 focus:border-[#45A0E3] focus:border-2 active:border-[#45A0E3] active:border-2"
                         type="text"
@@ -108,19 +94,19 @@ export default function SecondNavbar(): JSX.Element {
                         id="searchbar on focus"
                     >
                         {filteredUsers?.map((user) => (
-                            // <div key={user.id}>{user.name}</div>
                             <SearchbarCards
-                            id={user.id.toString()}
-                            key={user.id}
-                            bgColor="white"
-                            userName={user.name}
-                            userPicture={user.avatar}
-                            userStatus={''}
-                            variant="OTHER"
-                        />
+                                id={user.id.toString()}
+                                key={user.id}
+                                bgColor="white"
+                                userName={user.pseudo}
+                                userPicture={user.avatar}
+                                userStatus={''}
+                                variant="OTHER"
+                            />
                         ))}
                     </div>
-                )}
+                )} */}
+                <Searchbar></Searchbar>
             </div>
 
             <div className="flex justify-between gap-[50px]">

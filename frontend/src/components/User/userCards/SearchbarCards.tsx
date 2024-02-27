@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import PinguAvatar from '../../../assets/empty-state/pingu-face.svg'
-import DropdownCard from './DropdownCard'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
