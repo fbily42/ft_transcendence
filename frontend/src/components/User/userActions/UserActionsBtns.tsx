@@ -16,6 +16,9 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 export default function UserActionsBtns() {
     // const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
+    const [openProfileSettings, setOpenProfileSettings] =
+        useState<boolean>(false)
+
     const { data: currentUser } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
@@ -43,7 +46,10 @@ export default function UserActionsBtns() {
             id="Buttons"
             className={`w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar`}
         >
-            <Dialog>
+            <Dialog
+                open={openProfileSettings}
+                onOpenChange={setOpenProfileSettings}
+            >
                 <DialogTrigger asChild>
                     <Button className="w-full" variant={'default'}>
                         Settings
@@ -60,7 +66,7 @@ export default function UserActionsBtns() {
                         submitButtonText="I'm ready to noot"
                         currentAvatar={initialAvatar || ''}
                         currentPseudo={initialPseudo || ''}
-                        onClose={(e: React.MouseEvent) => e.stopPropagation()}
+                        onClose={() => setOpenProfileSettings(false)}
                     />
                 </DialogContent>
             </Dialog>
