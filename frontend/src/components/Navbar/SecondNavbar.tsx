@@ -122,16 +122,6 @@ export default function SecondNavbar(): JSX.Element {
                     </Label>
                 </div>
 
-                <div className="flex items-center gap-[10px]">
-                    <Button
-                        variant="secondNavIconStyle"
-                        size="secondNavIconSize"
-                    >
-                        <div className="text-black">
-                            <Music2 className="h-[24px] w-[24px]" />
-                        </div>
-                    </Button>
-                </div>
             </div>
         </div>
     )

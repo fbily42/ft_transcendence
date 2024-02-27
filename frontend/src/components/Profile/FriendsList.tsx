@@ -43,43 +43,20 @@ export default function FriendsList() {
 
     return (
         <div>
-            <h2 className="p-[20px] text-gray-500">All</h2>
-            <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {data ? (
-                    data.map((data: UserData) => (
-                        <UserCards
-                            id={data.id.toString()}
-                            key={data.id}
-                            bgColor="white"
-                            userName={data.pseudo}
-                            userPicture={data.avatar || PinguAvatar}
-                            userStatus={getStatus(data.name)}
-                            variant="OTHER"
-                        />
-                    ))
-                ) : (
-                    <div className="flex items-center justify-center w-full h-[68px] px-[6px] sm:px-[16px] md:px-[26px] gap-[10px]">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="w-full h-full flex flex-col justify-center gap-1">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[100px]" />
-                        </div>
-                    </div>
-                )}
-            </div>
-            <h2 className="p-[20px] text-gray-500">Friends</h2>
             <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
                 {friends ? (
                     friends.map((friend: FriendData) => (
-                        <UserCards
-                            id={friend.id.toString()}
-                            key={friend.id}
-                            bgColor="white"
-                            userName={friend.pseudo}
-                            userPicture={friend.avatar || PinguAvatar}
-                            userStatus={getStatus(friend.name)}
-                            variant="OTHER"
-                        />
+                        <div key={friend.id}>
+                            <h2 className="p-[20px] text-gray-500">Friends</h2>
+                            <UserCards
+                                id={friend.id.toString()}
+                                bgColor="white"
+                                userName={friend.pseudo}
+                                userPicture={friend.avatar || PinguAvatar}
+                                userStatus={getStatus(friend.name)}
+                                variant="OTHER"
+                            />
+                        </div>
                     ))
                 ) : (
                     <div className="flex items-center justify-center w-full h-[68px] px-[6px] sm:px-[16px] md:px-[26px] gap-[10px]">
