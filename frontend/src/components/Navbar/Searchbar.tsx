@@ -42,12 +42,13 @@ export function Searchbar() {
         <div className="relative">
             <Command
                 className="rounded-lg border rounded-xl"
-                // onBlur={() => setIsFocused(false)}
+                onBlur={(e: React.FocusEvent<HTMLDivElement, Element>) => {
+                    e.relatedTarget === null && setIsFocused(false)
+                }}
             >
                 <CommandInput
                     placeholder="Search for Noots..."
                     onFocus={() => setIsFocused(true)}
-                    // onBlur={() => setIsFocused(false)}
                 />
                 {isFocused && (
                     <div className="absolute z-50 mt-[50px] bg-white rounded-xl w-full">
