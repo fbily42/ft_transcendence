@@ -64,9 +64,9 @@ function Profile() {
                     >
                         <div
                             id="User avatar"
-                            className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'}`}
+                            className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'} w-[150px] h-[150px] border-[3px] border-customDarkBlue rounded-full overflow-hidden`}
                         >
-                            <UserAvatar selectedAvatar={selectedAvatar} />
+                            <UserAvatar  selectedAvatar={selectedAvatar} />
                         </div>
                         <div
                             id="User informations"

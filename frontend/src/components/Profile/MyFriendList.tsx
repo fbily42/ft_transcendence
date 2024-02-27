@@ -1,16 +1,11 @@
-import { getMyFriends, getUsers } from '@/lib/Dashboard/dashboard.requests'
-import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
+import { getMyFriends } from '@/lib/Dashboard/dashboard.requests'
+import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
 import UserCards from '../User/userCards/UserCards'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { Skeleton } from '../ui/skeleton'
-// import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 
 export default function MyFriendList() {
-    const { data } = useQuery<UserData[]>({
-        queryKey: ['users'],
-        queryFn: getUsers,
-    })
     const { data: myFriends } = useQuery<FriendData[]>({
         queryKey: ['userFriend'],
         queryFn: getMyFriends,
@@ -29,7 +24,6 @@ export default function MyFriendList() {
         }
         return friendStatus
     }
-    // console.log(myFriends)
 
     return (
         <div>

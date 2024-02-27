@@ -9,7 +9,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
-import { useNavigate } from 'react-router-dom'
 import SetProfileForm from '@/components/Auth/SetProfileForm'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
@@ -17,20 +16,10 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 export default function UserActionsBtns() {
     // const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
-    const {
-        data: currentUser,
-        isError,
-        isLoading,
-    } = useQuery({
+    const { data: currentUser } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
-    if (isError) {
-        return <div>Error</div>
-    }
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
 
     const initialAvatar = currentUser?.avatar
     const initialPseudo = currentUser?.pseudo
@@ -48,7 +37,6 @@ export default function UserActionsBtns() {
     //         window.removeEventListener('resize', handleResize)
     //     }
     // }, [])
-    const navigate = useNavigate()
 
     return (
         <div
@@ -72,7 +60,7 @@ export default function UserActionsBtns() {
                         submitButtonText="I'm ready to noot"
                         currentAvatar={initialAvatar || ''}
                         currentPseudo={initialPseudo || ''}
-                        onClose={() => navigate('/profile/me')}
+                        onClose={(e: React.MouseEvent) => e.stopPropagation()}
                     />
                 </DialogContent>
             </Dialog>

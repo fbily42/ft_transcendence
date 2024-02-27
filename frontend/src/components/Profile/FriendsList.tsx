@@ -1,19 +1,14 @@
-import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
+import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserCards from '../User/userCards/UserCards'
 import { Skeleton } from '../ui/skeleton'
-import { getFriends, getUsers } from '@/lib/Dashboard/dashboard.requests'
+import { getFriends } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { useParams } from 'react-router-dom'
 
 export default function FriendsList() {
     const param = useParams()
-
-    const { data, isLoading, isError } = useQuery<UserData[]>({
-        queryKey: ['users'],
-        queryFn: getUsers,
-    })
 
     const { data: friends } = useQuery({
         queryKey: ['userFriend'],
@@ -32,13 +27,6 @@ export default function FriendsList() {
             friendStatus = 'Offline'
         }
         return friendStatus
-    }
-
-    if (isError) {
-        return <div>Error</div>
-    }
-    if (isLoading) {
-        return <div>Loading...</div>
     }
 
     return (

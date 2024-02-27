@@ -15,8 +15,8 @@ import { Link } from 'react-router-dom'
 
 export function Searchbar() {
     const [isFocused, setIsFocused] = useState(false)
-    const [searchTerm, setSearchTerm] = useState<string>('')
-    const [selectedUser, setSelectedUser] = useState(null)
+    const [searchTerm] = useState<string>('')
+    const [selectedUser] = useState(null)
 
     const { data: users } = useQuery<UserData[]>({
         queryKey: ['users'],
@@ -41,7 +41,7 @@ export function Searchbar() {
     return (
         <div className="relative">
             <Command
-                className="rounded-lg border rounded-xl"
+                className="border rounded-xl"
                 onBlur={(e: React.FocusEvent<HTMLDivElement, Element>) => {
                     e.relatedTarget === null && setIsFocused(false)
                 }}

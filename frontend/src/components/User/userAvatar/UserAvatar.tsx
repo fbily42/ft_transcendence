@@ -9,7 +9,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ selectedAvatar }) => {
                 <img
                     src={selectedAvatar}
                     alt="Avatar Background"
-                    className={`p-2 md:p-4 w-full h-full`}
+                    className="w-full h-full rounded-full"
                 />
             </div>
         </div>
