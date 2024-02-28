@@ -25,14 +25,14 @@ export function Paddle_2(
         socket?.webSocket?.emit('key', { key: 'ArrowDown', roomId: roomName })
     }
 
-    ctx.beginPath()
     ctx.drawImage(
-        gameImages.image.img_grey,
+		gameImages.image.img_grey,
         gameInfo.paddleTwo.x,
         gameInfo.paddleTwo.y,
         gameInfo.paddleTwo.width,
         gameInfo.paddleTwo.height
-    )
+		)
+	ctx.beginPath()
     // ctx.rect(gameInfo.paddleTwo.x, gameInfo.paddleTwo.y, gameInfo.paddleTwo.width, gameInfo.paddleTwo.height);
     ctx.fillStyle = gameInfo.paddleTwo.color
     ctx.strokeStyle = gameInfo.paddleTwo.color

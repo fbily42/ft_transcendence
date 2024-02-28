@@ -11,8 +11,8 @@ export class GameStats {
 	// gameState: String;
 	constructor() {
 		this.canvas ={
-			height : 1600,
-			width : 1600,
+			height : 800,
+			width : 800,
 		}
 		this.ball = {
 			x: 200,
@@ -165,4 +165,5 @@ export class GameStats {
 export type RoomInfo = {
 	id: string;
 	websocket: string;
+	matchmaking : boolean;
 }

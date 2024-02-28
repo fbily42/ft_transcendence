@@ -6,11 +6,9 @@ export function BallMovement(
     ctx: CanvasRenderingContext2D,
     gameInfo: GameStats,
     gameImages: imageForGame,
-    socket: WebSocketContextType,
-    room: string
+
 ) {
     if (gameImages.image.img_fish.complete) {
-        // ctx.beginPath()
         ctx.drawImage(
             gameImages.image.img_fish,
             gameInfo.ball.x - gameInfo.ball.rad,
@@ -21,7 +19,7 @@ export function BallMovement(
         // ctx.closePath()
     } else {
         gameImages.image.img_fish.onload = function () {
-            // ctx.beginPath()
+
             ctx.drawImage(
                 gameImages.image.img_fish,
                 gameInfo.ball.x - gameInfo.ball.rad,
@@ -33,22 +31,6 @@ export function BallMovement(
         }
     }
     // ctx.beginPath()
-    // // gameImages.image.img_fish.onload = function() {
-    // // L'image est maintenant complètement chargée, vous pouvez travailler avec elle.
-    // // 	console.log(img.width); // Affiche la largeur de l'image
-    // // };
-    // ctx.drawImage(
-    //     gameImages.image.img_fish,
-    //     gameInfo.ball.x - gameInfo.ball.rad,
-    //     gameInfo.ball.y - gameInfo.ball.rad,
-    //     gameInfo.ball.rad * 2,
-    //     gameInfo.ball.rad * 2
-    // )
-    // // img.onload = () => {
-    // // 		ctx.drawImage(img, ballObj.x - ballObj.rad, ballObj.y - ballObj.rad, ballObj.rad * 2, ballObj.rad * 2);
-
-    // // };
-
     // // ctx.arc(gameInfo.ball.x, gameInfo.ball.y , gameInfo.ball.rad, 0, 2 * Math.PI);
     // ctx.fillStyle = 'red'
     // ctx.strokeStyle = 'black'
@@ -65,10 +47,10 @@ export function Paddle_Collision(
     socket: WebSocketContextType,
     room: string
 ) {
-    socket.webSocket?.emit('paddllColl', room)
+    // socket.webSocket?.emit('paddllColl', room)
 }
 
-function updatescore(
+export function updatescore(
     gameImages: imageForGame,
     gameInfo: GameStats,
     ctx: CanvasRenderingContext2D,

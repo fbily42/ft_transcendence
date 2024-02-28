@@ -7,6 +7,7 @@ import Modal from '@/components/Modal';
 import axios from 'axios';
 import GameForm from '@/components/Pong/GameForm';
 import Board from './Game';
+import Basic from './BasicGame';
 
 
 // faire un decompte en blur ou on voit le jeu en arriere plan, prevoir le cas de la reconnection pour ne pas declencher le decompte dans ce cas la 
@@ -18,6 +19,7 @@ function Pong() {
 	  <div className='flex flex-col justify-between pl-[122px] pb-[36px] pr-[36px] h-[90vh] bg-red-100 gap-[36px]'>
 		
 		  <Board />
+		  {/* <Basic /> */}
 	  </div>
 	);
   }

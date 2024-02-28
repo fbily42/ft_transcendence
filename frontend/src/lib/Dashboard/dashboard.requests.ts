@@ -22,7 +22,7 @@ export async function getOtherUser(pseudo: string): Promise<UserData> {
     return response.data
 }
 
-export async function getUsers(): Promise<UserData> {
+export async function getUsers(): Promise<UserData[]> {
     const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/user/all`,
         {
