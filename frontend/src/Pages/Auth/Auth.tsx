@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Link, Outlet } from 'react-router-dom'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Outlet } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Login from '@/components/Auth/Login'
-import Modal from '@/components/Modal'
-import OtpForm from '@/components/Auth/OtpForm'
-import OtpModal from '@/components/TwoFA/OtpModal'
 
 function Auth(): JSX.Element {
     const [isAuth, setIsAuth] = useState<boolean>(false)
