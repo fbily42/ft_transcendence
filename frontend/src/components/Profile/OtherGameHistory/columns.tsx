@@ -29,7 +29,9 @@ export const columns: ColumnDef<GameHistory>[] = [
                             className="rounded-full object-cover w-[40px] h-[40px]"
                             src={row.original.user.avatar}
                         />
-                        <AvatarFallback>{PinguAvatar}</AvatarFallback>
+                        <AvatarFallback>
+                            <img src={PinguAvatar} alt="pingu" />
+                        </AvatarFallback>
                     </Avatar>
                     <div className="text-right font-medium">
                         {row.original.user.pseudo}
@@ -60,7 +62,9 @@ export const columns: ColumnDef<GameHistory>[] = [
                             className="rounded-full object-cover w-[40px] h-[40px]"
                             src={row.original.opponent.avatar}
                         />
-                        <AvatarFallback>{PinguAvatar}</AvatarFallback>
+                        <AvatarFallback>
+                            <img src={PinguAvatar} alt="pingu" />
+                        </AvatarFallback>
                     </Avatar>
                     <div className="text-right font-medium">
                         {row.original.opponent.pseudo}

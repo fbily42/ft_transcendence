@@ -43,7 +43,9 @@ const SearchbarCards: React.FC<UserCards> = ({
                                 className="rounded-full object-cover w-[40px] h-[40px]"
                                 src={userPicture}
                             />
-                            <AvatarFallback>{PinguAvatar}</AvatarFallback>
+                            <AvatarFallback>
+                                <img src={PinguAvatar} alt="pingu" />
+                            </AvatarFallback>
                         </Avatar>
                         <CardHeader className="w-full h-full flex justify-center p-0">
                             <CardTitle>{userName}</CardTitle>

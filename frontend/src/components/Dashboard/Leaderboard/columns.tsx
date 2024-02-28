@@ -24,7 +24,9 @@ export const columns: ColumnDef<LeaderboardData>[] = [
                                 className="rounded-full object-cover w-[40px] h-[40px]"
                                 src={row.original.avatar}
                             />
-                            <AvatarFallback>{PinguAvatar}</AvatarFallback>
+                            <AvatarFallback>
+                                <img src={PinguAvatar} alt="pingu" />
+                            </AvatarFallback>
                         </Avatar>
                         <div className="text-right font-medium">
                             {playerName}

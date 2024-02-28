@@ -43,8 +43,14 @@ export default function MyFriendList() {
                         </div>
                     ))
                 ) : (
-                    <div className="flex items-center h-full">
+                    <div className="flex flex-col items-center h-full">
                         <img src={NoFriends} alt="no friends" />
+                        <span className="w-[200px]">
+                            <p className="text-center font-semibold">Oh no!</p>
+                            <p className="text-center">
+                                You have no friends yet.
+                            </p>
+                        </span>
                     </div>
                 )}
             </div>

@@ -40,7 +40,9 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
                             className={`rounded-full object-cover w-[40px] h-[40px] border-[3px] ${getAvatarBorderColor(targetRole)}`}
                             src={targetPicture}
                         />
-                        <AvatarFallback>{PinguAvatar}</AvatarFallback>
+                        <AvatarFallback>
+                            <img src={PinguAvatar} alt="pingu" />
+                        </AvatarFallback>
                     </Avatar>
                     <CardHeader className="w-full h-full flex justify-center p-0">
                         <CardTitle>{targetPseudo}</CardTitle>
