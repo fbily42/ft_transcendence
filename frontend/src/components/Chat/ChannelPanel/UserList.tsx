@@ -71,7 +71,7 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                                     targetPicture={user.avatar}
                                     targetRole={getRole(user)}
                                     userRole={getMyrole(me?.name!, users)}
-									channel={channel}
+                                    channel={channel}
                                 ></CardChannelUser>
                             </div>
                         ) : null
@@ -96,7 +96,7 @@ const UserList: React.FC<UserListProps> = ({ channel }) => {
                                                 me?.name!,
                                                 users
                                             )}
-											channel={channel}
+                                            channel={channel}
                                         ></CardChannelUser>
                                     </div>
                                 ) : null

@@ -212,10 +212,6 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                         </Button>
                                     </DialogTrigger>
                                     <DialogContent>
-                                        <img
-                                            src={Floe}
-                                            className="absolute -bottom-3 left-0"
-                                        />
                                         <CardInvite
                                             channel={currentChannel}
                                             onClose={() => setOpen2(false)}

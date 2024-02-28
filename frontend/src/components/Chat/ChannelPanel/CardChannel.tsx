@@ -123,14 +123,19 @@ const CardChannel: React.FC<CardChannel> = ({
                             <Avatar className="w-[48px] h-[48px] aspect-square">
                                 <AvatarImage
                                     className="rounded-full object-cover w-[40px] h-[40px] border-[3px] border-customDarkBlue"
-                                    src={getAvatar(getDirectName(channelName, me?.name!))}
+                                    src={getAvatar(
+                                        getDirectName(channelName, me?.name!)
+                                    )}
                                 />
                                 <AvatarFallback>{Pingu}</AvatarFallback>
                             </Avatar>
                             <CardHeader className="w-full h-full flex justify-center p-0">
                                 <CardTitle>{getPseudo()}</CardTitle>
                                 <CardDescription>
-                                    {getUserStatus(socket, getDirectName(channelName, me?.name!))
+                                    {getUserStatus(
+                                        socket,
+                                        getDirectName(channelName, me?.name!)
+                                    )
                                         ? 'Online'
                                         : 'Offline'}
                                 </CardDescription>

@@ -30,7 +30,7 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
     targetName,
     role,
     targetRole,
-	channel
+    channel,
 }) => {
     const navigate = useNavigate()
     const socket = useWebSocket() as WebSocketContextType
@@ -46,7 +46,6 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
         channel: channel,
     }
 
-	console.log(channel)
     return targetId === me?.id ? null : (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -66,9 +65,11 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
                 >
                     See Profile
                 </DropdownMenuItem>
-				<DropdownMenuItem
+                <DropdownMenuItem
                     className="w-full"
-                    onClick={() => {directMessage(targetName, socket)}}
+                    onClick={() => {
+                        directMessage(targetName, socket)
+                    }}
                 >
                     Chat
                 </DropdownMenuItem>

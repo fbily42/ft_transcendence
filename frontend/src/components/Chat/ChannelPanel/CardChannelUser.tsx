@@ -17,7 +17,7 @@ interface CardChannelUser {
     targetName: string
     targetRole: string
     userRole: string
-	channel: string
+    channel: string
 }
 
 const CardChannelUser: React.FC<CardChannelUser> = ({
@@ -27,7 +27,7 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
     targetPicture,
     targetRole,
     userRole,
-	channel,
+    channel,
 }) => {
     return (
         <div className="h-full w-full">
@@ -55,7 +55,7 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
                         targetName={targetName}
                         role={userRole}
                         targetRole={targetRole}
-						channel={channel}
+                        channel={channel}
                     />
                 </div>
             </Card>

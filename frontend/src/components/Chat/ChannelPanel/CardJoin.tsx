@@ -42,15 +42,12 @@ function CardJoin({ onClose }: CardJoinProps) {
     return (
         <div className="h-full w-full justify-between flex flex-col gap-[10px]">
             <div className="fixed-0">
-                <img
-                    src={ChatCard}
-                    className="absolute top-[-100px]"
-                />
+                <img src={ChatCard} className="absolute top-[-100px]" />
             </div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>
-                        <CardTitle className='text-xl'>Join</CardTitle>
+                        <CardTitle className="text-xl">Join</CardTitle>
                         <CardDescription>
                             Enter channel's informations to join it.
                         </CardDescription>
@@ -70,7 +67,10 @@ function CardJoin({ onClose }: CardJoinProps) {
                                 id="password"
                                 placeholder="Optionnal"
                                 type="password"
-                                {...register('password', {setValueAs: (value) => value === '' ? undefined : value})}
+                                {...register('password', {
+                                    setValueAs: (value) =>
+                                        value === '' ? undefined : value,
+                                })}
                             />
                         </div>
                         <div className="text-red-600">{errorMessage}</div>

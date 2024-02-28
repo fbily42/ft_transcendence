@@ -69,7 +69,7 @@ const MessageBubble: React.FC<MessageProps> = ({
                         </div>
                         <div
                             id="message"
-                            className={`flex-col gap-[10px] p-[8px] border-[3px] rounded-[12px] ${getMessageBorderColor(role)}`}
+                            className={`flex-col gap-[10px] p-[8px] border-[3px] rounded-[12px] ${getMessageBorderColor(role)} break-words max-w-[425px]`}
                         >
                             <p className="font-bold">{pseudo}</p>
                             <p>{message.content}</p>
