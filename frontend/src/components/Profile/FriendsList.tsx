@@ -1,19 +1,14 @@
-import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
+import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserCards from '../User/userCards/UserCards'
-import { Skeleton } from '../ui/skeleton'
-import { getFriends, getUsers } from '@/lib/Dashboard/dashboard.requests'
+import { getFriends } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { useParams } from 'react-router-dom'
+import NoFriends from '@/assets/other/NoFriends.png'
 
 export default function FriendsList() {
     const param = useParams()
-
-    const { data, isLoading, isError } = useQuery<UserData[]>({
-        queryKey: ['users'],
-        queryFn: getUsers,
-    })
 
     const { data: friends } = useQuery({
         queryKey: ['userFriend'],
@@ -34,60 +29,26 @@ export default function FriendsList() {
         return friendStatus
     }
 
-    if (isError) {
-        return <div>Error</div>
-    }
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
-
     return (
-        <div>
-            <h2 className="p-[20px] text-gray-500">All</h2>
-            <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {data ? (
-                    data.map((data: UserData) => (
-                        <UserCards
-                            id={data.id.toString()}
-                            key={data.id}
-                            bgColor="white"
-                            userName={data.pseudo}
-                            userPicture={data.avatar || PinguAvatar}
-                            userStatus={getStatus(data.name)}
-                            variant="OTHER"
-                        />
-                    ))
-                ) : (
-                    <div className="flex items-center justify-center w-full h-[68px] px-[6px] sm:px-[16px] md:px-[26px] gap-[10px]">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="w-full h-full flex flex-col justify-center gap-1">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[100px]" />
-                        </div>
-                    </div>
-                )}
-            </div>
-            <h2 className="p-[20px] text-gray-500">Friends</h2>
-            <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {friends ? (
+        <div className="h-full">
+            <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] h-full">
+                {friends && friends.length > 0 ? (
                     friends.map((friend: FriendData) => (
-                        <UserCards
-                            id={friend.id.toString()}
-                            key={friend.id}
-                            bgColor="white"
-                            userName={friend.pseudo}
-                            userPicture={friend.avatar || PinguAvatar}
-                            userStatus={getStatus(friend.name)}
-                            variant="OTHER"
-                        />
+                        <div key={friend.id}>
+                            <h2 className="p-[20px] text-gray-500">Friends</h2>
+                            <UserCards
+                                id={friend.id.toString()}
+                                bgColor="transparent"
+                                userName={friend.pseudo}
+                                userPicture={friend.avatar || PinguAvatar}
+                                userStatus={getStatus(friend.name)}
+                                variant="OTHER"
+                            />
+                        </div>
                     ))
                 ) : (
-                    <div className="flex items-center justify-center w-full h-[68px] px-[6px] sm:px-[16px] md:px-[26px] gap-[10px]">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="w-full h-full flex flex-col justify-center gap-1">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[100px]" />
-                        </div>
+                    <div className="flex items-center h-full">
+                        <img src={NoFriends} alt="no friends" />
                     </div>
                 )}
             </div>

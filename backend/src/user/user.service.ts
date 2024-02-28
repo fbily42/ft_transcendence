@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LeaderboardDTO } from './dto/leaderboard.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { UserData } from './types/user.types';
 
 @Injectable()
 export class UserService {
@@ -22,13 +23,7 @@ export class UserService {
 
 	async getUsers() {
 		const user = await this.prisma.user.findMany({
-			// select: {
-			// 	name: true,
-			// 	pseudo: true,
-			// 	score: true,
-			// 	avatar: true,
-			// 	rank: true,
-			// },
+			
 		});
 		if (!user) return null;
 		return user;
@@ -46,8 +41,11 @@ export class UserService {
 				score: true,
 				avatar: true,
 				rank: true,
+				wins: true,
+				games: true,
 				photo42: true,
 				friends: true,
+				looses: true,
 			},
 		});
 		if (!user) return null;
@@ -75,8 +73,6 @@ export class UserService {
 					HttpStatus.BAD_REQUEST,
 				);
 
-			// delete user.token42;
-			// delete user.jwt;
 			return user;
 		} catch (error) {
 			if (error instanceof HttpException) {
@@ -101,9 +97,11 @@ export class UserService {
 			},
 			select: {
 				photo42: true,
-				name: true, // ajouter le pseudo plus tard
+				name: true,
 				rank: true,
 				score: true,
+				pseudo: true,
+				avatar: true,
 			},
 		});
 
@@ -125,4 +123,42 @@ export class UserService {
 			);
 		}
 	}
+
+	async GameHistory(userId: string) {
+		const allUserGames = await this.prisma.game.findMany({
+			where: {
+				OR:[
+					{
+						user:{
+							id:userId
+						}
+					},{
+						opponent:{
+							id:userId
+						}
+					}
+				],
+			},
+			orderBy: {
+				createdAt:"desc",
+			},
+			include: {
+				user: {
+					select: {
+						pseudo: true,
+						avatar: true,
+					}
+				},
+				opponent: {
+					select: {
+						pseudo: true,
+						avatar: true,
+					}
+				}
+			},
+		});
+		return allUserGames
+	}
 }
+
+

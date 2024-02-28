@@ -123,3 +123,23 @@ export async function acceptFriend(friendId: string) {
     )
     return response.data
 }
+
+export async function getMyGameHistory() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/user/gameHistory/me`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function getGameHistory(userId: string) {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/user/gameHistory/${userId}`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}

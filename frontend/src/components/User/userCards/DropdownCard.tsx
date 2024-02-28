@@ -37,8 +37,9 @@ const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
                             See Profile
                         </div>
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator className="" />
                     <DropdownMenuItem asChild>
-                        <div className="w-full">PLay Pingu</div>
+                        <div className="w-full">Play Pingu</div>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                         <div className="w-full">Chat</div>
@@ -47,11 +48,10 @@ const DropdownCard: React.FC<DropdownCardProps> = ({ variant, id }) => {
 
                 {variant === 'FRIEND' ? (
                     <>
-                        <DropdownMenuSeparator className="" />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem asChild>
+                            {/* <DropdownMenuItem asChild>
                                 <div className="w-full">Remove</div>
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                         </DropdownMenuGroup>
                     </>
                 ) : (

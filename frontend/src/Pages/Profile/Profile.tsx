@@ -1,6 +1,4 @@
 // import SetUp2FAModal from '@/components/Profile/SetUp2FAModal';
-import UserScoreCard from '@/components/User/userStats/UserScoreCard'
-import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
 import {
     getFriendRequest,
@@ -14,6 +12,10 @@ import FriendRequest from '@/components/Profile/FriendRequest'
 import PendingInvitations from '@/components/Profile/PendingInvitations'
 import MyFriendList from '@/components/Profile/MyFriendList'
 import { FriendData } from '@/lib/Dashboard/dashboard.types'
+import MyUserStatsCard from '@/components/User/userStats/MyUserStatsCard'
+import MyUserScoreCard from '@/components/User/userStats/MyUserScoreCard'
+import MyGameHistory from '@/components/Profile/MyGameHistory/MyGameHistory'
+import Seperator from '@/assets/other/Seperator.svg'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -56,15 +58,15 @@ function Profile() {
             >
                 <div
                     id="User top info"
-                    className={`flex ${isMobile ? 'flex-col ' : 'flex-row h-[50%] w-full items-center justify-center'} bg-white rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]`}
+                    className={`flex justify-center ${isMobile ? 'flex-col ' : 'flex-row h-[50%] w-full items-center'} bg-white rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]`}
                 >
                     <div
                         id="User top info + padding"
-                        className={`flex ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full'} w-full p-[36px]`}
+                        className={`flex justify-center gap-10 items-center ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full'} w-full p-[36px]`}
                     >
                         <div
                             id="User avatar"
-                            className={`flex ${isMobile ? 'w-[50%] h-[50%] justify-center' : 'w-[50%] h-full justify-center items-center'}`}
+                            className={`flex justify-center items-center w-[150px] h-[150px] md:w-[200px] md:h-[200px] lg:w-[300px] lg:h-[300px] border-[5px] border-customDarkBlue rounded-full overflow-hidden`}
                         >
                             <UserAvatar selectedAvatar={selectedAvatar} />
                         </div>
@@ -72,16 +74,21 @@ function Profile() {
                             id="User informations"
                             className={`${isMobile ? 'w-full h-auto flex justify-end gap-[16px]' : 'w-[50%] h-full justify-between'} flex flex-col `}
                         >
-                            <UserScoreCard />
-                            <UserStatsCard />
+                            <MyUserScoreCard />
+                            <MyUserStatsCard />
                             <UserActionsBtns />
                         </div>
                     </div>
                 </div>
+                <div className="bg-white w-full">
+                    <img className="w-full" src={Seperator} />
+                </div>
                 <div
                     id="User bottom info"
-                    className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
-                ></div>
+                    className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-white rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
+                >
+                    <MyGameHistory />
+                </div>
             </div>
             <div
                 id="User friends"

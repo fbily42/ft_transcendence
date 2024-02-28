@@ -1,15 +1,13 @@
-import { getUserById } from '@/lib/Dashboard/dashboard.requests'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronsUp, Crown, Frown } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 
-export default function UserStatsCard() {
-    const param = useParams()
-    const { data: friend } = useQuery<UserData>({
-        queryKey: ['users', param.id],
-        queryFn: () => getUserById(param.id!),
+export default function MyUserStatsCard() {
+    const { data: me } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
     })
 
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -35,7 +33,7 @@ export default function UserStatsCard() {
         >
             <div id="My rank" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {friend?.rank}
+                    {me?.rank}
                 </h1>
                 <div>
                     {isMobile ? (
@@ -48,7 +46,7 @@ export default function UserStatsCard() {
             <div className="border-l-2 h-full border-l-[#C1E2F7] rounded-full"></div>
             <div id="Games won" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {friend?.wins}
+                    {me?.wins}
                 </h1>
                 <div>
                     {isMobile ? (
@@ -62,7 +60,7 @@ export default function UserStatsCard() {
 
             <div id="Total Games" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {friend?.looses}
+                    {me?.looses}
                 </h1>
                 <div>
                     {isMobile ? (

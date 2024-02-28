@@ -1,48 +1,51 @@
-import React, { ReactElement } from 'react'
-import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
+import React, { ReactElement, useEffect, useState } from 'react'
 
 import {
     Card,
     CardContent,
-    // CardDescription,
-    // CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { Award, Crown, Gamepad2 } from 'lucide-react'
 
 interface CardsDashboardProps {
     title: string
     content: number
-	icon: ReactElement
+    icon: ReactElement
+    backgroundColor: string
 }
 
-const CardsDashboard: React.FC<CardsDashboardProps> = ({ title, content, icon }) => {
+const CardsDashboard: React.FC<CardsDashboardProps> = ({
+    title,
+    content,
+    icon,
+    backgroundColor,
+}) => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+
+    const handleResize = () => {
+        setIsMobile(window.innerWidth < 900)
+    }
+    useEffect(() => {
+        handleResize()
+        window.addEventListener('resize', handleResize)
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
     return (
-        <div>
-            <Card className="flex items-center pl-[16px] h-[100%] rounded-[36px]">
+        <div className='h-full'>
+            <Card style={{ backgroundColor }} className={`flex border-none shadow-drop ${isMobile ? 'flex-col justify-center items-center h-full' : 'items-center pl-[16px] h-full'} rounded-[30px]`}>
                 <div>
                     {icon}
-                    {/* <Avatar>
-                        <AvatarImage
-                            className="w-[70px] h-[70px] rounded-full"
-                            src="https://github.com/shadcn.png"
-                        />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar> */}
                 </div>
-                <div>
-                    <CardHeader>
+                <div className={`flex ${isMobile ? 'flex-col items-center' : 'flex-col'}`}>
+                    <CardHeader className={`flex ${isMobile ? 'p-0 items-center justify-center text-center': ''}`}>
                         <CardTitle>{title}</CardTitle>
-                        {/* <CardDescription>Card Description</CardDescription> */}
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='py-0'>
                         <p className="text-[30px]">{content}</p>
                     </CardContent>
                 </div>
-                {/* <CardFooter>
-            <p>Card Footer</p>
-          </CardFooter> */}
             </Card>
         </div>
     )
