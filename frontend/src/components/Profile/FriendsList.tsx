@@ -1,7 +1,7 @@
 import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserCards from '../User/userCards/UserCards'
-import { getFriends } from '@/lib/Dashboard/dashboard.requests'
+import { getFriends, getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { useParams } from 'react-router-dom'
@@ -13,6 +13,11 @@ export default function FriendsList() {
     const { data: friends } = useQuery({
         queryKey: ['userFriend'],
         queryFn: () => getFriends(param.id!),
+    })
+
+    const { data: user } = useQuery({
+        queryKey: ['users', param.id],
+        queryFn: () => getUserById(param.id!),
     })
 
     const webSocket = useWebSocket() as WebSocketContextType
@@ -47,8 +52,14 @@ export default function FriendsList() {
                         </div>
                     ))
                 ) : (
-                    <div className="flex items-center h-full">
+                    <div className="flex flex-col items-center h-full">
                         <img src={NoFriends} alt="no friends" />
+                        <span className="w-[200px]">
+                            <p className="text-center font-semibold">Oh no!</p>
+                            <p className="text-center">
+                                {user?.pseudo} has no friends yet.
+                            </p>
+                        </span>
                     </div>
                 )}
             </div>
