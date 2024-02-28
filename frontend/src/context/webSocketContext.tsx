@@ -50,7 +50,6 @@ export const WebSocketProvider: React.FC = () => {
                 }
             )
         })
-		
 
         ws?.on('users', (users: SocketUsers) => {
             const usersMap: Map<string, string[]> = arrayToMap(users)
@@ -92,6 +91,10 @@ export const WebSocketProvider: React.FC = () => {
             toast(`You have been unmuted on ${channel}.`)
         })
 
+        ws?.on('newOwner', (channel: string) => {
+            toast(`You have been promote to owner in ${channel}`)
+        })
+
         return () => {
             if (ws) {
                 const events = [
@@ -105,6 +108,7 @@ export const WebSocketProvider: React.FC = () => {
                     'setMember',
                     'muted',
                     'unmuted',
+                    'newOwner',
                 ]
                 events.forEach((event) => {
                     ws.off(event)

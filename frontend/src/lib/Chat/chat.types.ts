@@ -67,6 +67,7 @@ export type DropdownChannelUserProps = {
     targetName: string
     role: string
     targetRole: string
+	channel: string
 }
 
 export type CmdData = {
@@ -87,4 +88,11 @@ export type LeaveChannelData = {
     channel: string
     role: string
 	newOwner?: string
+	alone: boolean
+}
+
+export type PasswordCmd = {
+	userId: string
+	channel: string
+	newPassword: string
 }

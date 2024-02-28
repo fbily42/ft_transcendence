@@ -8,16 +8,17 @@ export type FriendData = {
 }
 
 export type UserData = {
-	id: string;
-	name: string;
-	score: number;
-  rank: number;
-  games: number;
-  wins: number;
-	friends: FriendData[];
-	photo42: string;
-	avatar: string;
-	pseudo: string;
+    id: string
+    name: string
+    score: number
+    rank: number
+    games: number
+    wins: number
+    friends: FriendData[]
+    photo42: string
+    avatar: string
+    pseudo: string
+	blocked: string
 }
 
 export type LeaderboardData = {

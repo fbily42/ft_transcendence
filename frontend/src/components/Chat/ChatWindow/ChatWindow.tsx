@@ -64,9 +64,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     }
 
     useEffect(() => {
-        socket?.webSocket?.on('messageToRoom', () => {
+        socket?.webSocket?.on('messageToRoom', (channel: string) => {
+            console.log('refeth', channel)
             queryClient.invalidateQueries({
-                queryKey: ['messages', currentChannel],
+                queryKey: ['messages', channel],
             })
         })
         return () => {
@@ -97,10 +98,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     function getPseudo(name: string): string {
         if (users) {
             for (const user of users) {
-                if (user.name === name) return user.pseudo
+                if (user.name === name) {
+                    return user.pseudo
+                }
             }
         }
-        return name
+        return 'unknown'
     }
 
     useEffect(() => {
@@ -135,6 +138,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                     message={message}
                                     picture={getAvatar(message.sentByName)}
                                     role={getSenderRole(message.sentByName)}
+                                    blocked={
+                                        me?.blocked.includes(
+                                            message.sentByName
+                                        )!
+                                    }
                                 ></MessageBubble>
                             )
                         )}

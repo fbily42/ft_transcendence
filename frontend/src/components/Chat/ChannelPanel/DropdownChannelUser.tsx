@@ -8,42 +8,46 @@ import {
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import {
     ban,
+    block,
+    directMessage,
     kick,
     mute,
     setAdmin,
     setMember,
     unban,
+    unblock,
     unmute,
 } from '@/lib/Chat/chat.requests'
 import { CmdData, DropdownChannelUserProps } from '@/lib/Chat/chat.types'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { useQuery } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MoreHorizontal } from 'lucide-react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
     targetId,
     targetName,
     role,
     targetRole,
+	channel
 }) => {
     const navigate = useNavigate()
     const socket = useWebSocket() as WebSocketContextType
-    const [searchParams, setSearchParams] = useSearchParams()
-    const channel: string | null = searchParams.get('channelId')
+    const queryClient = useQueryClient() as QueryClient
     const { data: me } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
     const cmdData: CmdData = {
-        userId: me?.id.toString(),
+        userId: me?.id,
         targetId: targetId,
         targetName: targetName,
         channel: channel,
     }
 
-    return targetId === me?.id.toString() ? null : (
+	console.log(channel)
+    return targetId === me?.id ? null : (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant={'ghost'} size={'smIcon'}>
@@ -62,9 +66,31 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
                 >
                     See Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem className="w-full" onClick={() => {}}>
-                    Block
+				<DropdownMenuItem
+                    className="w-full"
+                    onClick={() => {directMessage(targetName, socket)}}
+                >
+                    Chat
                 </DropdownMenuItem>
+                {me?.blocked.includes(targetName) ? (
+                    <DropdownMenuItem
+                        className="w-full"
+                        onClick={() => {
+                            unblock(cmdData, queryClient)
+                        }}
+                    >
+                        Unblock
+                    </DropdownMenuItem>
+                ) : (
+                    <DropdownMenuItem
+                        className="w-full"
+                        onClick={() => {
+                            block(cmdData, queryClient)
+                        }}
+                    >
+                        Block
+                    </DropdownMenuItem>
+                )}
                 {role === 'owner' && targetRole !== 'banned' ? (
                     <>
                         <DropdownMenuItem

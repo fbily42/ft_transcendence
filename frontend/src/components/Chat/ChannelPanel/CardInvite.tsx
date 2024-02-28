@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import ChatCard from '../../../assets/other/chat-modal.svg'
 
 const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
     const { register, handleSubmit } = useForm<InviteFormValues>()
@@ -25,7 +26,7 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
 
     async function onSubmit(data: InviteFormValues) {
         data.channel = channel
-        data.sentBy = me?.name!
+        data.sentBy = me?.pseudo!
         try {
             const response = await axios.patch(
                 `${import.meta.env.VITE_BACKEND_URL}/chat/channel/invite`,
@@ -34,6 +35,7 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
                     withCredentials: true,
                 }
             )
+            data.name = response.data
             socket.webSocket?.emit('channelInvite', data)
             onClose()
         } catch (error: any) {
@@ -43,7 +45,10 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
     }
 
     return (
-        <div>
+        <div className="h-full w-full justify-between flex flex-col gap-[10px]">
+            <div className="fixed-0">
+                <img src={ChatCard} className="absolute top-[-100px]" />
+            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>

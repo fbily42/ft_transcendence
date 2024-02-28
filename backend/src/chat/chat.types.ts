@@ -1,27 +1,27 @@
-import { Prisma } from "@prisma/client"
+import { Prisma } from '@prisma/client';
 
 export type ChannelWithRelation = Prisma.ChannelGetPayload<{
 	include: {
-		users: true,
-	}
-}>
+		users: true;
+	};
+}>;
 
 export type UserInChannel = {
-	userId: string,
-	name: string,
-	pseudo: string,
-	avatar: string,
-	owner: boolean,
-	admin: boolean,
-	member: boolean,
-	banned: boolean,
-	muted: boolean,
-	invited: boolean,
-}
+	userId: string;
+	name: string;
+	pseudo: string;
+	avatar: string;
+	owner: boolean;
+	admin: boolean;
+	member: boolean;
+	banned: boolean;
+	muted: boolean;
+	invited: boolean;
+};
 
 export type ChannelList = {
-	name: string
-	direct: boolean
-	invited: boolean
-	banned: boolean
-}
+	name: string;
+	direct: boolean;
+	invited: boolean;
+	banned: boolean;
+};

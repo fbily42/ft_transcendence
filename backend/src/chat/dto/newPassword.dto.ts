@@ -1,19 +1,15 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class MessageDto {
+export class NewPasswordDto {
 	@IsNotEmpty()
 	@IsString()
 	readonly userId: string;
 
 	@IsNotEmpty()
 	@IsString()
-	readonly userName: string;
-
-	@IsNotEmpty()
-	@IsString()
-	readonly target: string;
+	readonly channel: string;
 
 	@IsString()
 	@IsNotEmpty()
-	readonly message: string;
+	readonly newPassword: string;
 }

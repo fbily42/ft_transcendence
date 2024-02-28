@@ -6,20 +6,23 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { DropdownChannelProps, LeaveChannelData } from '@/lib/Chat/chat.types'
 import { MoreHorizontal } from 'lucide-react'
+import LeaveChannel from './LeaveChannel'
+import CardPassword from './CardPassword'
+import { useState } from 'react'
 
 const DropdownChannel: React.FC<DropdownChannelProps> = ({
     userName,
     channelName,
     role,
 }) => {
-    const socket = useWebSocket() as WebSocketContextType
+	const [open, setOpen] = useState<boolean>(false);
     const cmd: LeaveChannelData = {
         user: userName,
         channel: channelName,
         role: role,
+		alone: false,
     }
     return (
         <DropdownMenu>
@@ -37,24 +40,24 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
                     </DialogTrigger>
                     {role === 'owner' ? (
                         <DialogContent>
-                            Owner have to choose a new owner
+                            <LeaveChannel cmd={cmd} variant='Owner'></LeaveChannel>
                         </DialogContent>
                     ) : (
                         <DialogContent>
-                            You are about to leave this channel
+                            <LeaveChannel cmd={cmd} variant='Other'></LeaveChannel>
                         </DialogContent>
                     )}
                 </Dialog>
                 <div>
                     {role === 'owner' ? (
-                        <Dialog>
+                        <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
                                 <DropdownMenuItem className="w-full text-sm" onSelect={(e) => e.preventDefault()}>
                                     Set password
                                 </DropdownMenuItem>
                             </DialogTrigger>
                             <DialogContent>
-                                You are about to change the password
+                                <CardPassword channel={channelName} closeDialog={() => setOpen(false)}/>
                             </DialogContent>
                         </Dialog>
                     ) : null}

@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
-export class JoinChannelDto{
-
+export class JoinChannelDto {
 	@IsNotEmpty()
 	@IsString()
 	readonly name: string;
