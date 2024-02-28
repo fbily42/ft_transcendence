@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreateChannelProps, CreateFormValues } from '@/lib/Chat/chat.types'
 import { createChannel } from '@/lib/Chat/chat.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
+import ChatCard from '../../../assets/other/chat-modal.svg'
 
 interface CardCreateProps {
     onClose: () => void
@@ -39,11 +40,14 @@ function CardCreate({ onClose }: CardCreateProps) {
     }
 
     return (
-        <div>
+        <div className="h-full w-full justify-between flex flex-col gap-[10px]">
+            <div className="fixed-0">
+                <img src={ChatCard} className="absolute top-[-100px]" />
+            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>
-                        <CardTitle>Create</CardTitle>
+                        <CardTitle className="text-xl">Create</CardTitle>
                         <CardDescription>
                             Enter channel's name and set a password if you need
                             it.
@@ -54,7 +58,7 @@ function CardCreate({ onClose }: CardCreateProps) {
                             <Label htmlFor="name">Channel's Name</Label>
                             <Input
                                 id="name"
-                                placeholder="Pingu's Family"
+                                placeholder="PinguFriends"
                                 {...register('name')}
                             />
                         </div>
@@ -64,7 +68,10 @@ function CardCreate({ onClose }: CardCreateProps) {
                                 id="password"
                                 placeholder="Optionnal"
                                 type="password"
-                                {...register('password')}
+                                {...register('password', {
+                                    setValueAs: (value) =>
+                                        value === '' ? undefined : value,
+                                })}
                             />
                         </div>
                         <div className="flex items-center space-x-2 space-y-1">

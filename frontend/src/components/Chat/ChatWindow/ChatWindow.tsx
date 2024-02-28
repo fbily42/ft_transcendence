@@ -15,6 +15,7 @@ import SelfMessage from './SelfMessage'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import { getRole } from '@/lib/Chat/chat.utils'
 import { useNavigate } from 'react-router-dom'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 type MessageFormValues = {
     userId: string
@@ -64,9 +65,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     }
 
     useEffect(() => {
-        socket?.webSocket?.on('messageToRoom', () => {
+        socket?.webSocket?.on('messageToRoom', (channel: string) => {
+            console.log('refeth', channel)
             queryClient.invalidateQueries({
-                queryKey: ['messages', currentChannel],
+                queryKey: ['messages', channel],
             })
         })
         return () => {
@@ -97,10 +99,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     function getPseudo(name: string): string {
         if (users) {
             for (const user of users) {
-                if (user.name === name) return user.pseudo
+                if (user.name === name) {
+                    return user.pseudo
+                }
             }
         }
-        return name
+        return 'unknown'
     }
 
     useEffect(() => {
@@ -135,6 +139,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                     message={message}
                                     picture={getAvatar(message.sentByName)}
                                     role={getSenderRole(message.sentByName)}
+                                    blocked={
+                                        me?.blocked.includes(
+                                            message.sentByName
+                                        )!
+                                    }
                                 ></MessageBubble>
                             )
                         )}
@@ -158,16 +167,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         <div className="flex flex-col justify-between bg-customBlue w-full p-[20px] rounded-[36px] shadow-drop">
             <div className="bg-white flex flex-col justify-center items-center w-full h-full rounded-[16px] overflow-hidden p-[20px] shadow-drop">
                 <img className="w-[80%]" src={Placeholder}></img>
-                <Button
-                    className="w-[10%] justify-between bg-customYellow"
-                    onClick={() => setOpen(true)}
-                >
-                    <span>Noot chat</span>
-                    <Plus />
-                </Button>
-                <Modal open={open} onClose={() => setOpen(false)}>
-                    <TabsChannel onClose={() => setOpen(false)}></TabsChannel>
-                </Modal>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="w-[10%] justify-between bg-customYellow">
+                            <span>Noot chat</span>
+                            <Plus />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <TabsChannel
+                            onClose={() => setOpen(false)}
+                        ></TabsChannel>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     )

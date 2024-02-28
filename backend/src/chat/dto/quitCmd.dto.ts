@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class quitCmdDto {
-
 	@IsNotEmpty()
 	@IsString()
 	readonly user: string;
@@ -17,4 +16,7 @@ export class quitCmdDto {
 	@IsOptional()
 	@IsString()
 	readonly newOwner: string;
+
+	@IsBoolean()
+	readonly alone: boolean;
 }

@@ -8,6 +8,7 @@ export class FormDto {
 	pseudo: string;
 
 	@IsOptional()
+	@IsString()
 	avatar: string
 
 }

@@ -100,7 +100,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		try {
 			if (client.rooms.has(message.target)){
 				const messages = await this.chatService.createMessage(message)
-				this.server.to(message.target).emit('messageToRoom');
+				this.server.to(message.target).emit('messageToRoom', message.target);
 			}
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
@@ -281,8 +281,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		{
 			throw new WsException('Internal Server Error')
 		}
-		
-
 	}
 	
 	@SubscribeMessage('key')
@@ -335,11 +333,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		{
 			throw new WsException('Internal Server Error')
 		}
-
 	}
-
-	
-
 
 	@SubscribeMessage('leaveChannel')
 	leave(@ConnectedSocket() client: Socket, @MessageBody() name: string){
@@ -356,6 +350,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const privateMessage = await this.chatService.createPrivateMessage(client.data.userName, client.data.userId, target)
 			this.server.to(client.id).emit('privateMessage')
 			this.server.to(client.id).emit('activePrivateMessage', privateMessage)
+			this.server.to(client.id).emit('updateChannelList')
+			const clientIds = this.clients.get(target)
+			if (clientIds)
+			{
+				clientIds.forEach (socketId =>
+					this.server.to(socketId).emit('updateChannelList')
+				)
+			}
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new WsException(`Prisma error code : ${error.code}`)
@@ -396,7 +398,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				}
 				this.server.to(cmd.channel).emit('updateChannelUsers')
 			}
-			throw new WsException('Internal server error')
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new WsException(`Prisma error code : ${error.code}`)
@@ -558,6 +559,44 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('quitChannel')
 	async quitChannel(@MessageBody() cmd: quitCmdDto) {
-		
+		try {
+			const deletedUser = await this.chatService.leaveChannel(cmd);
+			if (deletedUser) {
+				const clientIds = this.clients.get(cmd.user)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						const client = this.server.sockets.sockets.get(socketId)
+						if (client) {
+							client.leave(cmd.channel)
+							this.server.to(socketId).emit('hideChat')
+						}
+						this.server.to(socketId).emit('updateChannelList')
+					})
+				}
+			}
+			if (cmd.alone){
+				const deletedChannel = await this.chatService.deleteChannel(cmd.channel)
+				return ;
+			}
+			if (cmd.newOwner)
+			{
+				const clientIds = this.clients.get(cmd.newOwner)
+				if (clientIds)
+				{
+					clientIds.forEach(socketId => {
+						this.server.to(socketId).emit('newOwner', cmd.channel)
+					})
+				}
+			}
+			this.server.to(cmd.channel).emit('updateChannelUsers')
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new WsException(`Prisma error code : ${error.code}`)
+			else if (error instanceof Error)
+				throw new WsException(error.message)
+			else
+				throw new WsException('Internal server error')
+		}
 	}
 }

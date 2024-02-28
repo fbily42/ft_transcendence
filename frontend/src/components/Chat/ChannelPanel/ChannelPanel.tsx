@@ -1,13 +1,9 @@
 import { Button } from '@/components/ui/button'
 import React, { useEffect, useState } from 'react'
-import Modal from '../../Modal'
 import TabsChannel from './TabsChannel'
-import UserCards from '@/components/User/userCards/UserCards'
 import { getChannels } from '@/lib/Chat/chat.requests'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Share } from 'lucide-react'
-import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
-import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import UserList from './UserList'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import CardInvite from './CardInvite'
@@ -17,6 +13,8 @@ import { useNavigate } from 'react-router-dom'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { Channel } from '@/lib/Chat/chat.types'
 import CardChannel from './CardChannel'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import Floe from '../../../assets/other/mountain.svg'
 
 interface ChannelPanelProps {
     setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
@@ -62,7 +60,6 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
         queryClient.invalidateQueries({
             queryKey: ['channelUsers', previousChannel],
         })
-        navigate(`?channelId=${name}`)
         socket.webSocket?.emit('leaveChannel', previousChannel)
         socket.webSocket?.emit('joinChannel', name)
     }
@@ -72,27 +69,30 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
             if (currentChannel === channel) {
                 setCurrentChannel('')
                 setHide(true)
-                navigate('')
             }
         })
         socket?.webSocket?.on('activePrivateMessage', (channelName: string) => {
             const previousChannel = currentChannel
-            setHide(false)
+            setHide(true)
             queryClient.invalidateQueries({
                 queryKey: ['channelUsers', previousChannel],
             })
             setCurrentChannel(channelName)
-            navigate(`?channelId=${channelName}`)
             socket.webSocket?.emit('leaveChannel', previousChannel)
             socket.webSocket?.emit('joinChannel', channelName)
         })
         socket?.webSocket?.on('updateChannelList', () => {
             queryClient.invalidateQueries({ queryKey: ['channels'] })
         })
+        socket?.webSocket?.on('hideChat', () => {
+            setCurrentChannel('')
+            setHide(true)
+        })
         return () => {
             socket?.webSocket?.off('kickedFromChannel')
             socket?.webSocket?.off('activePrivateMessage')
             socket?.webSocket?.off('updateChannelList')
+            socket?.webSocket?.off('hideChat')
         }
     })
 
@@ -110,24 +110,32 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
             <div className="flex h-full inner-block">
                 <div className=" bg-white w-[150px] lg:w-[290px] rounded-[36px] overflow-hidden shadow-drop">
                     <div className="flex flex-col h-full">
-                        <div className="bg-customBlue flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
-                            <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                        <div className="bg-customBlue relative flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                            <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold z-10">
                                 Channels
                             </h1>
-                            <Button
-                                variant="ghost"
-                                size="smIcon"
-                                onClick={() => setOpen(true)}
-                            >
-                                <Plus></Plus>
-                            </Button>
-                            <Modal open={open} onClose={() => setOpen(false)}>
-                                <TabsChannel
-                                    onClose={() => setOpen(false)}
-                                ></TabsChannel>
-                            </Modal>
+                            <Dialog open={open} onOpenChange={setOpen}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="smIcon"
+                                        className="z-10"
+                                    >
+                                        <Plus></Plus>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <TabsChannel
+                                        onClose={() => setOpen(false)}
+                                    ></TabsChannel>
+                                </DialogContent>
+                            </Dialog>
+                            <img
+                                src={Floe}
+                                className="absolute -bottom-3 left-0"
+                            />
                         </div>
-                        <div className="flex flex-col overflow-y-auto">
+                        <div className="flex flex-col overflow-y-auto no-scrollbar">
                             <h1 className="p-[20px] text-gray-500">
                                 Private Messages
                             </h1>
@@ -158,7 +166,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                 )}
                             </div>
                         </div>
-                        <div className="flex flex-col overflow-y-auto">
+                        <div className="flex flex-col overflow-y-auto no-scrollbar">
                             <h1 className="p-[20px] text-gray-500">Groups</h1>
                             <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
@@ -197,22 +205,19 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                         {getDirectName(currentChannel, me?.name!) ===
                         currentChannel ? (
                             <div>
-                                <Button
-                                    variant="ghost"
-                                    size="smIcon"
-                                    onClick={() => setOpen2(true)}
-                                >
-                                    <Share></Share>
-                                </Button>
-                                <Modal
-                                    open={open2}
-                                    onClose={() => setOpen2(false)}
-                                >
-                                    <CardInvite
-                                        channel={currentChannel}
-                                        onClose={() => setOpen2(false)}
-                                    ></CardInvite>
-                                </Modal>
+                                <Dialog open={open2} onOpenChange={setOpen2}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="ghost" size="smIcon">
+                                            <Share></Share>
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <CardInvite
+                                            channel={currentChannel}
+                                            onClose={() => setOpen2(false)}
+                                        ></CardInvite>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         ) : null}
                     </div>
@@ -223,26 +228,30 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     } else {
         return (
             <div className="flex h-full inner-block">
-                <div className=" bg-white w-[290px] rounded-[36px] overflow-hidden ">
+                <div className=" bg-white w-[290px] rounded-[36px] overflow-hidden">
                     <div className="flex flex-col h-full">
-                        <div className="bg-customBlue flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
-                            <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
+                        <div className="bg-customBlue relative flex justify-between items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                            <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold z-10">
                                 Channels
                             </h1>
-                            <Button
-                                variant="ghost"
-                                size="smIcon"
-                                onClick={() => setOpen(true)}
-                            >
-                                <Plus></Plus>
-                            </Button>
-                            <Modal open={open} onClose={() => setOpen(false)}>
-                                <TabsChannel
-                                    onClose={() => setOpen(false)}
-                                ></TabsChannel>
-                            </Modal>
+                            <Dialog open={open} onOpenChange={setOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="ghost" size="smIcon">
+                                        <Plus></Plus>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <TabsChannel
+                                        onClose={() => setOpen(false)}
+                                    ></TabsChannel>
+                                </DialogContent>
+                            </Dialog>
+                            <img
+                                src={Floe}
+                                className="absolute -bottom-3 left-0"
+                            />
                         </div>
-                        <div className="flex flex-col overflow-y-auto">
+                        <div className="flex flex-col overflow-y-auto no-scrollbar">
                             <h1 className="p-[20px] text-gray-500">
                                 Private Messages
                             </h1>
@@ -273,7 +282,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                                 )}
                             </div>
                         </div>
-                        <div className="flex flex-col overflow-y-auto">
+                        <div className="flex flex-col overflow-y-auto no-scrollbar">
                             <h1 className="p-[20px] text-gray-500">Groups</h1>
                             <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
@@ -309,28 +318,3 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
 }
 
 export default ChannelPanel
-
-/* 
-
-https://react-hook-form.com/form-builder
-
-import React from 'react';
-import { useForm } from 'react-hook-form';
-
-export default function App() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const onSubmit = data => console.log(data);
-  console.log(errors);
-  
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input type="text" placeholder="name" {...register("name", {required: true})} />
-      <input type="password" placeholder="password" {...register("password", {required: true})} />
-      <input type="checkbox" placeholder="private" {...register("private", {})} />
-
-      <input type="submit" />
-    </form>
-  );
-}
-
-*/

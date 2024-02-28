@@ -19,6 +19,7 @@ export type UserData = {
 	avatar: string;
 	pseudo: string;
   looses: number;
+	blocked: string
 }
 
 export type LeaderboardData = {
