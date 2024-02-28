@@ -29,11 +29,11 @@ function Dashboard(): JSX.Element {
                 >
                     <div
                         id="play box"
-                        className="relative bg-customDarkBlue w-[80%] h-full rounded-[36px] overflow-hidden shadow-drop"
+                        className="relative bg-customDarkBlue w-[80%] h-full rounded-[30px] overflow-hidden border-none shadow-drop"
                     >
                         <div
                             id="content w/o clouds and mountain"
-                            className="z-20 absolute h-full w-full flex items-center pl-6 pb-2 "
+                            className="z-20 absolute h-full w-full flex items-center pl-6 pb-2"
                         >
                             <div
                                 id="pingu div"
@@ -109,7 +109,7 @@ function Dashboard(): JSX.Element {
                 </div>
                 <div
                     id="bottom bento"
-                    className="w-[100%] h-[50%] bg-white rounded-md border"
+                    className="w-[100%] h-[50%] bg-white rounded-[30px] border-none shadow-drop"
                 >
                     <LeaderBoard />
                 </div>

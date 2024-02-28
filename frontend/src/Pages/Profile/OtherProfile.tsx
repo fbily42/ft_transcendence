@@ -43,7 +43,7 @@ function Profile() {
                 >
                     <div
                         id="User top info + padding"
-                        className={`flex justify-center items-center ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full gap-20'} w-full p-[36px]`}
+                        className={`flex justify-center gap-10 items-center ${isMobile ? 'flex-col items-center h-auto gap-[16px]' : 'flex-row h-full'} w-full p-[36px]`}
                     >
                         <div
                             id="User avatar"

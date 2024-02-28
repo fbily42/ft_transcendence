@@ -15,7 +15,7 @@ export default function LeaderBoard(): JSX.Element {
         return <div className="h-full"></div>
     }
     return (
-        <div className="h-full">
+        <div className="h-full rounded-[36px]">
             {data.length > 0 && <DataTable columns={columns} data={data} />}
         </div>
     )

@@ -1,6 +1,4 @@
 // import SetUp2FAModal from '@/components/Profile/SetUp2FAModal';
-import UserScoreCard from '@/components/User/userStats/UserScoreCard'
-import UserStatsCard from '@/components/User/userStats/UserStatsCard'
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
 import {
     getFriendRequest,
@@ -14,6 +12,8 @@ import FriendRequest from '@/components/Profile/FriendRequest'
 import PendingInvitations from '@/components/Profile/PendingInvitations'
 import MyFriendList from '@/components/Profile/MyFriendList'
 import { FriendData } from '@/lib/Dashboard/dashboard.types'
+import MyUserStatsCard from '@/components/User/userStats/MyUserStatsCard'
+import MyUserScoreCard from '@/components/User/userStats/MyUserScoreCard'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -72,8 +72,8 @@ function Profile() {
                             id="User informations"
                             className={`${isMobile ? 'w-full h-auto flex justify-end gap-[16px]' : 'w-[50%] h-full justify-between'} flex flex-col `}
                         >
-                            <UserScoreCard />
-                            <UserStatsCard />
+                            <MyUserScoreCard />
+                            <MyUserStatsCard />
                             <UserActionsBtns />
                         </div>
                     </div>

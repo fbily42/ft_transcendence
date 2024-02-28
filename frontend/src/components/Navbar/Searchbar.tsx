@@ -39,7 +39,7 @@ export function Searchbar() {
     }, [selectedUser])
 
     return (
-        <div className="relative">
+        <div className="relative ">
             <Command
                 className="border rounded-xl"
                 onBlur={(e: React.FocusEvent<HTMLDivElement, Element>) => {
@@ -51,7 +51,7 @@ export function Searchbar() {
                     onFocus={() => setIsFocused(true)}
                 />
                 {isFocused && (
-                    <div className="absolute z-50 mt-[50px] bg-white rounded-xl w-full">
+                    <div className="absolute z-50 mt-[50px] bg-white rounded-xl w-full shadow-drop">
                         <CommandList>
                             <CommandEmpty>No results found.</CommandEmpty>
                             <CommandGroup>
@@ -66,13 +66,13 @@ export function Searchbar() {
                                                 }
                                             >
                                                 <CommandItem className="flex items-center rounded-lg gap-4">
-                                                    <Avatar className="w-[48px] h-[48px]">
+                                                    <Avatar className="w-[48px] h-[48px] border-[3px] border-customDarkBlue rounded-full">
                                                         <AvatarImage
                                                             className="rounded-full object-cover w-[40px] h-[40px]"
                                                             src={user.avatar}
                                                         />
                                                     </Avatar>
-                                                    <span>{user.pseudo}</span>
+                                                    <span className='font-semibold'>{user.pseudo}</span>
                                                 </CommandItem>
                                             </Link>
                                         )

@@ -46,6 +46,8 @@ export class UserService {
 				score: true,
 				avatar: true,
 				rank: true,
+				wins: true,
+				games: true,
 				photo42: true,
 				friends: true,
 			},

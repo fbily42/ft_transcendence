@@ -1,14 +1,14 @@
-import { getUserById } from '@/lib/Dashboard/dashboard.requests'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
 
-export default function UserScoreCard() {
-    const param = useParams()
-
-    const { data: friend } = useQuery({
-        queryKey: ['users', param.id],
-        queryFn: () => getUserById(param.id!),
+export default function MyUserScoreCard() {
+    const { data: me } = useQuery<UserData>({
+        queryKey: [],
+        queryFn: getUserMe,
+        refetchInterval: 1000 * 10,
     })
+
     return (
         <div
             id="Pseudo"
@@ -18,10 +18,10 @@ export default function UserScoreCard() {
                 <div className="flex items-center">
                     <div className="">
                         <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-3xl font-semibold">
-                            {friend?.pseudo}
+                            {me?.pseudo}
                         </h1>
                         <div>
-                            <p className="text-[12px]">{friend?.score}</p>
+                            <p className="text-[12px]">{me?.score}</p>
                         </div>
                     </div>
                 </div>
