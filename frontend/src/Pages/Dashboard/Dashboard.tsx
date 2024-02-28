@@ -7,7 +7,7 @@ import Mountains from '../../assets/other/mountain.svg'
 import PinguPlaying from '../../assets/other/Pingu.svg'
 import { Button } from '@/components/ui/button'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { Award, Crown, Gamepad2 } from 'lucide-react'
+import { ChevronsUp, Crown, Gamepad2 } from 'lucide-react'
 
 function Dashboard(): JSX.Element {
     const { data } = useQuery<UserData>({
@@ -84,16 +84,8 @@ function Dashboard(): JSX.Element {
                         <div id="rank card" className="h-full">
                             <CardsDashboard
                                 title="My Rank"
-                                icon={<Award />}
+                                icon={<ChevronsUp />}
                                 content={data?.rank || 0}
-                                backgroundColor="#FFFFFF"
-                            ></CardsDashboard>
-                        </div>
-                        <div id="game card" className="h-full">
-                            <CardsDashboard
-                                title="Game Played"
-                                icon={<Gamepad2 />}
-                                content={data?.games || 0}
                                 backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>
@@ -102,6 +94,14 @@ function Dashboard(): JSX.Element {
                                 title="Game Won"
                                 icon={<Crown />}
                                 content={data?.wins || 0}
+                                backgroundColor="#FFFFFF"
+                            ></CardsDashboard>
+                        </div>
+                        <div id="game card" className="h-full">
+                            <CardsDashboard
+                                title="Game Played"
+                                icon={<Gamepad2 />}
+                                content={data?.games || 0}
                                 backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>

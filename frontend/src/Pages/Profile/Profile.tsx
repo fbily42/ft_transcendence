@@ -14,6 +14,8 @@ import MyFriendList from '@/components/Profile/MyFriendList'
 import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import MyUserStatsCard from '@/components/User/userStats/MyUserStatsCard'
 import MyUserScoreCard from '@/components/User/userStats/MyUserScoreCard'
+import MyGameHistory from '@/components/Profile/MyGameHistory/MyGameHistory'
+import Seperator from '@/assets/other/Seperator.svg'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -78,10 +80,15 @@ function Profile() {
                         </div>
                     </div>
                 </div>
+                <div className="bg-white w-full">
+                    <img className="w-full" src={Seperator} />
+                </div>
                 <div
                     id="User bottom info"
-                    className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-[#C1E2F7] rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
-                ></div>
+                    className={`flex ${isMobile ? 'h-full' : 'h-[50%]'} w-full justify-between bg-white rounded-b-[26px] md:rounded-b-[30px] lg:rounded-b-[36px]`}
+                >
+                    <MyGameHistory />
+                </div>
             </div>
             <div
                 id="User friends"

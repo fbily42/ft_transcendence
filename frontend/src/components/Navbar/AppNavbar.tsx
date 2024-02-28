@@ -71,7 +71,7 @@ const VerticalNavbar: React.FC = () => {
             )
             navigate('/auth')
         } catch (error) {
-            console.log('Error getdata', error)
+            throw error
         }
     }
 
@@ -116,7 +116,6 @@ const VerticalNavbar: React.FC = () => {
                                         : 'gameBtnDefault'
                                 }
                                 size="icon"
-                                onClick={() => handleNavTabs(2)}
                             >
                                 <div
                                     className={`${

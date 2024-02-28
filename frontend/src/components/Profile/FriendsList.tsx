@@ -1,11 +1,11 @@
 import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserCards from '../User/userCards/UserCards'
-import { Skeleton } from '../ui/skeleton'
 import { getFriends } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { useParams } from 'react-router-dom'
+import NoFriends from '@/assets/other/NoFriends.png'
 
 export default function FriendsList() {
     const param = useParams()
@@ -30,15 +30,15 @@ export default function FriendsList() {
     }
 
     return (
-        <div>
-            <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] ">
-                {friends ? (
+        <div className="h-full">
+            <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] h-full">
+                {friends && friends.length > 0 ? (
                     friends.map((friend: FriendData) => (
                         <div key={friend.id}>
                             <h2 className="p-[20px] text-gray-500">Friends</h2>
                             <UserCards
                                 id={friend.id.toString()}
-                                bgColor="white"
+                                bgColor="transparent"
                                 userName={friend.pseudo}
                                 userPicture={friend.avatar || PinguAvatar}
                                 userStatus={getStatus(friend.name)}
@@ -47,12 +47,8 @@ export default function FriendsList() {
                         </div>
                     ))
                 ) : (
-                    <div className="flex items-center justify-center w-full h-[68px] px-[6px] sm:px-[16px] md:px-[26px] gap-[10px]">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="w-full h-full flex flex-col justify-center gap-1">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[100px]" />
-                        </div>
+                    <div className="flex items-center h-full">
+                        <img src={NoFriends} alt="no friends" />
                     </div>
                 )}
             </div>

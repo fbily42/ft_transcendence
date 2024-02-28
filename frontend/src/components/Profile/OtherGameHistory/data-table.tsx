@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
         <div className="flex flex-col justify-between h-[100%]">
             <div className="border-b h-[90%] flex flex-col justify-between">
                 <Table className="h-[100%]">
-                    <TableHeader className="h-[64px] ">
+                    <TableHeader className="h-[64px]">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {

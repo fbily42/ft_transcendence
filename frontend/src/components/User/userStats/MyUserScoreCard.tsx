@@ -4,9 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 
 export default function MyUserScoreCard() {
     const { data: me } = useQuery<UserData>({
-        queryKey: [],
+        queryKey: ['me'],
         queryFn: getUserMe,
-        refetchInterval: 1000 * 10,
     })
 
     return (

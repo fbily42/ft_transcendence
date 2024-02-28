@@ -28,9 +28,11 @@ export function Searchbar() {
         queryFn: getUserMe,
     })
 
-    const filteredUsers = users?.filter((user) =>
-        user.pseudo.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredUsers = users?.filter((user) => {
+        if (user && user.pseudo) {
+            return user.pseudo.toLowerCase().includes(searchTerm.toLowerCase())
+        }
+    })
 
     useEffect(() => {
         if (selectedUser) {
@@ -72,7 +74,9 @@ export function Searchbar() {
                                                             src={user.avatar}
                                                         />
                                                     </Avatar>
-                                                    <span className='font-semibold'>{user.pseudo}</span>
+                                                    <span className="font-semibold">
+                                                        {user.pseudo}
+                                                    </span>
                                                 </CommandItem>
                                             </Link>
                                         )

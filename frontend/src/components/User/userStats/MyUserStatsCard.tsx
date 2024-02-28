@@ -1,14 +1,13 @@
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
-import { Award, Gamepad2, Trophy } from 'lucide-react'
+import { ChevronsUp, Crown, Frown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function MyUserStatsCard() {
     const { data: me } = useQuery<UserData>({
-        queryKey: [],
+        queryKey: ['me'],
         queryFn: getUserMe,
-        refetchInterval: 1000 * 10,
     })
 
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -38,7 +37,7 @@ export default function MyUserStatsCard() {
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Award size={20} />
+                        <ChevronsUp size={20} />
                     ) : (
                         <p className="text-center text-[12px]">My Rank</p>
                     )}
@@ -51,7 +50,7 @@ export default function MyUserStatsCard() {
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Trophy size={20} />
+                        <Crown size={20} />
                     ) : (
                         <p className="text-center text-[12px]">Games won</p>
                     )}
@@ -61,11 +60,11 @@ export default function MyUserStatsCard() {
 
             <div id="Total Games" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {me?.games}
+                    {me?.looses}
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Gamepad2 size={20} />
+                        <Frown size={20} />
                     ) : (
                         <p className="text-center text-[12px]">Total games</p>
                     )}

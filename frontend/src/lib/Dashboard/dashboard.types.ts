@@ -18,6 +18,7 @@ export type UserData = {
 	photo42: string;
 	avatar: string;
 	pseudo: string;
+  looses: number;
 }
 
 export type LeaderboardData = {
@@ -25,4 +26,6 @@ export type LeaderboardData = {
     score: number
     rank: number
     name: string
+    pseudo: string
+	  avatar: string;
 }

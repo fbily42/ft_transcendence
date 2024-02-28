@@ -1,7 +1,7 @@
 import { getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
-import { Award, Gamepad2, Trophy } from 'lucide-react'
+import { ChevronsUp, Crown, Frown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -39,7 +39,7 @@ export default function UserStatsCard() {
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Award size={20} />
+                        <ChevronsUp size={20} />
                     ) : (
                         <p className="text-center text-[12px]">My Rank</p>
                     )}
@@ -52,7 +52,7 @@ export default function UserStatsCard() {
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Trophy size={20} />
+                        <Crown size={20} />
                     ) : (
                         <p className="text-center text-[12px]">Games won</p>
                     )}
@@ -62,11 +62,11 @@ export default function UserStatsCard() {
 
             <div id="Total Games" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {friend?.games}
+                    {friend?.looses}
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Gamepad2 size={20} />
+                        <Frown size={20} />
                     ) : (
                         <p className="text-center text-[12px]">Total games</p>
                     )}

@@ -22,7 +22,7 @@ model User {
 
     //Auth
     jwt          String[]
-    banJwt      String[]
+    banJwt       String[]
     refreshToken String?
 
     //2FA
@@ -47,7 +47,8 @@ model User {
 
     blocked String[]
 
-    Games Game[]
+    UserGames Game[] @relation(name: "userGames")
+    OpponentGames Game[] @relation(name: "opponentGames")
 }
 
 model Channel {
@@ -65,29 +66,30 @@ model Channel {
 }
 
 model Message {
-    id     		Int      @id @default(autoincrement())
-    sentAt 		DateTime @default(now())
+    id     Int      @id @default(autoincrement())
+    sentAt DateTime @default(now())
 
-    sentBy		User   @relation(fields: [sentByName], references: [name], onDelete: Cascade)
-    sentByName	String
+    sentBy     User   @relation(fields: [sentByName], references: [name], onDelete: Cascade)
+    sentByName String
 
     channel     Channel @relation(fields: [channelName], references: [name], onDelete: Cascade)
     channelName String
 
-    content 	String
+    content String
 }
 
 model Game {
-    id        		Int       @id @default(autoincrement())
-    createdAt 		DateTime  @default(now())
-    endAt     		DateTime?
+    id        Int       @id @default(autoincrement())
+    createdAt DateTime  @default(now())
+    endAt     DateTime?
 
-    userId 			String
-    user   			User   @relation(fields: [userId], references: [name], onDelete: Cascade)
+    userId String
+    user   User   @relation(name: "userGames", fields: [userId], references: [name], onDelete: Cascade)
 
-	opponent		String
-	userScore		Int
-	opponentScore	Int
+    opponentId    String
+    opponent      User   @relation(name: "opponentGames", fields: [opponentId], references: [name], onDelete: Cascade)
+    userScore     Int
+    opponentScore Int
 }
 
 // Relation table for many-to-many relation
@@ -119,4 +121,3 @@ model FriendShip {
 
     @@id([userId, friendId])
 }
-
