@@ -17,12 +17,12 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
     channelName,
     role,
 }) => {
-	const [open, setOpen] = useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false)
     const cmd: LeaveChannelData = {
         user: userName,
         channel: channelName,
         role: role,
-		alone: false,
+        alone: false,
     }
     return (
         <DropdownMenu>
@@ -34,17 +34,26 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
             <DropdownMenuContent className="flex flex-col gap-1">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <DropdownMenuItem className="w-full text-sm" onSelect={(e) => e.preventDefault()}>
+                        <DropdownMenuItem
+                            className="w-full text-sm"
+                            onSelect={(e) => e.preventDefault()}
+                        >
                             Leave
                         </DropdownMenuItem>
                     </DialogTrigger>
                     {role === 'owner' ? (
                         <DialogContent>
-                            <LeaveChannel cmd={cmd} variant='Owner'></LeaveChannel>
+                            <LeaveChannel
+                                cmd={cmd}
+                                variant="Owner"
+                            ></LeaveChannel>
                         </DialogContent>
                     ) : (
                         <DialogContent>
-                            <LeaveChannel cmd={cmd} variant='Other'></LeaveChannel>
+                            <LeaveChannel
+                                cmd={cmd}
+                                variant="Other"
+                            ></LeaveChannel>
                         </DialogContent>
                     )}
                 </Dialog>
@@ -52,12 +61,18 @@ const DropdownChannel: React.FC<DropdownChannelProps> = ({
                     {role === 'owner' ? (
                         <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
-                                <DropdownMenuItem className="w-full text-sm" onSelect={(e) => e.preventDefault()}>
+                                <DropdownMenuItem
+                                    className="w-full text-sm"
+                                    onSelect={(e) => e.preventDefault()}
+                                >
                                     Set password
                                 </DropdownMenuItem>
                             </DialogTrigger>
                             <DialogContent>
-                                <CardPassword channel={channelName} closeDialog={() => setOpen(false)}/>
+                                <CardPassword
+                                    channel={channelName}
+                                    closeDialog={() => setOpen(false)}
+                                />
                             </DialogContent>
                         </Dialog>
                     ) : null}

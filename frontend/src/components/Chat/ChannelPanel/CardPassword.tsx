@@ -12,10 +12,13 @@ import axios from 'axios'
 
 type CardPasswordProps = {
     channel: string
-	closeDialog: () => void
+    closeDialog: () => void
 }
 
-const CardPassword: React.FC<CardPasswordProps> = ({ channel, closeDialog }) => {
+const CardPassword: React.FC<CardPasswordProps> = ({
+    channel,
+    closeDialog,
+}) => {
     const { register, handleSubmit } = useForm<PasswordCmd>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const { data: me } = useQuery<UserData>({
@@ -26,7 +29,6 @@ const CardPassword: React.FC<CardPasswordProps> = ({ channel, closeDialog }) => 
     async function onSubmit(data: PasswordCmd) {
         data.channel = channel
         data.userId = me?.id!
-        console.log(data)
         try {
             const response = await axios.patch(
                 `${import.meta.env.VITE_BACKEND_URL}/chat/channel/password`,
@@ -35,7 +37,7 @@ const CardPassword: React.FC<CardPasswordProps> = ({ channel, closeDialog }) => 
                     withCredentials: true,
                 }
             )
-			closeDialog();
+            closeDialog()
         } catch (error: any) {
             setErrorMessage(error.response.data.message)
             throw error
@@ -70,7 +72,7 @@ const CardPassword: React.FC<CardPasswordProps> = ({ channel, closeDialog }) => 
                     <DialogClose asChild>
                         <Button className="w-full">Return</Button>
                     </DialogClose>
-                    <Button className="w-full" type='submit'>
+                    <Button className="w-full" type="submit">
                         Change password
                     </Button>
                 </div>

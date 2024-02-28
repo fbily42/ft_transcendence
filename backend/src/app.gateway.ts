@@ -509,6 +509,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('channelMute')
 	async channelMute(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const muted = await this.chatService.muteUser(cmd)
