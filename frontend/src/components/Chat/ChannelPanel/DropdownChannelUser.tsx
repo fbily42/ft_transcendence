@@ -9,6 +9,7 @@ import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import {
     ban,
     block,
+    directMessage,
     kick,
     mute,
     setAdmin,
@@ -22,18 +23,17 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MoreHorizontal } from 'lucide-react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
     targetId,
     targetName,
     role,
     targetRole,
+	channel
 }) => {
     const navigate = useNavigate()
     const socket = useWebSocket() as WebSocketContextType
-    const [searchParams, setSearchParams] = useSearchParams()
-    const channel: string | null = searchParams.get('channelId')
     const queryClient = useQueryClient() as QueryClient
     const { data: me } = useQuery<UserData>({
         queryKey: ['me'],
@@ -46,6 +46,7 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
         channel: channel,
     }
 
+	console.log(channel)
     return targetId === me?.id ? null : (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -64,6 +65,12 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
                     }}
                 >
                     See Profile
+                </DropdownMenuItem>
+				<DropdownMenuItem
+                    className="w-full"
+                    onClick={() => {directMessage(targetName, socket)}}
+                >
+                    Chat
                 </DropdownMenuItem>
                 {me?.blocked.includes(targetName) ? (
                     <DropdownMenuItem

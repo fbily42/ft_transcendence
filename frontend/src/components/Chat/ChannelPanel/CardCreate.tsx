@@ -50,7 +50,7 @@ function CardCreate({ onClose }: CardCreateProps) {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>
-                        <CardTitle>Create</CardTitle>
+                        <CardTitle className='text-xl'>Create</CardTitle>
                         <CardDescription>
                             Enter channel's name and set a password if you need
                             it.
@@ -61,7 +61,7 @@ function CardCreate({ onClose }: CardCreateProps) {
                             <Label htmlFor="name">Channel's Name</Label>
                             <Input
                                 id="name"
-                                placeholder="Pingu's Family"
+                                placeholder="PinguFriends"
                                 {...register('name')}
                             />
                         </div>
@@ -71,7 +71,7 @@ function CardCreate({ onClose }: CardCreateProps) {
                                 id="password"
                                 placeholder="Optionnal"
                                 type="password"
-                                {...register('password')}
+                                {...register('password', {setValueAs: (value) => value === '' ? undefined : value})}
                             />
                         </div>
                         <div className="flex items-center space-x-2 space-y-1">

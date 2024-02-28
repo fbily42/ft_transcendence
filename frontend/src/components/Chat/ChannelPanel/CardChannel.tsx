@@ -94,7 +94,7 @@ const CardChannel: React.FC<CardChannel> = ({
                         className={`flex items-center px-[6px] sm:px-[16px] md:px-[26px] h-[68px] ${bgColor} w-full rounded-none shadow-none border-none justify-between`}
                     >
                         <div className="flex items-center h-full w-full gap-[10px] md:gap-[20px]">
-                            <Avatar className="w-[48px] h-[48px]">
+                            <Avatar className="w-[48px] h-[48px] aspect-square">
                                 <AvatarImage
                                     className="rounded-full object-cover w-[40px] h-[40px] border-[3px] border-customDarkBlue"
                                     src={PinguFamily}
@@ -120,7 +120,7 @@ const CardChannel: React.FC<CardChannel> = ({
                         className={`flex items-center px-[6px] sm:px-[16px] md:px-[26px] h-[68px] ${bgColor} w-full rounded-none shadow-none border-none justify-between`}
                     >
                         <div className="flex items-center h-full w-full gap-[10px] md:gap-[20px]">
-                            <Avatar className="w-[48px] h-[48px]">
+                            <Avatar className="w-[48px] h-[48px] aspect-square">
                                 <AvatarImage
                                     className="rounded-full object-cover w-[40px] h-[40px] border-[3px] border-customDarkBlue"
                                     src={getAvatar(getDirectName(channelName, me?.name!))}

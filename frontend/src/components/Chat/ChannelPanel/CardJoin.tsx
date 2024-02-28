@@ -50,7 +50,7 @@ function CardJoin({ onClose }: CardJoinProps) {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>
-                        <CardTitle>Join</CardTitle>
+                        <CardTitle className='text-xl'>Join</CardTitle>
                         <CardDescription>
                             Enter channel's informations to join it.
                         </CardDescription>
@@ -70,7 +70,7 @@ function CardJoin({ onClose }: CardJoinProps) {
                                 id="password"
                                 placeholder="Optionnal"
                                 type="password"
-                                {...register('password')}
+                                {...register('password', {setValueAs: (value) => value === '' ? undefined : value})}
                             />
                         </div>
                         <div className="text-red-600">{errorMessage}</div>

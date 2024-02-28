@@ -1,8 +1,13 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class NewChannelDto {
 	@IsNotEmpty()
 	@IsString()
+	@MaxLength(20)
+	@MinLength(3)
+	@Matches(/^[a-zA-Z0-9]*$/, {
+		message: 'Name should only contain alphanumeric characters',
+	})
 	readonly name: string;
 
 	@IsNotEmpty()
@@ -11,5 +16,6 @@ export class NewChannelDto {
 
 	@IsString()
 	@IsOptional()
+	@MinLength(8)
 	readonly password: string;
 }

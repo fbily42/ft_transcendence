@@ -17,6 +17,7 @@ interface CardChannelUser {
     targetName: string
     targetRole: string
     userRole: string
+	channel: string
 }
 
 const CardChannelUser: React.FC<CardChannelUser> = ({
@@ -26,6 +27,7 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
     targetPicture,
     targetRole,
     userRole,
+	channel,
 }) => {
     return (
         <div className="h-full w-full">
@@ -33,7 +35,7 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
                 className={`flex items-center px-[6px] sm:px-[16px] md:px-[26px] h-[68px] bg-transparent w-full rounded-none shadow-none border-none justify-between`}
             >
                 <div className="flex items-center h-full w-full gap-[10px] md:gap-[20px]">
-                    <Avatar className="w-[48px] h-[48px]">
+                    <Avatar className="w-[48px] h-[48px] aspect-square">
                         <AvatarImage
                             className={`rounded-full object-cover w-[40px] h-[40px] border-[3px] ${getAvatarBorderColor(targetRole)}`}
                             src={targetPicture}
@@ -53,6 +55,7 @@ const CardChannelUser: React.FC<CardChannelUser> = ({
                         targetName={targetName}
                         role={userRole}
                         targetRole={targetRole}
+						channel={channel}
                     />
                 </div>
             </Card>

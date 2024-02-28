@@ -119,6 +119,10 @@ export function leaveChannel(cmd: LeaveChannelData, socket: WebSocketContextType
 	socket?.webSocket?.emit('quitChannel', cmd)
 }
 
+export function directMessage(name: string, socket: WebSocketContextType) {
+	socket.webSocket?.emit('privateMessage', name)
+}
+
 export async function block(cmd: CmdData, queryClient: QueryClient) {
 	try {
 		const response = await axios.patch(

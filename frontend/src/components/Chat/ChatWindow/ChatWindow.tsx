@@ -64,9 +64,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     }
 
     useEffect(() => {
-        socket?.webSocket?.on('messageToRoom', () => {
+        socket?.webSocket?.on('messageToRoom', (channel: string) => {
+            console.log('refeth', channel)
             queryClient.invalidateQueries({
-                queryKey: ['messages', currentChannel],
+                queryKey: ['messages', channel],
             })
         })
         return () => {

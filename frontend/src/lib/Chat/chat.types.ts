@@ -67,6 +67,7 @@ export type DropdownChannelUserProps = {
     targetName: string
     role: string
     targetRole: string
+	channel: string
 }
 
 export type CmdData = {
