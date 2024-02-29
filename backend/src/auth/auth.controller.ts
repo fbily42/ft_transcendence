@@ -6,23 +6,18 @@ import {
 	Res,
 	UseGuards,
 	HttpCode,
-	Delete,
 	Put,
-	Query,
 	Body,
 	UsePipes,
 	ValidationPipe,
 	ParseUUIDPipe,
 	Param,
 } from '@nestjs/common';
-import { AuthService, Payload_type } from './auth.service';
+import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { IsInt, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
 import { OtpDto, UuidDto, TokenDto } from './auth.dto';
-import { Payload } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 
 
@@ -88,7 +83,6 @@ export class AuthController {
 			}
 			res.redirect(`${process.env.FRONTEND_URL}`);
 		} catch (error) {
-			console.log(error);
 			res.redirect(`${process.env.FRONTEND_URL}/auth`);
 			throw error;
 		}
@@ -115,8 +109,8 @@ export class AuthController {
 					message: 'User profile is set',
 				});
 			} else {
-				res.status(HttpStatus.NOT_FOUND).send({
-					status: 'NOT FOUND',
+				res.status(HttpStatus.UNAUTHORIZED).send({
+					status: 'NOT SET',
 					message: 'User profile is not set',
 				});
 			}

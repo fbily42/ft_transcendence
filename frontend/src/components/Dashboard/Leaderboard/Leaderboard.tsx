@@ -8,14 +8,13 @@ export default function LeaderBoard(): JSX.Element {
     const { data } = useQuery<LeaderboardData[]>({
         queryKey: ['leaderboard'],
         queryFn: getLeaderboard,
-        refetchInterval: 1000 * 10,
     })
 
     if (!data) {
         return <div className="h-full"></div>
     }
     return (
-        <div className="h-full">
+        <div className="h-full rounded-[30px] overflow-hidden">
             {data.length > 0 && <DataTable columns={columns} data={data} />}
         </div>
     )

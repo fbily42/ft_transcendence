@@ -1,6 +1,5 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import instance from '@/axiosConfig'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
@@ -9,7 +8,11 @@ function ProtectedRoute(): JSX.Element {
     const navigate = useNavigate()
     const location = useLocation()
     const [auth, setAuth] = useState<boolean>(false)
-    const { data: me } = useQuery({
+    const {
+        data: me,
+        isSuccess,
+        isPending,
+    } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
@@ -24,8 +27,8 @@ function ProtectedRoute(): JSX.Element {
                     }
                 )
                 setAuth(true)
-                if (!me?.avatar || !me?.pseudo) {
-                    throw new Error()
+                if (isSuccess) {
+                    if (!me?.avatar || !me?.pseudo) throw new Error()
                 }
             } catch (error) {
                 setAuth(false)
@@ -33,7 +36,7 @@ function ProtectedRoute(): JSX.Element {
             }
         }
         checkIsAuth()
-    }, [location.pathname])
+    }, [location.pathname, isSuccess])
 
     if (auth) {
         return <Outlet></Outlet>

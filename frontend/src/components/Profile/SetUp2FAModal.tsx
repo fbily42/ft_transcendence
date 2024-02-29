@@ -51,7 +51,6 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
     // onSubmit function
     // posts token to /verify
     // sets up IsTokenValid
-
     type TokenData = {
         token: string
     }
@@ -74,6 +73,8 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
                 }
             )
             if (response.status === 202) {
+                //Open a success notif/message box
+                //Toggle the switch
                 setTwoFAVerified()
                 enableTwoFA()
                 onClose()
@@ -81,9 +82,7 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
                     '2FA authentication has successfully been verified and enabled.'
                 )
             }
-            //Open a success notif/message box
-            //Toggle the switch
-        } catch (error) {
+        } catch (error: any) {
             if (error.response.status === 401)
                 setIsTokValid('Token is not valid')
             else if (error.response.status === 500)
@@ -93,72 +92,67 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
 
     return (
         <div className="w-full h-full">
-            <Modal open={open} onClose={onClose}>
-                <div className="flex flex-col gap-[20px] p-[24px] border-10">
+            {/* <Modal open={open} onClose={onClose}> */}
+            <div className="flex flex-col gap-[20px] p-[24px] border-10">
+                <div>
+                    <p className="text-lg font-bold">
+                        Two-Factor Authentication (2FA)
+                    </p>
+                </div>
+                <div>
+                    <ol className="text-sm font-light">
+                        <li>
+                            <p>
+                                1. Install the authenticator app of your choice
+                                (Google Authenticator, Authy, Chrome
+                                Authenticator...)
+                            </p>
+                        </li>
+                        <li>
+                            <p>2. In the authenticator app, select '+' icon</p>
+                        </li>
+                        <li>
+                            <p>
+                                3. Select 'Scan a barcode (or QR code)' and use
+                                the phone's camera to scan the QR code below
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+                <div>
+                    <hr></hr>
+                </div>
+                <div>
+                    <p className="text-md font-bold">Scan QR code</p>
+                </div>
+                <div className="flex justify-center items-center">
+                    <QRCode value={otpUrl} size={172}></QRCode>
+                </div>
+                <div>
                     <div>
-                        <p className="text-lg font-bold">
-                            Two-Factor Authentication (2FA)
+                        <p className="capitalize font-bold text-sm text-center">
+                            Or enter code manually into your app
                         </p>
-                    </div>
-                    <div>
-                        <ol className="text-sm font-light">
-                            <li>
-                                <p>
-                                    1. Install the authenticator app of your
-                                    choice (Google Authenticator, Authy, Chrome
-                                    Authenticator...)
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    2. In the authenticator app, select '+' icon
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    3. Select 'Scan a barcode (or QR code)' and
-                                    use the phone's camera to scan the QR code
-                                    below
-                                </p>
-                            </li>
-                        </ol>
-                    </div>
-                    <div>
-                        <hr></hr>
-                    </div>
-                    <div>
-                        <p className="text-md font-bold">Scan QR code</p>
-                    </div>
-                    <div className="flex justify-center items-center">
-                        <QRCode value={otpUrl} size={172}></QRCode>
-                    </div>
-                    <div>
-                        <div>
-                            <p className="capitalize font-bold text-sm text-center">
-                                Or enter code manually into your app
-                            </p>
-                            <p className="text-sm text-center">
-                                SecretKey: {key}
-                            </p>
-                        </div>
-                    </div>
-                    <div>
-                        <hr></hr>
-                    </div>
-                    <div>
-                        <p className="text-md font-bold">Verify code</p>
-                    </div>
-                    <div>
-                        <OtpForm
-                            value={token}
-                            onChange={setToken}
-                            onSubmit={onSubmit}
-                            onClose={onClose}
-                            isTokenValid={isTokValid}
-                        />
+                        <p className="text-sm text-center">SecretKey: {key}</p>
                     </div>
                 </div>
-            </Modal>
+                <div>
+                    <hr></hr>
+                </div>
+                <div>
+                    <p className="text-md font-bold">Verify code</p>
+                </div>
+                <div>
+                    <OtpForm
+                        value={token}
+                        onChange={setToken}
+                        onSubmit={onSubmit}
+                        onClose={onClose}
+                        isTokenValid={isTokValid}
+                    />
+                </div>
+            </div>
+            {/* </Modal> */}
         </div>
     )
 }

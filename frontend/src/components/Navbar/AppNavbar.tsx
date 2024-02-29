@@ -10,8 +10,6 @@ import {
     CircleUserRound,
 } from 'lucide-react'
 import axios from 'axios'
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
-import { useQuery } from '@tanstack/react-query'
 import GameForm from '../Pong/GameForm'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
@@ -19,12 +17,7 @@ const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
     const [open, setOpen] = useState(false)
-    // const { data } = useQuery({
-    //     queryKey: ['me'],
-    //     queryFn: getUserMe,
-    // })
 
-    // Update active state when the route changes
     useEffect(() => {
         const path = location.pathname
         switch (path) {
@@ -78,7 +71,7 @@ const VerticalNavbar: React.FC = () => {
             )
             navigate('/auth')
         } catch (error) {
-            console.log('Error getdata', error)
+            throw error
         }
     }
 
@@ -123,7 +116,6 @@ const VerticalNavbar: React.FC = () => {
                                         : 'gameBtnDefault'
                                 }
                                 size="icon"
-                                onClick={() => handleNavTabs(2)}
                             >
                                 <div
                                     className={`${

@@ -22,6 +22,7 @@ const ImageInput: React.FC<ImageInputprops> = ({ onChange, size }) => {
                 className="hidden"
             />
             <Button
+                type="button"
                 className={
                     'rounded-full bg-customYellow' +
                     ` w-[${size}px]` +

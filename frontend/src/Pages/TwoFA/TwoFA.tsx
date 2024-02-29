@@ -70,13 +70,13 @@ function TwoFA(): JSX.Element {
     }
 
     return (
-        <OtpModal
-            open={open2FA}
-            onClose={onOtpModalClose}
-            redirect={''}
-            verify={false}
-            uuid={id!}
-        ></OtpModal>
+        <div className="z-20">
+            <OtpModal
+                open={open2FA}
+                onClose={onOtpModalClose}
+                uuid={id!}
+            ></OtpModal>
+        </div>
     )
 }
 

@@ -1,10 +1,9 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
-export class InviteChannelDto{
-
+export class InviteChannelDto {
 	@IsNotEmpty()
 	@IsString()
-	readonly sentBy: string
+	readonly sentBy: string;
 
 	@IsNotEmpty()
 	@IsString()

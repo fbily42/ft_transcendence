@@ -1,7 +1,10 @@
-import { IsInt, IsNumberString, IsString } from "class-validator";
+import { IsNumberString, IsString, MaxLength, MinLength } from "class-validator";
 
 export class OtpDto {
 	@IsString()
+	@IsNumberString()
+	@MinLength(6)
+	@MaxLength(6)
 	token: string;
 
 	@IsString()
@@ -15,5 +18,8 @@ export class UuidDto {
 
 export class TokenDto {
 	@IsString()
+	@IsNumberString()
+	@MinLength(6)
+	@MaxLength(6)
 	token: string;
 }

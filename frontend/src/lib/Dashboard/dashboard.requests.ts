@@ -93,3 +93,53 @@ export async function getMyFriends() {
     )
     return response.data
 }
+
+export async function getFriendRequest() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/me/request`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function getPendingInvitations() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/me/pending`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function acceptFriend(friendId: string) {
+    const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/friends/accept/${friendId}`, {},
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function getMyGameHistory() {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/user/gameHistory/me`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}
+
+export async function getGameHistory(userId: string) {
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/user/gameHistory/${userId}`,
+        {
+            withCredentials: true
+        }
+    )
+    return response.data
+}

@@ -7,15 +7,15 @@ import Mountains from '../../assets/other/mountain.svg'
 import PinguPlaying from '../../assets/other/Pingu.svg'
 import { Button } from '@/components/ui/button'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { Award, Crown, Gamepad2 } from 'lucide-react'
+import { ChevronsUp, Crown, Gamepad2 } from 'lucide-react'
 
 function Dashboard(): JSX.Element {
     const { data } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
-    const CloudsArray = new Array(10).fill(Clouds) // Change the number for more or fewer clouds
-    const MountainsArray = new Array(10).fill(Mountains) // Change the number for more or fewer mountains
+    const CloudsArray = new Array(10).fill(Clouds)
+    const MountainsArray = new Array(10).fill(Mountains)
 
     return (
         <>
@@ -29,11 +29,11 @@ function Dashboard(): JSX.Element {
                 >
                     <div
                         id="play box"
-                        className="relative bg-customDarkBlue w-[80%] h-full rounded-[36px] overflow-hidden shadow-drop"
+                        className="relative bg-customDarkBlue w-[80%] h-full rounded-[30px] overflow-hidden border-none shadow-drop"
                     >
                         <div
                             id="content w/o clouds and mountain"
-                            className="z-20 absolute h-full w-full flex items-center pl-6 pb-2 "
+                            className="z-20 absolute h-full w-full flex items-center pl-6 pb-2"
                         >
                             <div
                                 id="pingu div"
@@ -79,37 +79,37 @@ function Dashboard(): JSX.Element {
                     </div>
                     <div
                         id="stat cards"
-                        className="flex flex-col w-[20%] h-[100%] justify-between gap-[20px]"
+                        className="flex flex-col w-[20%] h-[100%] justify-between gap-4"
                     >
-                        <div id="rank card" className="bg-yellow-100 h-[30%]">
+                        <div id="rank card" className="h-full">
                             <CardsDashboard
                                 title="My Rank"
-                                icon={<Award />}
-                                //content={user ? user.rank : 0}
+                                icon={<ChevronsUp />}
                                 content={data?.rank || 0}
+                                backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>
-                        <div id="game card" className="bg-yellow-100 h-[30%]">
-                            <CardsDashboard
-                                title="Game Played"
-                                icon={<Gamepad2 />}
-                                // content={user ? user.games : 0}
-                                content={data?.games || 0}
-                            ></CardsDashboard>
-                        </div>
-                        <div id="win card" className="bg-yellow-100 h-[30%]">
+                        <div id="win card" className="h-full">
                             <CardsDashboard
                                 title="Game Won"
                                 icon={<Crown />}
-                                // content={user ? user.wins : 0}
                                 content={data?.wins || 0}
+                                backgroundColor="#FFFFFF"
+                            ></CardsDashboard>
+                        </div>
+                        <div id="game card" className="h-full">
+                            <CardsDashboard
+                                title="Game Played"
+                                icon={<Gamepad2 />}
+                                content={data?.games || 0}
+                                backgroundColor="#FFFFFF"
                             ></CardsDashboard>
                         </div>
                     </div>
                 </div>
                 <div
                     id="bottom bento"
-                    className="w-[100%] h-[50%] bg-white rounded-md border"
+                    className="w-[100%] h-[50%] bg-white rounded-[30px] border-none shadow-drop"
                 >
                     <LeaderBoard />
                 </div>

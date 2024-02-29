@@ -1,6 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	darkMode: ["class"],
+	mode: 'jit',
+	purge: [
+		"./pages/**/*.{ts,tsx}",
+		"./components/**/*.{ts,tsx}",
+		"./app/**/*.{ts,tsx}",
+		"./src/**/*.{ts,tsx}",
+	],
 	content: [
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
@@ -19,21 +26,26 @@ module.exports = {
 			fontFamily: {
 				sans: ['Fredoka', 'sans-serif'],
 			},
+			fontSize: {
+				'xs': '0.75rem',  // Extra Small
+				'sm': '0.875rem', // Small
+				'base': '1rem',   // Medium (Base)
+				'lg': '1.125rem', // Large
+				'xl': '1.25rem',  // Extra Large
+				'2xl': '1.5rem',  // 2X Large
+				'3xl': '1.875rem',  // 3X Large
+				'4xl': '2.25rem',   // 4X Large
+				'5xl': '3rem',      // 5X Large
+			},
 			colors: {
-				fontSize: {
-					'xs': '0.75rem',  // Extra Small
-					'sm': '0.875rem', // Small
-					'base': '1rem',   // Medium (Base)
-					'lg': '1.125rem', // Large
-					'xl': '1.25rem',  // Extra Large
-					'2xl': '1.5rem',  // 2X Large
-					'3xl': '1.875rem',  // 3X Large
-					'4xl': '2.25rem',   // 4X Large
-					'5xl': '3rem',      // 5X Large
-				  },
+				customBlue: "#C1E2F7",
+				customLightGreen: "#A0F4C7",
 				customLightBlue: "#F1F8FD",
+				customLightYellow: "#FFE6AF",
         		customDarkBlue: "#45A0E3",
         		customYellow: "#F5BC41",
+				customGreen: "#14AE5C",
+				textYellow: "#DA9501",
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",

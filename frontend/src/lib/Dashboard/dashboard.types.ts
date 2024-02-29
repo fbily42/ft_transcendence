@@ -1,7 +1,9 @@
 export type FriendData = {
     id: string
     name: string
-    avatar?: string
+    pseudo: string
+    avatar: string
+    accepted: boolean
     status: string
 }
 
@@ -16,6 +18,8 @@ export type UserData = {
 	photo42: string;
 	avatar: string;
 	pseudo: string;
+  looses: number;
+	blocked: string
 }
 
 export type LeaderboardData = {
@@ -23,4 +27,6 @@ export type LeaderboardData = {
     score: number
     rank: number
     name: string
+    pseudo: string
+	  avatar: string;
 }

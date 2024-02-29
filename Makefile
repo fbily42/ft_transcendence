@@ -7,7 +7,7 @@ COMPOSE_FILE = ./docker-compose.yml
 
 all:
 	@echo "$(BOLD)$(YELLOW)\n ----- Building app ----- \n$(RESET)"
-	@docker-compose -f $(COMPOSE_FILE) up --build -d
+	@docker compose -f $(COMPOSE_FILE) up --build -d
 	@echo "\n$(BOLD)$(GREEN)App ready [ ✔ ]\n$(RESET)"
 
 start:

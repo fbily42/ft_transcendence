@@ -1,14 +1,15 @@
-import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
-import { Award, Gamepad2, Trophy } from 'lucide-react'
+import { ChevronsUp, Crown, Frown } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 export default function UserStatsCard() {
-    const { data } = useQuery<UserData>({
-        queryKey: [],
-        queryFn: getUserMe,
-        refetchInterval: 1000 * 10,
+    const param = useParams()
+    const { data: friend } = useQuery<UserData>({
+        queryKey: ['users', param.id],
+        queryFn: () => getUserById(param.id!),
     })
 
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -34,11 +35,11 @@ export default function UserStatsCard() {
         >
             <div id="My rank" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {data?.rank}
+                    {friend?.rank}
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Award size={20} />
+                        <ChevronsUp size={20} />
                     ) : (
                         <p className="text-center text-[12px]">My Rank</p>
                     )}
@@ -47,11 +48,11 @@ export default function UserStatsCard() {
             <div className="border-l-2 h-full border-l-[#C1E2F7] rounded-full"></div>
             <div id="Games won" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {data?.wins}
+                    {friend?.wins}
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Trophy size={20} />
+                        <Crown size={20} />
                     ) : (
                         <p className="text-center text-[12px]">Games won</p>
                     )}
@@ -61,13 +62,13 @@ export default function UserStatsCard() {
 
             <div id="Total Games" className="flex flex-col items-center">
                 <h1 className="text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
-                    {data?.games}
+                    {friend?.looses}
                 </h1>
                 <div>
                     {isMobile ? (
-                        <Gamepad2 size={20} />
+                        <Frown size={20} />
                     ) : (
-                        <p className="text-center text-[12px]">Total games</p>
+                        <p className="text-center text-[12px]">Games lost</p>
                     )}
                 </div>
             </div>
