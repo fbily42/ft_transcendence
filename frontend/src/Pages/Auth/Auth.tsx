@@ -9,7 +9,7 @@ function Auth(): JSX.Element {
     const [isProfileSet, setIsProfileSet] = useState<boolean>(false)
 
     useEffect(() => {
-        async function checkIsAuth(): Promise<void> {
+        async function checkIsAuth(): Promise<void> {``
             try {
                 const response = await axios.get(
                     `${import.meta.env.VITE_BACKEND_URL}/auth/isProfileSet`,

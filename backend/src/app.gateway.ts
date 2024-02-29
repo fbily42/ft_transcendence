@@ -18,7 +18,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js
 import * as cookie from 'cookie';
 import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
 import { ChatService } from './chat/chat.service';
-import { GameStat } from './Game/Game.types';
+import { GameStats, RoomInfo } from './Game/Game.types';
 import { quitCmdDto } from './chat/dto/quitCmd.dto';
 
 @UsePipes(new ValidationPipe())
@@ -37,8 +37,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	clients = new Map<string, string[]>();
-	games_room = new Map<string, string[]>();
-	games_info = new Map<string , GameStat>();
+	gamesRoom = new Map<string, RoomInfo[]>();
+	gamesInfo = new Map<string , GameStats>();
 	
 
 	constructor (private jwtService: JwtService,
@@ -151,48 +151,133 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+
+	@SubscribeMessage('AcceptInvitation')
+	acceptInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string })
+	{
+		try {
+
+			if (this.gamesRoom.has(data.roomId))
+			{
+				client.join(data.roomId);
+				let array = this.gamesRoom.get(data.roomId);
+				array.push({id:client.data.userName , websocket: client.id, matchmaking: false});
+				this.gamesRoom.set(data.roomId, array);
+				this.server.to(client.id).emit('ReadyForGame', 'Joined')//creer le .on 
+
+				this.server.to(this.gamesRoom.get(data.roomId)[0].websocket).emit('JoinPartyFriend', 'Go');
+
+
+				// this.server.to(this.gamesRoom[data.roomId][0].websocket).emit('JoinPartyFriend', 'Go');//pour le createur
+
+				this.server.to(data.roomId).emit('Ready', data.roomId);
+
+				return ;
+			}
+			else
+				return;
+
+		}
+		catch(error){
+			throw new WsException('Internal Server Error');
+
+		}
+
+	}
+	@SubscribeMessage('DeclineInvitation')
+	declineInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string })
+	{
+		try {
+			if (this.gamesRoom.has(data.roomId))
+			{
+				//envoyer un emit qui va faire quitter la partie au createur et qui va le prevenir que le joueur a refuser de joueur avec lui
+				this.server.to(this.gamesRoom.get(data.roomId)[0].websocket).emit('JoinPartyFriend', "Decline")
+				return ;
+			}
+
+		}
+		catch(error){
+			throw new WsException('Internal Server Error');
+
+		}
+
+	}
+
+	//est ce que je dois stocker le nom de la personne qui est invite pour ajouter une securite ou est ce que le fait qu'il soit le seul a recevoir une Key unique est suffisant
+	@SubscribeMessage('JoinRoomFriend')
+	joinGameRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string })
+	{
+		try {
+
+			if(this.clients.has(data.friend))//verifier d'abord que l'amis est connecte, faire une deuxieme verification avant d'envoyer l'invitation
+			{
+				this.gamesRoom.set(data.roomId, [{id: client.data.userName, websocket: client.id, matchmaking:false}]);
+				client.join(data.roomId);
+				const clientIds = this.clients.get(data.friend)
+				if (clientIds)
+				{
+					clientIds.forEach ((socketId) => {
+
+						this.server.to(socketId).emit('GameInvitation', {friend: data.friend, roomId: data.roomId})
+					}
+					)
+				}
+				// this.server.to(this.clients[data.friend]).emit('GameInvitation', {friend: data.friend, roomId: data.roomId})
+				// this.server.to(client.id).emit('JoinParty', `You have created a room : ${data.roomId}`);
+				return ;
+			}
+			else
+			{
+				this.server.to(client.id).emit('JoinPartyFriend', 'Error');
+				return;
+			}
+
+		}
+		catch(error){
+			throw new WsException('Internal Server Error');
+
+		}
+
+	}
+	
+
+
 	//possible probleme
-	//si une personne cree une room elle peut pas en rejoindre une 
-	//si une personne veux annuler sa recherche comment faire
-	//que se passe t il si elle spam un bouton 
 	//si elle est en partie ne rien faire
 	//verifier le login de la personne pour l'empecher de faire deux matchmaking
 	@SubscribeMessage('JoinRoom')
 	joingame(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try{
-			for (let [key, value] of this.games_room)
+			for (let [key, value] of this.gamesRoom)
 			{
-				let stringcount = 0;
-				for (let item of value){
-					if (typeof item === 'string')
-						stringcount++;
-					if (stringcount === 2)
-						break;
-				}
-				if (stringcount < 2)
+				// let stringcount = 0;
+				// for (let item of value){
+				// 	if (typeof item === 'string')
+				// 		stringcount++;
+				// 	if (stringcount === 2)
+				// 		break;
+				// }
+				if (value.length == 1)
 				{
-					if (value[0] != client.id)
+					if (value[0].websocket != client.id && value[0].id != client.data.userName && value[0].matchmaking === true)
 					{
 						client.join(key);
-						let array = this.games_room.get(key);
-						array.push(client.id);
-						this.games_room.set(key, array);
-						this.server.to(client.id).emit('JoinParty', `You have joined room : ${key}`)
-						// console.log("nom de la room", key);
+						let array = this.gamesRoom.get(key);
+						array.push({id:client.data.userName , websocket: client.id, matchmaking: true});
+						this.gamesRoom.set(key, array);
+						this.server.to(client.id).emit('JoinParty', 'Joined')
+						this.server.to(value[0].websocket).emit('JoinParty', 'Go');
+
 						this.server.to(key).emit('Ready', key);
-						this.server.to(value[0]).emit('JoinParty', 'Ready');
 						return ;
 	
 					}
-					else
-						return;
 				}
 			}
-			this.games_room.set(room, [client.id]);
+			this.gamesRoom.set(room, [{id: client.data.userName, websocket: client.id, matchmaking:true}]);
 			client.join(room);
-			// console.log(`room : ${room}`)
-			this.server.to(client.id).emit('JoinParty', `You have created a room : ${room}`);
+
 			return ;
 
 		}
@@ -207,14 +292,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	{
 		try{
 
-			if (this.games_info.has(room)){
-				// console.log('la data existe');
-				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+			if (this.gamesInfo.has(room)){
+
+				
+				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
 			}
-			else{
-				this.games_info.set(room, new GameStat());
-				this.server.to(client.id).emit('UpdateKey', this.games_info.get(room))
+			else {
+				this.gamesInfo.set(room, new GameStats());
+				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
 			}
+
 		}
 		catch(error)
 		{
@@ -227,23 +314,130 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
+			
+			if(this.gamesInfo.has(room))
+			{
 
-			// const now = Date.now();
-			// const delay = 10;
-			let gamestat:GameStat = this.games_info.get(room);
-			// if (now - gamestat.ball.last > delay)
-			// {
-				// gamestat.ball.last = now;
-				gamestat.ball.x += gamestat.ball.dx * gamestat.ball.speed;
-				gamestat.ball.y += gamestat.ball.dy * gamestat.ball.speed;
-				
-				gamestat.WallCollision();
-			// }
-			// gamestat.PaddleCollision(gamestat.paddle_1);
-			// gamestat.PaddleCollision(gamestat.paddle_2);
+				// const now = Date.now();
+				// const delay = 10;
+				let gameStats:GameStats = this.gamesInfo.get(room);
+				// if (now - gameStats.ball.last > delay)
+				// {
+					// gameStats.ball.last = now;
+					gameStats.ball.x += gameStats.ball.dx * gameStats.ball.speed;
+					gameStats.ball.y += gameStats.ball.dy * gameStats.ball.speed;
+					
+					gameStats.WallCollision();
+					if (gameStats.gameStatus.gameState == 'finish'){
+
+						let gamesRoom = this.gamesRoom.get(room)
+						// this.server.to(room).emit('finish', gameStats);
+						if (gameStats.gameStatus.scoreOne == 10)
+						{
+
+							gameStats.gameStatus.winner = gamesRoom[1].id;
+							gameStats.gameStatus.looser = gamesRoom[0].id;
+						}
+						else if(gameStats.gameStatus.scoreTwo == 10)
+						{
+
+							gameStats.gameStatus.winner = gamesRoom[0].id;
+							gameStats.gameStatus.looser = gamesRoom[1].id;
+						}
+						this.server.to(room).emit('finish', gameStats);
+						//mettre a jour DB
+						// clear rooms info
+						this.gamesRoom.delete(room);
+						this.gamesInfo.delete(room);
+						return;
+					}
+				// }
+				// gameStats.PaddleCollision(gameStats.paddleOne);
+				// gameStats.PaddleCollision(gameStats.paddleTwo);
+				if (gameStats !== undefined && gameStats.PaddleCollision !== undefined)
+				{
+					gameStats.PaddleCollision(gameStats.paddleOne);
+					gameStats.PaddleCollision(gameStats.paddleTwo);
+					
+				}
+				this.gamesInfo.set(room, gameStats);
+				this.server.to(room).emit('UpdateKey', gameStats);
+			}
+		}
+		catch(error)
+		{
+
+			throw new WsException('Internal Server Error')
+		}
+
+	}
+	@SubscribeMessage('endGame')
+	endGame(@ConnectedSocket() client: Socket, @MessageBody() room:string)
+	{
+		try{
+			if (this.gamesInfo.has(room))
+			{
+
+				let gameStats:GameStats = this.gamesInfo.get(room);
+				let gamesRoom = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
 	
-			this.games_info.set(room, gamestat);
-			this.server.to(room).emit('UpdateKey', gamestat);
+				for (let [key , value ] of this.gamesRoom)
+				{
+					if (key === room)
+					{
+						if (gameStats.gameStatus.scoreOne === 10)
+						{
+
+							gameStats.gameStatus.winner = value[1].id
+							gameStats.gameStatus.looser = value[0].id
+							this.gamesInfo.set(room, gameStats);
+							this.server.to(key).emit('UpdateKey', gameStats);
+						}
+						else if (gameStats.gameStatus.scoreTwo === 10)
+						{
+							gameStats.gameStatus.winner = value[0].id
+
+							gameStats.gameStatus.looser = value[1].id
+
+							this.gamesInfo.set(room, gameStats);
+							this.server.to(key).emit('UpdateKey', gameStats);
+						}
+						//mettre a jour la db avant de tout delete
+						// this.gamesRoom.delete(room);
+						// this.gamesInfo.delete(room);
+					}	
+				}
+			}
+		} catch(error){
+			// console.log(error)
+			throw new WsException('Internal Server Error')
+
+		}
+	}
+
+
+	@SubscribeMessage('leaveRoomBefore')
+	leaveRoombefore(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	{
+		try {
+
+			let gamestat:GameStats = this.gamesInfo.get(room);//il faut supprimer la roomm et le Gamestat
+			let games_room = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+			let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
+	
+	
+			if (this.gamesRoom.has(room)) {
+				this.gamesRoom.delete(room);
+
+			}
+			else
+				return
+			
+			if (this.gamesInfo.has(room)) {
+				this.gamesInfo.delete(room);
+			}
+			else
+				return
 		}
 		catch(error)
 		{
@@ -258,91 +452,122 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
+			//tout delete uniquement si la room est vide, donc verifier que
+			let gameStats:GameStats = this.gamesInfo.get(room);//il faut supprimer la roomm et le Gamestat
+			let gamesRoom = this.gamesRoom.get(room)//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
+			let clients  = this.clients;//utilie les clientid dans gamesRoom pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
 
-			let gamestat:GameStat = this.games_info.get(room);//il faut supprimer la roomm et le Gamestat
-			let games_room = this.games_room;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
-			let clients  = this.clients;//utilie les clientid dans games_room pour savoir qui a quitte la game avant la fin pour savoir si il y a quelqu'un a penalise
-			
-			// for (let [key , value ] of this.games_room)
-			// {
-			// 	if (key == room)
-			// 	{
-					
-			// 	}
+			if (gameStats?.gameStatus?.gameState === 'finish') return;
+			if(!gamesRoom) return 
+			if (gamesRoom[0].websocket === client.id){
+				gameStats.gameStatus.gameState = "finish";
+				gameStats.gameStatus.winner = gamesRoom[1].id;
+				gameStats.gameStatus.looser = gamesRoom[0].id;
+				gameStats.gameStatus.scoreOne = 0;
+				gameStats.gameStatus.scoreTwo = 10;
+				this.server.to(room).emit('finish', gameStats);
+				// Ajouter dans la db
+				this.gamesRoom.delete(room);
+				this.gamesInfo.delete(room);
+				return;
+			}
+			if (gamesRoom[1].websocket === client.id){
+				gameStats.gameStatus.gameState = "finish";
+				gameStats.gameStatus.winner = gamesRoom[0].id;
+				gameStats.gameStatus.looser = gamesRoom[1].id;
+				gameStats.gameStatus.scoreOne = 10;
+				gameStats.gameStatus.scoreTwo = 0;
+				this.server.to(room).emit('finish', gameStats);
+				// Ajouter dans la db
+				this.gamesRoom.delete(room);
+				this.gamesInfo.delete(room);
+				return;
+			}
+
+
+		}
+		catch(error)
+		{
+			console.log(error);
+			// throw new WsException('Internal Server Error')
+		}
+	}
+
+	// @SubscribeMessage('paddllColl')
+	// paddllColl(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	// {
+	// 	try {
+	// 		if (this.gamesInfo.has(room))
+	// 		{
+	// 			let gameStats:GameStats = this.gamesInfo.get(room);
 				
-			// }
-			this.games_room.delete(room);
-			this.games_info.delete(room);
-		}
-		catch(error)
-		{
-			throw new WsException('Internal Server Error')
-		}
+	// 			if (gameStats !== undefined && gameStats.PaddleCollision !== undefined)
+	// 			{
+	// 				gameStats.PaddleCollision(gameStats.paddleOne);
+	// 				gameStats.PaddleCollision(gameStats.paddleTwo);
+					
+	// 			}
+	// 			this.gamesInfo.set(room, gameStats);
+	// 			this.server.to(room).emit('UpdateKey', gameStats);
+	// 		}
+	// 	}
+	// 	catch(error)
+	// 	{
 
-	}
+	// 		throw new WsException('Internal Server Error')
+	// 	}
+		
 
-	@SubscribeMessage('paddllColl')
-	paddllColl(@ConnectedSocket() client: Socket, @MessageBody() room: string)
-	{
-		try {
-
-			let gamestat:GameStat = this.games_info.get(room);
-			gamestat.PaddleCollision(gamestat.paddle_1);
-			gamestat.PaddleCollision(gamestat.paddle_2);
-			this.games_info.set(room, gamestat);
-			this.server.to(room).emit('UpdateKey', gamestat);
-		}
-		catch(error)
-		{
-			throw new WsException('Internal Server Error')
-		}
-	}
+	// }
 	
 	@SubscribeMessage('key')
 	UpdateKey(@ConnectedSocket() client: Socket, @MessageBody() data: { key: string; roomId: string })
 	{
 		try {
+			if (this.gamesInfo.has(data.roomId) && this.gamesRoom.has(data.roomId))
+			{
 
-			let gamestat:GameStat = this.games_info.get(data.roomId)
-			let array = this.games_room.get(data.roomId);
-			// if(array[0] == client.id)
-			// {
-	
-				if (data.key === "a") {
-					if ((gamestat.paddle_1.y - 10) > 0 )
-						gamestat.paddle_1.y -= 5;
-					}
-	
-				else if (data.key === "d") {
-					if ((gamestat.paddle_1.y + 10 + 60) < gamestat.canvas.height )
-					{
-						gamestat.paddle_1.y += 5;
-					}
-				}
-				// else
-				// 	return;
-	
-			// }
-			// if(array[1] == client.id)
-			// {
-				if (data.key === "ArrowUp" ) {
-					if ((gamestat.paddle_2.y - 10) > 0 )
-						gamestat.paddle_2.y -= 5;
-					}
+				let gameStats:GameStats = this.gamesInfo.get(data.roomId)
+				let array = this.gamesRoom.get(data.roomId);
+				if(array[0].websocket == client.id)
+				{
 		
-				else if (data.key === "ArrowDown") {
-					if ((gamestat.paddle_2.y + 10 + 60) < gamestat.canvas.height )
-					{
-						gamestat.paddle_2.y += 5;
+					if (data.key === "a") {
+						if ((gameStats.paddleOne.y - 10) > 0 )
+							gameStats.paddleOne.y -= 5;
+						}
+		
+					else if (data.key === "d") {
+						if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
+						{
+							gameStats.paddleOne.y += 5;
+						}
 					}
+					else
+						return;
+		
 				}
-				// else
-				// return;
-	
-			// }
-	
-			this.games_info.set(data.roomId, gamestat);
-			this.server.to(data.roomId).emit('UpdateKey', gamestat);
+				if(array[1].websocket == client.id)
+				{
+					if (data.key === "ArrowUp" ) {
+						if ((gameStats.paddleTwo.y - 10) > 0 )
+							gameStats.paddleTwo.y -= 5;
+						}
+			
+					else if (data.key === "ArrowDown") {
+						if ((gameStats.paddleTwo.y + 10 + 60) < gameStats.canvas.height )
+						{
+							gameStats.paddleTwo.y += 5;
+						}
+					}
+					else
+						return;
+		
+				}
+		
+				this.gamesInfo.set(data.roomId, gameStats);
+				this.server.to(data.roomId).emit('UpdateKey', gameStats);
+			}
 		}
 		catch (error)
 		{

@@ -1,16 +1,16 @@
 import { WebSocketContextType } from '@/context/webSocketContext'
 
-import { GameStat, imageForGame } from '@/lib/Game/Game.types'
+import { GameStats, imageForGame } from '@/lib/Game/Game.types'
 
 
 
-type keyData = {
-	key: string,
-	roomId: string,
-}
+// type keyData = {
+// 	key: string,
+// 	roomId: string,
+// }
 export function Paddle_2(
     ctx: CanvasRenderingContext2D,
-    gameInfo: GameStat,
+    gameInfo: GameStats,
     keys: { [key: string]: boolean },
     gameImages: imageForGame,
     socket: WebSocketContextType,
@@ -18,35 +18,35 @@ export function Paddle_2(
 ) {
 
     if (keys['ArrowUp']) {
-		const data: keyData = {key: 'ArrowUp', roomId: roomName}
-        socket?.webSocket?.emit('key', data)}
+		// const data: keyData = {key: 'ArrowUp', roomId: roomName}
+        socket?.webSocket?.emit('key', { key: 'ArrowUp', roomId: roomName })}
 
     else if (keys['ArrowDown']) {
         socket?.webSocket?.emit('key', { key: 'ArrowDown', roomId: roomName })
     }
 
-    ctx.beginPath()
+	ctx.beginPath()
     ctx.drawImage(
-        gameImages.image.img_grey,
-        gameInfo.paddle_2.x,
-        gameInfo.paddle_2.y,
-        gameInfo.paddle_2.width,
-        gameInfo.paddle_2.height
-    )
-    // ctx.rect(gameInfo.paddle_2.x, gameInfo.paddle_2.y, gameInfo.paddle_2.width, gameInfo.paddle_2.height);
-    ctx.fillStyle = gameInfo.paddle_2.color
-    ctx.strokeStyle = gameInfo.paddle_2.color
+		gameImages.image.img_grey,
+        gameInfo.paddleTwo.x,
+        gameInfo.paddleTwo.y,
+        gameInfo.paddleTwo.width,
+        gameInfo.paddleTwo.height
+		)
+    // ctx.rect(gameInfo.paddleTwo.x, gameInfo.paddleTwo.y, gameInfo.paddleTwo.width, gameInfo.paddleTwo.height);
+    ctx.fillStyle = gameInfo.paddleTwo.color
+    ctx.strokeStyle = gameInfo.paddleTwo.color
     ctx.lineWidth = 1
-    ctx.fillStyle = gameInfo.paddle_2.color
+    ctx.fillStyle = gameInfo.paddleTwo.color
     ctx.shadowBlur = 0
     ctx.shadowColor = 'blue'
-    ctx.strokeRect(gameInfo.paddle_2.x, gameInfo.paddle_2.y, gameInfo.paddle_2.width, gameInfo.paddle_2.height)
+    ctx.strokeRect(gameInfo.paddleTwo.x, gameInfo.paddleTwo.y, gameInfo.paddleTwo.width, gameInfo.paddleTwo.height)
     ctx.fill()
 }
 
 export function Paddle_1(
     ctx: CanvasRenderingContext2D,
-    gameInfo: GameStat,
+    gameInfo: GameStats,
     keys: { [key: string]: boolean },
     gameImages: imageForGame,
     socket: WebSocketContextType,
@@ -63,18 +63,18 @@ export function Paddle_1(
     ctx.beginPath()
     ctx.drawImage(
         gameImages.image.img_pingu,
-        gameInfo.paddle_1.x,
-        gameInfo.paddle_1.y,
-        gameInfo.paddle_1.width,
-        gameInfo.paddle_1.height
+        gameInfo.paddleOne.x,
+        gameInfo.paddleOne.y,
+        gameInfo.paddleOne.width,
+        gameInfo.paddleOne.height
     )
-    // ctx.rect(gameInfo.paddle_1.x, gameInfo.paddle_1.y, gameInfo.paddle_1.width, gameInfo.paddle_1.height);
-    ctx.fillStyle = gameInfo.paddle_1.color
-    ctx.strokeStyle = gameInfo.paddle_1.color
+    // ctx.rect(gameInfo.paddleOne.x, gameInfo.paddleOne.y, gameInfo.paddleOne.width, gameInfo.paddleOne.height);
+    ctx.fillStyle = gameInfo.paddleOne.color
+    ctx.strokeStyle = gameInfo.paddleOne.color
     ctx.lineWidth = 1
-    ctx.fillStyle = gameInfo.paddle_1.color
+    ctx.fillStyle = gameInfo.paddleOne.color
     ctx.shadowBlur = 0
     ctx.shadowColor = 'blue'
-    ctx.strokeRect(gameInfo.paddle_1.x, gameInfo.paddle_1.y, gameInfo.paddle_1.width, gameInfo.paddle_1.height)
+    ctx.strokeRect(gameInfo.paddleOne.x, gameInfo.paddleOne.y, gameInfo.paddleOne.width, gameInfo.paddleOne.height)
     ctx.fill()
 }

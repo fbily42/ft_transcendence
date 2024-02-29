@@ -409,12 +409,9 @@ export class AuthService {
 		}
 	}
 
-	async refreshTheToken(token_refresh: string, token: string)
+	async refreshTheToken(token_refresh: string)
 	{
 		try {
-			if(!token)
-				throw new HttpException("Token doesn't exist", HttpStatus.NOT_FOUND);
-			this.jwt.verify(token);
 			if(!token_refresh)//il faut log out
 			{
 				throw new HttpException("Token already used", HttpStatus.NOT_FOUND);

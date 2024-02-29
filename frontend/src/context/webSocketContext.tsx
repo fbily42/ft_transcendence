@@ -31,6 +31,7 @@ export const WebSocketProvider: React.FC = () => {
     const [usersOn, setUsersOn] = useState(new Map<string, string[]>())
     const queryClient = useQueryClient()
     const navigate = useNavigate()
+    const socket = useWebSocket()
 
     useEffect(() => {
         const ws: Socket = io(`${import.meta.env.VITE_WSCHAT_URL}`, {
@@ -48,6 +49,36 @@ export const WebSocketProvider: React.FC = () => {
                     },
                 }
             )
+        })
+        ws?.on('GameInvitation', (data) => {
+            console.log('toaast')
+            console.log('roomId dans GameInviation', data)
+            toast(`You have been invite to a game against ${data.friend}`, {
+                action: {
+                    label: 'Accept',
+                    onClick: () =>
+                        ws?.emit('AcceptInvitation', {
+                            friend: data.friend,
+                            roomId: data.roomId,
+                        }),
+                },
+                duration: 5000,
+                onAutoClose: () => {
+                    ws?.emit('DeclineInvitation', {
+                        friend: data.friend,
+                        roomId: data.roomId,
+                    })
+                },
+				
+            })
+        })
+
+        ws?.on('ReadyForGame', (message: string) => {
+            if (message.startsWith('Joined')) {
+                // processingMessage.current = true
+                // closeDialog()
+                navigate('/pong')
+            }
         })
 
         ws?.on('users', (users: SocketUsers) => {
@@ -114,6 +145,8 @@ export const WebSocketProvider: React.FC = () => {
                     'setMember',
                     'muted',
                     'unmuted',
+                    'ReadyForGame',
+                    'GameInvitation',
                     'newOwner',
                     'refreshFriendlist',
                 ]
