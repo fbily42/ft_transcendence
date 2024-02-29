@@ -28,17 +28,16 @@ export default function MyFriendList() {
     return (
         <div className="h-full">
             <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] h-full">
+                <h2 className="p-[20px] text-gray-500">Friends</h2>
                 {myFriends && myFriends.length > 0 ? (
                     myFriends.map((friend: FriendData) => (
                         <div key={friend.id}>
-                            <h2 className="p-[20px] text-gray-500">Friends</h2>
                             <UserCards
                                 id={friend.id}
                                 bgColor="transparent"
                                 userName={friend.pseudo}
                                 userPicture={friend.avatar!}
                                 userStatus={getStatus(friend.name)}
-                                variant="FRIEND"
                             />
                         </div>
                     ))

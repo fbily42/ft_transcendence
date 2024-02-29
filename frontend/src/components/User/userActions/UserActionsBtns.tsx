@@ -14,7 +14,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 
 export default function UserActionsBtns() {
-    // const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
     const [openProfileSettings, setOpenProfileSettings] =
         useState<boolean>(false)
@@ -26,20 +25,6 @@ export default function UserActionsBtns() {
 
     const initialAvatar = currentUser?.avatar
     const initialPseudo = currentUser?.pseudo
-
-    // const handleResize = () => {
-    //     setIsMobile(window.innerWidth < 900)
-    // }
-
-    // useEffect(() => {
-    //     handleResize()
-    //     window.addEventListener('resize', handleResize)
-
-    //     // Cleanup the event listener on component unmount
-    //     return () => {
-    //         window.removeEventListener('resize', handleResize)
-    //     }
-    // }, [])
 
     return (
         <div

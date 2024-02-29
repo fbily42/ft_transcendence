@@ -82,7 +82,7 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
                     '2FA authentication has successfully been verified and enabled.'
                 )
             }
-        } catch (error) {
+        } catch (error: any) {
             if (error.response.status === 401)
                 setIsTokValid('Token is not valid')
             else if (error.response.status === 500)

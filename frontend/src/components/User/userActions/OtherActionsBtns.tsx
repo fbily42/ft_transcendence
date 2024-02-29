@@ -7,11 +7,27 @@ import {
     getMyFriends,
     getPendingInvitations,
     getUserById,
+    getUserMe,
     removeFriend,
 } from '@/lib/Dashboard/dashboard.requests'
 import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+    QueryClient,
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { block, directMessage, unblock } from '@/lib/Chat/chat.requests'
+import { CmdData } from '@/lib/Chat/chat.types'
 
 export default function OtherActionsBtns() {
     const param = useParams()
@@ -35,33 +51,48 @@ export default function OtherActionsBtns() {
         queryFn: () => getUserById(param.id!),
     })
 
-    const queryClient = useQueryClient()
+    const { data: me } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
+
+    const queryClient = useQueryClient() as QueryClient
     const socket = useWebSocket() as WebSocketContextType
+
+    const cmdData: CmdData = {
+        userId: me?.id,
+        targetId: user?.id!,
+        targetName: user?.name!,
+        channel: 'none',
+    }
 
     const addNewFriendMutation = useMutation({
         mutationFn: (friendId: string) => addNewFriend(friendId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['request'] })
-            queryClient.invalidateQueries({ queryKey: ['pending'] })
-            queryClient.invalidateQueries({ queryKey: ['friends'] })
+            socket?.webSocket?.emit('refreshFriendlist', {
+                user: me?.name,
+                friend: user?.name,
+            })
         },
     })
 
     const acceptFriendMutation = useMutation({
         mutationFn: (friendId: string) => acceptFriend(friendId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['request'] })
-            queryClient.invalidateQueries({ queryKey: ['pending'] })
-            queryClient.invalidateQueries({ queryKey: ['friends'] })
+            socket?.webSocket?.emit('refreshFriendlist', {
+                user: me?.name,
+                friend: user?.name,
+            })
         },
     })
 
     const removeFriendMutation = useMutation({
         mutationFn: (friendId: string) => removeFriend(friendId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['request'] })
-            queryClient.invalidateQueries({ queryKey: ['pending'] })
-            queryClient.invalidateQueries({ queryKey: ['friends'] })
+            socket?.webSocket?.emit('refreshFriendlist', {
+                user: me?.name,
+                friend: user?.name,
+            })
         },
     })
 
@@ -70,10 +101,6 @@ export default function OtherActionsBtns() {
     const isRequested = friendRequest?.some(
         (request) => request.id === param.id
     )
-
-    function directMessage(name: string) {
-        socket.webSocket?.emit('privateMessage', name)
-    }
 
     return (
         <div>
@@ -90,12 +117,49 @@ export default function OtherActionsBtns() {
             {isFriend && (
                 <>
                     <div className="w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar">
-                        <Button
-                            className="w-full"
-                            onClick={() => directMessage(user?.name!)}
-                        >
-                            Send PM
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button className="w-full" variant="default">
+                                    Actions
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-fit ">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            directMessage(user?.name!, socket)
+                                        }
+                                    >
+                                        Send PM
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        Play PinguPong
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    {me?.blocked.includes(user?.name!) ? (
+                                        <DropdownMenuItem
+                                            className="w-full"
+                                            onClick={() => {
+                                                unblock(cmdData, queryClient)
+                                            }}
+                                        >
+                                            Unblock
+                                        </DropdownMenuItem>
+                                    ) : (
+                                        <DropdownMenuItem
+                                            className="w-full"
+                                            onClick={() => {
+                                                block(cmdData, queryClient)
+                                            }}
+                                        >
+                                            Block
+                                        </DropdownMenuItem>
+                                    )}
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                         <Button
                             className="w-full"
                             variant={'destructive'}

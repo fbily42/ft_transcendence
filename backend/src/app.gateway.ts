@@ -135,6 +135,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('refreshFriendlist')
+	refreshFriendlist(@MessageBody() data: {user: string, friend: string}){
+		const userIds = this.clients.get(data.user)
+		if (userIds){
+			userIds.forEach(socketId => {
+				this.server.to(socketId).emit('refreshFriendlist')
+			})
+		}
+		const friendIds = this.clients.get(data.friend)
+		if (friendIds){
+			friendIds.forEach(socketId => {
+				this.server.to(socketId).emit('refreshFriendlist')
+			})
+		}
+	}
 
 	//possible probleme
 	//si une personne cree une room elle peut pas en rejoindre une 

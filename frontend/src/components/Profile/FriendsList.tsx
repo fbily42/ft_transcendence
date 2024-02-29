@@ -37,31 +37,34 @@ export default function FriendsList() {
     return (
         <div className="h-full">
             <div className="bg-white w-full flex flex-col rounded-[26px] md:rounded-[30px] lg:rounded-[36px] h-full">
-                {friends && friends.length > 0 ? (
-                    friends.map((friend: FriendData) => (
-                        <div key={friend.id}>
-                            <h2 className="p-[20px] text-gray-500">Friends</h2>
-                            <UserCards
-                                id={friend.id.toString()}
-                                bgColor="transparent"
-                                userName={friend.pseudo}
-                                userPicture={friend.avatar || PinguAvatar}
-                                userStatus={getStatus(friend.name)}
-                                variant="OTHER"
-                            />
+                <h2 className="p-[20px] text-gray-500">Friends</h2>
+                <div className="overflow-y-auto max-h-[300px] no-scrollbar">
+                    {friends && friends.length > 0 ? (
+                        friends.map((friend: FriendData) => (
+                            <div key={friend.id}>
+                                <UserCards
+                                    id={friend.id.toString()}
+                                    bgColor="transparent"
+                                    userName={friend.pseudo}
+                                    userPicture={friend.avatar || PinguAvatar}
+                                    userStatus={getStatus(friend.name)}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <div className="flex flex-col items-center h-full">
+                            <img src={NoFriends} alt="no friends" />
+                            <span className="w-[200px]">
+                                <p className="text-center font-semibold">
+                                    Oh no!
+                                </p>
+                                <p className="text-center">
+                                    {user?.pseudo} has no friends yet.
+                                </p>
+                            </span>
                         </div>
-                    ))
-                ) : (
-                    <div className="flex flex-col items-center h-full">
-                        <img src={NoFriends} alt="no friends" />
-                        <span className="w-[200px]">
-                            <p className="text-center font-semibold">Oh no!</p>
-                            <p className="text-center">
-                                {user?.pseudo} has no friends yet.
-                            </p>
-                        </span>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     )

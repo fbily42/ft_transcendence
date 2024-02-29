@@ -1,6 +1,5 @@
-import { InviteFormValues } from '@/components/Chat/ChannelPanel/Channels/CardInvite'
+import { InviteFormValues } from '@/lib/Chat/chat.types'
 import { useQueryClient } from '@tanstack/react-query'
-import { channel } from 'diagnostics_channel'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { Socket, io } from 'socket.io-client'
@@ -95,6 +94,13 @@ export const WebSocketProvider: React.FC = () => {
             toast(`You have been promote to owner in ${channel}`)
         })
 
+        ws?.on('refreshFriendlist', () => {
+            queryClient.invalidateQueries({ queryKey: ['request'] })
+            queryClient.invalidateQueries({ queryKey: ['pending'] })
+            queryClient.invalidateQueries({ queryKey: ['friends'] })
+            queryClient.invalidateQueries({ queryKey: ['userFriend'] })
+        })
+
         return () => {
             if (ws) {
                 const events = [
@@ -109,6 +115,7 @@ export const WebSocketProvider: React.FC = () => {
                     'muted',
                     'unmuted',
                     'newOwner',
+                    'refreshFriendlist',
                 ]
                 events.forEach((event) => {
                     ws.off(event)
