@@ -514,8 +514,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 				let gameStats:GameStats = this.gamesInfo.get(data.roomId)
 				let array = this.gamesRoom.get(data.roomId);
-				// if(array[0].websocket == client.id)
-				// {
+				if(array[0].websocket == client.id)
+				{
 		
 					if (data.key === "a") {
 						if ((gameStats.paddleOne.y - 10) > 0 )
@@ -528,12 +528,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 							gameStats.paddleOne.y += 5;
 						}
 					}
-					// else
-					// 	return;
+					else
+						return;
 		
-				// }
-				// if(array[1].websocket == client.id)
-				// {
+				}
+				if(array[1].websocket == client.id)
+				{
 					if (data.key === "ArrowUp" ) {
 						if ((gameStats.paddleTwo.y - 10) > 0 )
 							gameStats.paddleTwo.y -= 5;
@@ -545,10 +545,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 							gameStats.paddleTwo.y += 5;
 						}
 					}
-					// else
-					// 	return;
+					else
+						return;
 		
-				// }
+				}
 		
 				this.gamesInfo.set(data.roomId, gameStats);
 				this.server.to(data.roomId).emit('UpdateKey', gameStats);
