@@ -4,15 +4,17 @@ import { getUserById } from '@/lib/Dashboard/dashboard.requests'
 import { useQuery } from '@tanstack/react-query'
 import UserAvatar from '@/components/User/userAvatar/UserAvatar'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import FriendsList from '@/components/Profile/FriendsList'
 import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 import OtherGameHistory from '@/components/Profile/OtherGameHistory/OtherGameHistory'
 import Seperator from '@/assets/other/Seperator.svg'
+import NotFound from '../NotFound/NotFound'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
     const param = useParams()
+    const navigate = useNavigate()
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
     }
@@ -24,10 +26,19 @@ function Profile() {
         }
     }, [])
 
-    const { data } = useQuery({
+    const { data, isError, isLoading } = useQuery({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
+        retry: 0,
     })
+
+    if (isLoading) {
+        return (<div></div>)
+    }
+
+    if (isError) {
+        return navigate('/')
+    }
 
     const selectedAvatar = data?.avatar
 

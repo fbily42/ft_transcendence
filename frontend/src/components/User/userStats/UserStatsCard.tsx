@@ -68,7 +68,7 @@ export default function UserStatsCard() {
                     {isMobile ? (
                         <Frown size={20} />
                     ) : (
-                        <p className="text-center text-[12px]">Total games</p>
+                        <p className="text-center text-[12px]">Games lost</p>
                     )}
                 </div>
             </div>
