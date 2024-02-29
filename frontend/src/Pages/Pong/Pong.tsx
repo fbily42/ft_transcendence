@@ -8,17 +8,66 @@ import axios from 'axios';
 import GameForm from '@/components/Pong/GameForm';
 import Board from './Game';
 import Basic from './BasicGame';
+import { useWebSocket } from '@/context/webSocketContext';
+import { GameStats } from '@/lib/Game/Game.types';
 
 
 // faire un decompte en blur ou on voit le jeu en arriere plan, prevoir le cas de la reconnection pour ne pas declencher le decompte dans ce cas la 
 // solution possible faire le decompte ici mais envoyer la fonction qui change le useState dans la fonction Board
 function Pong() {
+	const [roomName, setRoomName] = useState<string>('')
+	const socket = useWebSocket()
+	const [gameInfo, setGameInfo] = useState<GameStats>()
+	const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
+	const [gameStatus, setGameStatus] = useState<'PLAYING' | 'FINISH'>(
+        'PLAYING'
+    )
+	useEffect(() => {
+        return () => {
+            socket?.webSocket?.emit('leaveRoom', roomName)
+        }
+    }, [roomName])
 	// État pour déterminer si le Board doit être affiché
-	
+	const handleKeyDown = (event: KeyboardEvent) => {
+        if (keys[event.key]) {
+            return
+        }
+        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
+    }
+
+	useEffect(() => {
+        socket?.webSocket?.on('finish', (gameStats: GameStats) => {
+            setGameStatus('FINISH')
+            setGameInfo(gameStats)
+        })
+    }, [socket])
+
+	useEffect(() => {
+        socket?.webSocket?.on('Ready', (room: string) => {
+            const roomName = room
+            setRoomName(roomName)
+            socket?.webSocket?.emit('CreateGameinfo', room)
+        })
+        socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
+            setGameInfo(gameStats)
+        })
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+            socket?.webSocket?.off('UpdateKey')
+            socket?.webSocket?.off('Ready')
+            window.removeEventListener('keyup', handleKeyUp)
+        }
+    }, [socket])
 	return (
-	  <div className='flex flex-col justify-between pl-[122px] pb-[36px] pr-[36px] h-[90vh] bg-red-100 gap-[36px]'>
+	  <div className='flex flex-col justify-center pl-[122px] pb-[36px] pr-[36px] h-[90vh] gap-[36px]'>
 		
-		  <Board />
+		  {gameInfo && <Board gameStatus={gameStatus} gameInfo={gameInfo} keys={keys} roomName={roomName} />}
 		  {/* <Basic /> */}
 	  </div>
 	);

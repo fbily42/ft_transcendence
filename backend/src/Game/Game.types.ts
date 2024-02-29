@@ -19,23 +19,23 @@ export class GameStats {
 			y: 200,
 			dx: 1,
 			dy: 1,
-			rad: 40,
-			speed: 1,//15
+			rad: 20,//
+			speed: 2,//15
 			last : 0,
 		}
 		this.paddleOne = {
 			x: 10,
 			y: 20,
-			height : 160,
-			width : 60,
+			height : 80,
+			width : 30,
 			color : '#FFA62b',
 
 		}
 		this.paddleTwo ={
-			x: 1490,
+			x: 760,
 			y: 20,
-			height : 160,
-			width : 60,
+			height : 80,
+			width : 30,
 			color : '#FFA62b',
 		}
 		this.gameStatus = {
@@ -79,7 +79,7 @@ export class GameStats {
 		//    this.gameStatus.gameState = 'score';
 		//    setTimeout(() => {
 			this.gameStatus.gameState = 'playing';
-			if (this.gameStatus.scoreOne === 10)
+			if (this.gameStatus.scoreOne === 10 )
 				this.gameStatus.gameState = 'finish'
 			this.ResetBall(1);
 		// }, 1000);

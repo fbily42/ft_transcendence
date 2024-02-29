@@ -4,10 +4,10 @@ import { GameStats, imageForGame } from '@/lib/Game/Game.types'
 
 
 
-type keyData = {
-	key: string,
-	roomId: string,
-}
+// type keyData = {
+// 	key: string,
+// 	roomId: string,
+// }
 export function Paddle_2(
     ctx: CanvasRenderingContext2D,
     gameInfo: GameStats,
@@ -18,13 +18,14 @@ export function Paddle_2(
 ) {
 
     if (keys['ArrowUp']) {
-		const data: keyData = {key: 'ArrowUp', roomId: roomName}
-        socket?.webSocket?.emit('key', data)}
+		// const data: keyData = {key: 'ArrowUp', roomId: roomName}
+        socket?.webSocket?.emit('key', { key: 'ArrowUp', roomId: roomName })}
 
     else if (keys['ArrowDown']) {
         socket?.webSocket?.emit('key', { key: 'ArrowDown', roomId: roomName })
     }
 
+	ctx.beginPath()
     ctx.drawImage(
 		gameImages.image.img_grey,
         gameInfo.paddleTwo.x,
@@ -32,7 +33,6 @@ export function Paddle_2(
         gameInfo.paddleTwo.width,
         gameInfo.paddleTwo.height
 		)
-	ctx.beginPath()
     // ctx.rect(gameInfo.paddleTwo.x, gameInfo.paddleTwo.y, gameInfo.paddleTwo.width, gameInfo.paddleTwo.height);
     ctx.fillStyle = gameInfo.paddleTwo.color
     ctx.strokeStyle = gameInfo.paddleTwo.color

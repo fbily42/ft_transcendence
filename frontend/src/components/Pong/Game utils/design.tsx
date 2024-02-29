@@ -20,7 +20,7 @@ export default function Static_image(
 			gameImages.image.img_filet,
 			canvas.width / 2,
 			0,
-			gameImages.image.img_filet.width,
+			gameImages.image.img_filet.width / 2,
 			canvas.height
 		)
     } else {
@@ -29,7 +29,7 @@ export default function Static_image(
 				gameImages.image.img_filet,
 				canvas.width / 2,
 				0,
-				gameImages.image.img_filet.width,
+				gameImages.image.img_filet.width / 2,
 				canvas.height
 			)
         }

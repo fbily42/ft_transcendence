@@ -20,71 +20,99 @@ import ice from './../../assets/Game/ice.svg'
 import ice_bottom from './../../assets/Game/ice_bottom.svg'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
-import { useWebSocket } from '@/context/webSocketContext'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { Socket } from 'socket.io-client'
 import { GameStats, imageForGame } from '@/lib/Game/Game.types'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+
+import { Button } from '@/components/ui/button'
+import { useNavigate } from 'react-router-dom'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
+import loose_game from './../../assets/Game/loose_game.svg'
+import win_game from './../../assets/Game/win_game.svg'
 // import { Image } from "@/components/Pong/Game utils/data";
 
 //creer une map room pour lier l'ID de la room avec un objec, pour a chaque fois renvoyer l'objet modifier
 
-export default function Board() {
+interface BoardProps {
+    gameStatus: 'FINISH' | 'PLAYING'
+    gameInfo: GameStats
+    keys: { [key: string]: boolean }
+    roomName: string
+}
+//gameStatus, gameInfo, keys, roomName
+const Board: React.FC<BoardProps> = ({
+    gameStatus,
+    gameInfo,
+    keys,
+    roomName,
+}) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    const [gameStatus, setGameStatus] = useState<'PLAYING' | 'FINISH'>(
-        'PLAYING'
-    )
+    // const [gameStatus, setGameStatus] = useState<'PLAYING' | 'FINISH'>(
+    //     'PLAYING'
+    // )
+    const navigate = useNavigate()
     // const imgRef = useRef<HTMLImageElement | null>(null);
-    const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
+    // const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
     // const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
-    const socket = useWebSocket()
+    const socket = useWebSocket() as WebSocketContextType
 
-    const [roomName, setRoomName] = useState<string>('')
-    const [gameInfo, setGameInfo] = useState<GameStats>()
+    // const [roomName, setRoomName] = useState<string>('')
+    // const [gameInfo, setGameInfo] = useState<GameStats>()
 
     const gameImages = new imageForGame()
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-        if (keys[event.key]) {
-            return
-        }
-        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
-    }
+    // const handleKeyDown = (event: KeyboardEvent) => {
+    //     if (keys[event.key]) {
+    //         return
+    //     }
+    //     setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
+    // }
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
-    }
+    // const handleKeyUp = (event: KeyboardEvent) => {
+    //     setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
+    // }
 
-    useEffect(() => {
-        socket?.webSocket?.on('finish', (gameStats: GameStats) => {
-            setGameStatus('FINISH')
-            setGameInfo(gameStats)
-        })
-    }, [socket])
+    // useEffect(() => {
+    //     socket?.webSocket?.on('finish', (gameStats: GameStats) => {
+    //         setGameStatus('FINISH')
+    //         setGameInfo(gameStats)
+    //     })
+    // }, [socket])
 
-    useEffect(() => {
-        socket?.webSocket?.on('Ready', (room: string) => {
-            const roomName = room
-            setRoomName(roomName)
-            socket?.webSocket?.emit('CreateGameinfo', room)
-        })
-        console.log('etape 4')
-        socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
-            setGameInfo(gameStats)
-        })
-        window.addEventListener('keydown', handleKeyDown)
-        window.addEventListener('keyup', handleKeyUp)
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-            socket?.webSocket?.off('UpdateKey')
-            socket?.webSocket?.off('Ready')
-            window.removeEventListener('keyup', handleKeyUp)
-        }
-    }, [socket])
+    // useEffect(() => {
+    //     socket?.webSocket?.on('Ready', (room: string) => {
+    //         const roomName = room
+    //         setRoomName(roomName)
+    //         socket?.webSocket?.emit('CreateGameinfo', room)
+    //     })
+    //     socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
+    //         setGameInfo(gameStats)
+    //     })
+    //     window.addEventListener('keydown', handleKeyDown)
+    //     window.addEventListener('keyup', handleKeyUp)
+    //     return () => {
+    //         window.removeEventListener('keydown', handleKeyDown)
+    //         socket?.webSocket?.off('UpdateKey')
+    //         socket?.webSocket?.off('Ready')
+    //         window.removeEventListener('keyup', handleKeyUp)
+    //     }
+    // }, [socket])
 
-    useEffect(() => {
-        return () => {
-            socket?.webSocket?.emit('leaveRoom', roomName)
-        }
-    }, [roomName])
+    // useEffect(() => {
+    //     console.log('finish')
+    //     return () => {
+    //         console.log('finish 2')
+    //         socket?.webSocket?.emit('leaveRoom', roomName)
+    //     }
+    // }, [roomName])
     gameImages.image.img_ice_bottom.src = ice_bottom
     gameImages.image.img_ice.src = ice
     gameImages.image.img_fish.src = fish
@@ -98,20 +126,13 @@ export default function Board() {
             return
         }
         let animationFrameId: number
-        // imgRef.current = new Image(); //possible besoin d'ajouter un if (imgRef) comme pour canvas
         const canvas = canvasRef.current
         if (!canvas) return
 
         const render = () => {
-            // console.log('etape 3', gameInfo)
             const ctx = canvas.getContext('2d')
             if (!ctx) return
             if (!gameInfo || !socket) return
-            gameInfo.paddleTwo.x = canvas?.width - 70
-
-            // console.log('etape 2', gameInfo.gameStatus.gameState)
-            // if (img_fishRef.current)
-            // 	ctx.drawImage(img_fishRef.current, ballObj.x, ballObj.y, 10, 10);
             ctx?.clearRect(0, 0, canvas.width, canvas.height)
             Static_image(ctx, canvas, gameImages)
             BallMovement(ctx, gameInfo, gameImages) //envoie un update
@@ -121,8 +142,8 @@ export default function Board() {
             updatescore(gameImages, gameInfo, ctx, canvas)
             animationFrameId = requestAnimationFrame(render)
         }
-        render()
-        // requestAnimationFrame(render)
+        //  render()
+        animationFrameId = requestAnimationFrame(render)
         return () => {
             // socket?.webSocket?.emit('leaveRoom', roomName) // faire un autre else if gameInfo.gameStatus.gameState === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
             // window.removeEventListener('keydown', handleKeyDown);
@@ -131,19 +152,75 @@ export default function Board() {
         // }
     }, [gameStatus, gameInfo])
 
+    const { data: me } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
     return (
         <>
             <canvas id="canvas_pong" ref={canvasRef} height={800} width={800} />
             {gameStatus === 'FINISH' && (
-                <div className="h-screen w-screen fixed top-0 left-0 bg-red-500 opacity-50">
-                    <p>{gameInfo?.gameStatus.winner}</p>
-                    <p>{gameInfo?.gameStatus.looser}</p>
+                <div className="h-screen w-screen fixed top-0 left-0 ">
+                    <Dialog defaultOpen={true}>
+                        <DialogContent
+                            onInteractOutside={() => {
+                                navigate('/')
+                            }}
+                        >
+                            {/* <DialogHeader> */}
+                            <DialogTitle>
+                                <div className="flex items-center justify-center">
+                                    {gameInfo?.gameStatus.looser === me?.name &&
+                                        'Noooooooot ! You lose'}
+                                    {gameInfo?.gameStatus.winner === me?.name &&
+                                        'Hurray ! You Won'}
+                                </div>
+                            </DialogTitle>
+                            {/* <DialogDescription> */}
+                            {gameInfo?.gameStatus.looser === me?.name ? (
+                                <div className="flex items-center justify-center">
+                                    <img
+                                        src={loose_game}
+                                        alt="Pingu with Robby"
+                                        className=""
+                                    />
+                                </div>
+                            ) : (
+                                // {gameInfo?.gameStatus.winner ===
+                                //     me?.name &&
+                                <div className="flex items-center justify-center">
+                                    <img
+                                        src={win_game}
+                                        alt="Pingu with Robby"
+                                        className=""
+                                    />
+                                </div>
+                            )}
+                            {/* </DialogDescription> */}
+                            <div className="flex justify-center items-center">
+                                <Button
+                                    className="w-[50%]"
+                                    onClick={() => {
+                                        navigate('/')
+                                    }}
+                                >
+                                    Leave the Game
+                                </Button>
+                            </div>
+                            {/* </DialogHeader> */}
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* <p> the winner is {gameInfo?.gameStatus.winner}</p>
+                    <p>The loser is {gameInfo?.gameStatus.looser}</p>
                     <p>
                         {gameInfo?.gameStatus.scoreOne}:
                         {gameInfo?.gameStatus.scoreTwo}
-                    </p>
+                    </p> */}
                 </div>
             )}
         </>
     )
 }
+
+export default Board

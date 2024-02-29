@@ -9,31 +9,31 @@ export class GameStats {
 
 	constructor() {
 		this.canvas ={
-			height : 1000,
-			width : 1600,
+			height : 800,
+			width : 800,
 		}
 		this.ball = {
 			x: 200,
 			y: 200,
 			dx: 1,
 			dy: 1,
-			rad: 40,
-			speed: 10,//15
+			rad: 20,//
+			speed: 1,//15
 			last : 0,
 		}
 		this.paddleOne = {
 			x: 10,
 			y: 20,
-			height : 160,
-			width : 60,
+			height : 80,
+			width : 30,
 			color : '#FFA62b',
 
 		}
 		this.paddleTwo ={
-			x: 1490,
+			x: 760,
 			y: 20,
-			height : 160,
-			width : 60,
+			height : 80,
+			width : 30,
 			color : '#FFA62b',
 		}
 		this.gameStatus = {
@@ -41,7 +41,7 @@ export class GameStats {
 			scoreTwo: 0,
 			gameState: 'playing',
 			img: 'not ready',
-			int: 0,
+			int:1,
 			winner:'',
 			looser:'',
 		}
