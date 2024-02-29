@@ -55,21 +55,25 @@ export default function UserActionsBtns() {
                     />
                 </DialogContent>
             </Dialog>
-            <Button
-                variant={'outlineBlue'}
-                className="w-full"
-                onClick={() => setOpenSetUp2FA(true)}
-            >
-                Setup 2FA
-            </Button>
-            <div>
-                <SetUp2FAModal
-                    open={openSetUp2FA}
-                    onClose={() => {
-                        setOpenSetUp2FA(false)
-                    }}
-                />
-            </div>
+            <Dialog open={openSetUp2FA} onOpenChange={setOpenSetUp2FA}>
+                <DialogTrigger asChild>
+                    <Button
+                        variant={'outlineBlue'}
+                        className="w-full"
+                        onClick={() => setOpenSetUp2FA(true)}
+                    >
+                        Setup 2FA
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] flex flex-col items-center">
+                    <SetUp2FAModal
+                        open={openSetUp2FA}
+                        onClose={() => {
+                            setOpenSetUp2FA(false)
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

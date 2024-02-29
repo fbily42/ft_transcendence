@@ -16,7 +16,7 @@ const zodSchema = z.object({
     pseudo: z
         .string()
         .min(2, { message: 'Pseudo must be at least 2 characters long' })
-        .max(20, { message: 'Pseudo can not exceed 20 characters' })
+        .max(10, { message: 'Pseudo can not exceed 10 characters' })
         .regex(/^[a-zA-Z]+$/, { message: 'Pseudo can only contain letters' }),
 })
 

@@ -15,7 +15,6 @@ import { UploadsService } from './uploads.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FormDto } from './uploads.dto';
-import { IsString, Length, MaxLength, MinLength } from 'class-validator';
 
 @Controller('uploads')
 @UseGuards(AuthGuard)
