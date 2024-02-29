@@ -10,25 +10,24 @@ export default function PendingInvitations() {
     })
     return (
         <div>
-            {friendInvites && friendInvites.length > 0 ? (
-                friendInvites.map((friend: FriendData) => (
-                    <div key={friend.id}>
-                        <h2 className="p-[20px] text-gray-500">
-                            Pending Invitations
-                        </h2>
-                        <UserCards
-                            id={friend.id}
-                            bgColor="white"
-                            userName={friend.name}
-                            userPicture={friend.avatar || ''}
-                            userStatus=""
-                            variant="OTHER"
-                        />
-                    </div>
-                ))
-            ) : (
-                <div>No pending friend invitations</div>
-            )}
+            <h2 className="p-[20px] text-gray-500">Pending Invitations</h2>
+            <div className="overflow-y-auto max-h-[130px] no-scrollbar">
+                {friendInvites && friendInvites.length > 0 ? (
+                    friendInvites.map((friend: FriendData) => (
+                        <div key={friend.id}>
+                            <UserCards
+                                id={friend.id}
+                                bgColor="white"
+                                userName={friend.pseudo}
+                                userPicture={friend.avatar || ''}
+                                userStatus=""
+                            />
+                        </div>
+                    ))
+                ) : (
+                    <div>No pending friend invitations</div>
+                )}
+            </div>
         </div>
     )
 }

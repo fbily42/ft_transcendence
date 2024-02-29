@@ -83,7 +83,7 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
             }
             //Open a success notif/message box
             //Toggle the switch
-        } catch (error) {
+        } catch (error: any) {
             if (error.response.status === 401)
                 setIsTokValid('Token is not valid')
             else if (error.response.status === 500)
