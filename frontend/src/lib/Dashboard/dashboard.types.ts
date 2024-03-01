@@ -1,3 +1,5 @@
+import { AchievementType, Badge } from "../Profile/profile.types"
+
 export type FriendData = {
     id: string
     name: string
@@ -20,6 +22,8 @@ export type UserData = {
 	pseudo: string;
   looses: number;
 	blocked: string
+  chosenBadge: AchievementType;
+  allBadges: AchievementType[];
 }
 
 export type LeaderboardData = {

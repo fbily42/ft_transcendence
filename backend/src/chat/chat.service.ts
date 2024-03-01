@@ -13,11 +13,11 @@ import { Channel, ChannelUser, Message, User } from '@prisma/client';
 import { ChannelList, ChannelWithRelation, UserInChannel } from './chat.types';
 import { InviteChannelDto } from './dto/inviteChannel.dto';
 import { quitCmdDto } from './dto/quitCmd.dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChatService {
-	constructor(private prisma: PrismaService) {}
-	public map: Map<string, any> = new Map();
+	constructor(private prisma: PrismaService, private userService: UserService) {}
 
 	async createChannel(userId: string, dto: NewChannelDto): Promise<string> {
 		try {
@@ -37,6 +37,7 @@ export class ChatService {
 					owner: true,
 				},
 			});
+			this.userService.addBadge(userId, 'FIRST_CHANNEL')
 			return channel.name;
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
