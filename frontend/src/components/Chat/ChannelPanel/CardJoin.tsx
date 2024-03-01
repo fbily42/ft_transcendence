@@ -57,7 +57,7 @@ function CardJoin({ onClose }: CardJoinProps) {
                             <Label htmlFor="name">Channel's name</Label>
                             <Input
                                 id="name"
-                                placeholder="Pinga's Place"
+                                placeholder="PingaFriends"
                                 {...register('name')}
                             />
                         </div>
@@ -65,7 +65,7 @@ function CardJoin({ onClose }: CardJoinProps) {
                             <Label htmlFor="password">Password</Label>
                             <Input
                                 id="password"
-                                placeholder="Optionnal"
+                                placeholder="Optional"
                                 type="password"
                                 {...register('password', {
                                     setValueAs: (value) =>

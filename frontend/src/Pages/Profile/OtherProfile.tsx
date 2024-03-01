@@ -32,12 +32,14 @@ function Profile() {
         retry: 0,
     })
 
-    if (isLoading) {
-        return (<div></div>)
-    }
+    useEffect(() => {
+        if (isError) {
+            navigate('/')
+        }
+    }, [isError, navigate])
 
-    if (isError) {
-        return navigate('/')
+    if (isLoading) {
+        return <div></div>
     }
 
     const selectedAvatar = data?.avatar
