@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { AchievementType } from '@prisma/client';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
 	@IsOptional()
@@ -6,4 +7,10 @@ export class UpdateUserDto {
 	photo42: string;
 	avatar: string;
 	name: string;
+}
+
+export class BadgeDTO {
+	@IsEnum(AchievementType)
+	@IsNotEmpty()
+	chosenBadge: AchievementType; 
 }

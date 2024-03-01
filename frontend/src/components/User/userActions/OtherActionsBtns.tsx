@@ -138,7 +138,7 @@ export default function OtherActionsBtns() {
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    {me?.blocked.includes(user?.name!) ? (
+                                    {me?.blocked?.includes(user?.name!) ? (
                                         <DropdownMenuItem
                                             className="w-full"
                                             onClick={() => {
