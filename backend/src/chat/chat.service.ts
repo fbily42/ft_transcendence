@@ -864,6 +864,8 @@ export class ChatService {
 					opponentScore: gameStats.gameStatus.scoreOne,
 				}
 			})
+			this.userService.addBadge(roomInfo[0].uuid, 'FIRST_GAME')
+			this.userService.addBadge(roomInfo[1].uuid, 'FIRST_GAME')
 		}
 		catch(error)
 		{
@@ -904,6 +906,7 @@ export class ChatService {
 			else
 				looser.score += gameStats.gameStatus.scoreTwo;
 
+			this.userService.addBadge(winner.id, 'FIRST_WIN')
 			await this.prisma.user.update({
 				where:  {
 					id: winner.id,
