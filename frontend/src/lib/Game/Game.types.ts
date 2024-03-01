@@ -44,6 +44,8 @@ export class GameStats {
 			int:1,
 			winner:'',
 			looser:'',
+			level:'',
+			map:'',
 		}
 	}
   }
@@ -56,6 +58,8 @@ export class GameStats {
 	int : number;
 	winner:string;
 	looser:string;
+	level:string;
+	map: string;
   }
   
   export type BallObj = {

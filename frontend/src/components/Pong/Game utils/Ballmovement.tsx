@@ -7,45 +7,43 @@ export function BallMovement(
     gameInfo: GameStats,
     gameImages: imageForGame
 ) {
-    if (gameImages.image.img_fish.complete) {
-        ctx.drawImage(
-            gameImages.image.img_fish,
-            gameInfo.ball.x - gameInfo.ball.rad,
-            gameInfo.ball.y - gameInfo.ball.rad,
-            gameInfo.ball.rad * 2,
-            gameInfo.ball.rad * 2
-        )
-        // ctx.closePath()
-    } else {
-        gameImages.image.img_fish.onload = function () {
-            ctx.drawImage(
-                gameImages.image.img_fish,
-                gameInfo.ball.x - gameInfo.ball.rad,
-                gameInfo.ball.y - gameInfo.ball.rad,
-                gameInfo.ball.rad * 2,
-                gameInfo.ball.rad * 2
-            )
-            // ctx.closePath()
-        }
-    }
-    // ctx.beginPath()
-    // // ctx.arc(gameInfo.ball.x, gameInfo.ball.y , gameInfo.ball.rad, 0, 2 * Math.PI);
-    // ctx.fillStyle = 'red'
-    // ctx.strokeStyle = 'black'
-    // ctx.lineWidth = 1
-    // ctx?.fill()
-    // ctx.stroke()
+	if (gameInfo.gameStatus.map === 'mapPingu')
+	{
+		if (gameImages.image.img_fish.complete) {
+			ctx.drawImage(
+				gameImages.image.img_fish,
+				gameInfo.ball.x - gameInfo.ball.rad,
+				gameInfo.ball.y - gameInfo.ball.rad,
+				gameInfo.ball.rad * 2,
+				gameInfo.ball.rad * 2
+			)
+			// ctx.closePath()
+		} else {
+			gameImages.image.img_fish.onload = function () {
+				ctx.drawImage(
+					gameImages.image.img_fish,
+					gameInfo.ball.x - gameInfo.ball.rad,
+					gameInfo.ball.y - gameInfo.ball.rad,
+					gameInfo.ball.rad * 2,
+					gameInfo.ball.rad * 2
+				)
+				// ctx.closePath()
+			}
+		}
+		
+	}
+	else
+	{
 
-    // socket.webSocket?.emit('ballMov', room)
-}
-
-export function Paddle_Collision(
-    gameInfo: GameStats,
-    paddle: PaddleObj,
-    socket: WebSocketContextType,
-    room: string
-) {
-    // socket.webSocket?.emit('paddllColl', room)
+		ctx.beginPath()
+		ctx.arc(gameInfo.ball.x, gameInfo.ball.y , gameInfo.ball.rad, 0, 2 * Math.PI);
+		ctx.fillStyle = 'red'
+		ctx.strokeStyle = 'black'
+		ctx.lineWidth = 1
+		ctx?.fill()
+		ctx.stroke()
+	
+	}
 }
 
 export function updatescore(

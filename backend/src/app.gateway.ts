@@ -18,7 +18,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js
 import * as cookie from 'cookie';
 import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
 import { ChatService } from './chat/chat.service';
-import { GameStats, RoomInfo } from './Game/Game.types';
+import { GameStats, RoomInfo } from './game/Game.types';
 import { quitCmdDto } from './chat/dto/quitCmd.dto';
 
 @UsePipes(new ValidationPipe())
@@ -153,24 +153,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
 	@SubscribeMessage('AcceptInvitation')
-	acceptInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string })
+	acceptInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string ; level: string; map:string;})
 	{
 		try {
-
 			if (this.gamesRoom.has(data.roomId))
 			{
-				client.join(data.roomId);
-				let array = this.gamesRoom.get(data.roomId);
-				array.push({id:client.data.userName , websocket: client.id, matchmaking: false});
-				this.gamesRoom.set(data.roomId, array);
-				this.server.to(client.id).emit('ReadyForGame', 'Joined')//creer le .on 
-
-				this.server.to(this.gamesRoom.get(data.roomId)[0].websocket).emit('JoinPartyFriend', 'Go');
-
-
-				// this.server.to(this.gamesRoom[data.roomId][0].websocket).emit('JoinPartyFriend', 'Go');//pour le createur
-
-				this.server.to(data.roomId).emit('Ready', data.roomId);
+				
+				if (this.gamesRoom.get(data.roomId).length  < 2)
+				{
+					client.join(data.roomId);
+					let array = this.gamesRoom.get(data.roomId);
+					array.push({id:client.data.userName , websocket: client.id, matchmaking: false, uuid:client.data.userId});
+					this.gamesRoom.set(data.roomId, array);
+					this.server.to(client.id).emit('ReadyForGame', 'Joined')//creer le .on 
+	
+					this.server.to(this.gamesRoom.get(data.roomId)[0].websocket).emit('JoinPartyFriend', 'Go');
+	
+	
+					// this.server.to(this.gamesRoom[data.roomId][0].websocket).emit('JoinPartyFriend', 'Go');//pour le createur
+	
+					this.server.to(data.roomId).emit('Ready', data);
+				}
 
 				return ;
 			}
@@ -192,6 +195,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			{
 				//envoyer un emit qui va faire quitter la partie au createur et qui va le prevenir que le joueur a refuser de joueur avec lui
 				this.server.to(this.gamesRoom.get(data.roomId)[0].websocket).emit('JoinPartyFriend', "Decline")
+				this.gamesRoom.delete(data.roomId);
 				return ;
 			}
 
@@ -205,20 +209,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	//est ce que je dois stocker le nom de la personne qui est invite pour ajouter une securite ou est ce que le fait qu'il soit le seul a recevoir une Key unique est suffisant
 	@SubscribeMessage('JoinRoomFriend')
-	joinGameRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string })
+	joinGameRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string; level: string; map:string; })
 	{
 		try {
-
 			if(this.clients.has(data.friend))//verifier d'abord que l'amis est connecte, faire une deuxieme verification avant d'envoyer l'invitation
 			{
-				this.gamesRoom.set(data.roomId, [{id: client.data.userName, websocket: client.id, matchmaking:false}]);
+				this.gamesRoom.set(data.roomId, [{id: client.data.userName, websocket: client.id, matchmaking:false, uuid: client.data.userId}]);
 				client.join(data.roomId);
 				const clientIds = this.clients.get(data.friend)
 				if (clientIds)
 				{
 					clientIds.forEach ((socketId) => {
 
-						this.server.to(socketId).emit('GameInvitation', {friend: data.friend, roomId: data.roomId})
+						this.server.to(socketId).emit('GameInvitation', {friend: data.friend, roomId: data.roomId, level: data.level, map: data.map})
 					}
 					)
 				}
@@ -264,18 +267,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					{
 						client.join(key);
 						let array = this.gamesRoom.get(key);
-						array.push({id:client.data.userName , websocket: client.id, matchmaking: true});
+						array.push({id:client.data.userName , websocket: client.id, matchmaking: true, uuid: client.data.userId});
 						this.gamesRoom.set(key, array);
 						this.server.to(client.id).emit('JoinParty', 'Joined')
 						this.server.to(value[0].websocket).emit('JoinParty', 'Go');
 
-						this.server.to(key).emit('Ready', key);
+						this.server.to(key).emit('Ready', {friend:'', roomId: key, level:'', map:''});
 						return ;
 	
 					}
 				}
 			}
-			this.gamesRoom.set(room, [{id: client.data.userName, websocket: client.id, matchmaking:true}]);
+			this.gamesRoom.set(room, [{id: client.data.userName, websocket: client.id, matchmaking:true, uuid: client.data.userId}]);
 			client.join(room);
 
 			return ;
@@ -288,18 +291,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('CreateGameinfo')
-	CreateGameinfo(@ConnectedSocket() client: Socket, @MessageBody() room:string)
+	CreateGameinfo(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string ; level: string; map:string;})
 	{
 		try{
 
-			if (this.gamesInfo.has(room)){
+			if (this.gamesInfo.has(data.roomId)){
 
 				
-				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
+				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(data.roomId))
 			}
 			else {
-				this.gamesInfo.set(room, new GameStats());
-				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(room))
+				if (!data.map)
+					data.map = 'BasicPong'
+				this.gamesInfo.set(data.roomId, new GameStats(data.level, data.map));
+				this.server.to(client.id).emit('UpdateKey', this.gamesInfo.get(data.roomId))
 			}
 
 		}
@@ -311,7 +316,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('ballMov')
-	ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	async ballMov(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
 			
@@ -345,6 +350,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 							gameStats.gameStatus.looser = gamesRoom[1].id;
 						}
 						this.server.to(room).emit('finish', gameStats);
+						await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats)
+						await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
 						//mettre a jour DB
 						// clear rooms info
 						this.gamesRoom.delete(room);
@@ -371,50 +378,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 	}
-	@SubscribeMessage('endGame')
-	endGame(@ConnectedSocket() client: Socket, @MessageBody() room:string)
-	{
-		try{
-			if (this.gamesInfo.has(room))
-			{
-
-				let gameStats:GameStats = this.gamesInfo.get(room);
-				let gamesRoom = this.gamesRoom;//il faut supprimer la room pour mettre a la personne de pouvoir relancer un matchmaking
-	
-				for (let [key , value ] of this.gamesRoom)
-				{
-					if (key === room)
-					{
-						if (gameStats.gameStatus.scoreOne === 10)
-						{
-
-							gameStats.gameStatus.winner = value[1].id
-							gameStats.gameStatus.looser = value[0].id
-							this.gamesInfo.set(room, gameStats);
-							this.server.to(key).emit('UpdateKey', gameStats);
-						}
-						else if (gameStats.gameStatus.scoreTwo === 10)
-						{
-							gameStats.gameStatus.winner = value[0].id
-
-							gameStats.gameStatus.looser = value[1].id
-
-							this.gamesInfo.set(room, gameStats);
-							this.server.to(key).emit('UpdateKey', gameStats);
-						}
-						//mettre a jour la db avant de tout delete
-						// this.gamesRoom.delete(room);
-						// this.gamesInfo.delete(room);
-					}	
-				}
-			}
-		} catch(error){
-			// console.log(error)
-			throw new WsException('Internal Server Error')
-
-		}
-	}
-
 
 	@SubscribeMessage('leaveRoomBefore')
 	leaveRoombefore(@ConnectedSocket() client: Socket, @MessageBody() room: string)
@@ -449,7 +412,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	//faire le cas ou une personne quitte
 	//le cas ou c'est la fin de la partie 
 	@SubscribeMessage('leaveRoom')
-	leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
+	async leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string)
 	{
 		try {
 			//tout delete uniquement si la room est vide, donc verifier que
@@ -466,7 +429,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameStats.gameStatus.scoreOne = 0;
 				gameStats.gameStatus.scoreTwo = 10;
 				this.server.to(room).emit('finish', gameStats);
+				
 				// Ajouter dans la db
+				await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats)
+				await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
 				this.gamesRoom.delete(room);
 				this.gamesInfo.delete(room);
 				return;
@@ -479,17 +445,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameStats.gameStatus.scoreTwo = 0;
 				this.server.to(room).emit('finish', gameStats);
 				// Ajouter dans la db
+				await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats)
+				await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
 				this.gamesRoom.delete(room);
 				this.gamesInfo.delete(room);
 				return;
 			}
-
-
 		}
 		catch(error)
 		{
-			console.log(error);
-			// throw new WsException('Internal Server Error')
+			throw new WsException('Internal Server Error')
 		}
 	}
 
@@ -529,8 +494,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 				let gameStats:GameStats = this.gamesInfo.get(data.roomId)
 				let array = this.gamesRoom.get(data.roomId);
-				if(array[0].websocket == client.id)
-				{
+				// if(array[0].websocket == client.id)
+				// {
 		
 					if (data.key === "a") {
 						if ((gameStats.paddleOne.y - 10) > 0 )
@@ -543,12 +508,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 							gameStats.paddleOne.y += 5;
 						}
 					}
-					else
-						return;
+				// 	else
+				// 		return;
 		
-				}
-				if(array[1].websocket == client.id)
-				{
+				// }
+				// if(array[1].websocket == client.id)
+				// {
 					if (data.key === "ArrowUp" ) {
 						if ((gameStats.paddleTwo.y - 10) > 0 )
 							gameStats.paddleTwo.y -= 5;
@@ -560,10 +525,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 							gameStats.paddleTwo.y += 5;
 						}
 					}
-					else
-						return;
+				// 	else
+				// 		return;
 		
-				}
+				// }
 		
 				this.gamesInfo.set(data.roomId, gameStats);
 				this.server.to(data.roomId).emit('UpdateKey', gameStats);

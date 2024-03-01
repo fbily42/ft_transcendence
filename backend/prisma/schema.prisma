@@ -39,7 +39,6 @@ model User {
     looses Int @default(0)
     games  Int @default(0)
     score  Int @default(0)
-    level  Int @default(0)
     rank   Int @default(0)
 
     friendship FriendShip[] @relation(name: "UserFriends")
@@ -83,11 +82,11 @@ model Game {
     createdAt DateTime  @default(now())
     endAt     DateTime?
 
-    userId String
-    user   User   @relation(name: "userGames", fields: [userId], references: [name], onDelete: Cascade)
+    userName String
+    user   User   @relation(name: "userGames", fields: [userName], references: [name], onDelete: Cascade)
 
-    opponentId    String
-    opponent      User   @relation(name: "opponentGames", fields: [opponentId], references: [name], onDelete: Cascade)
+    opponentName    String
+    opponent      User   @relation(name: "opponentGames", fields: [opponentName], references: [name], onDelete: Cascade)
     userScore     Int
     opponentScore Int
 }

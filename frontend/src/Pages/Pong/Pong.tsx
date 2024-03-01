@@ -10,6 +10,7 @@ import Board from './Game';
 import Basic from './BasicGame';
 import { useWebSocket } from '@/context/webSocketContext';
 import { GameStats } from '@/lib/Game/Game.types';
+import BasicGame from './BasicGame';
 
 
 // faire un decompte en blur ou on voit le jeu en arriere plan, prevoir le cas de la reconnection pour ne pas declencher le decompte dans ce cas la 
@@ -47,10 +48,10 @@ function Pong() {
     }, [socket])
 
 	useEffect(() => {
-        socket?.webSocket?.on('Ready', (room: string) => {
-            const roomName = room
+        socket?.webSocket?.on('Ready', (data) => {
+            const roomName = data.roomId
             setRoomName(roomName)
-            socket?.webSocket?.emit('CreateGameinfo', room)
+            socket?.webSocket?.emit('CreateGameinfo', data)
         })
         socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
             setGameInfo(gameStats)
@@ -67,8 +68,8 @@ function Pong() {
 	return (
 	  <div className='flex flex-col justify-center pl-[122px] pb-[36px] pr-[36px] h-[90vh] gap-[36px]'>
 		
-		  {gameInfo && <Board gameStatus={gameStatus} gameInfo={gameInfo} keys={keys} roomName={roomName} />}
-		  {/* <Basic /> */}
+		  {gameInfo && gameInfo.gameStatus.map === 'mapPingu' && <Board gameStatus={gameStatus} gameInfo={gameInfo} keys={keys} roomName={roomName} />}
+		  {gameInfo && gameInfo.gameStatus.map === 'BasicPong' && <BasicGame gameStatus={gameStatus} gameInfo={gameInfo} keys={keys} roomName={roomName} />}
 	  </div>
 	);
   }
