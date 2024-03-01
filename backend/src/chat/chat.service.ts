@@ -13,6 +13,7 @@ import { Channel, ChannelUser, Message, User } from '@prisma/client';
 import { ChannelList, ChannelWithRelation, UserInChannel } from './chat.types';
 import { InviteChannelDto } from './dto/inviteChannel.dto';
 import { quitCmdDto } from './dto/quitCmd.dto';
+import { GameStats, RoomInfo } from 'src/game/Game.types';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -848,6 +849,125 @@ export class ChatService {
 			throw new HttpException(
 				'Internal server error',
 				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async addGameInfo(roomInfo : RoomInfo[], gameStats: GameStats)
+	{
+		try{
+			const game = await this.prisma.game.create({
+				data: {
+					userName : roomInfo[0].id,
+					opponentName: roomInfo[1].id,
+					userScore: gameStats.gameStatus.scoreTwo,
+					opponentScore: gameStats.gameStatus.scoreOne,
+				}
+			})
+		}
+		catch(error)
+		{
+			if (error instanceof HttpException) throw error;
+			else if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async updateUserStat(roomInfo : RoomInfo[], gameStats : GameStats)
+	{
+		try{
+			const winner = await this.prisma.user.findUnique({
+				where: {
+						name: gameStats.gameStatus.winner,
+				}
+			})
+			const looser = await this.prisma.user.findUnique({
+				where: {
+						name: gameStats.gameStatus.looser,
+				}
+			})
+
+			winner.games += 1;
+			winner.wins += 1;
+			winner.score += 10;
+			looser.games += 1;
+			looser.looses += 1;
+			if (gameStats.gameStatus.scoreOne < gameStats.gameStatus.scoreTwo)
+				looser.score += gameStats.gameStatus.scoreOne;
+			else
+				looser.score += gameStats.gameStatus.scoreTwo;
+
+			await this.prisma.user.update({
+				where:  {
+					id: winner.id,
+				},
+				data:
+				{
+					games: winner.games,
+					wins: winner.wins,
+					score: winner.score,
+
+				}
+			})
+			await this.prisma.user.update({
+				where:  {
+					id: looser.id,
+				},
+				data:
+				{
+					games: looser.games,
+					looses: looser.looses,
+					score: looser.score,
+					
+				}
+			})
+			await this.updateRank()
+		}
+		catch(error)
+		{
+			if (error instanceof HttpException) throw error;
+			else if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async updateRank() {
+		try {
+			const users = await this.prisma.user.findMany({
+				orderBy: {
+					score: 'desc',
+				}
+			})
+			const updates = users.map((user, index) => {
+				return this.prisma.user.update({
+					where: { id: user.id },
+					data: { rank: index + 1 },
+				});
+			});
+			await this.prisma.$transaction(updates);
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError)
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			throw new HttpException(
+			'Internal server error',
+			HttpStatus.INTERNAL_SERVER_ERROR,
 			);
 		}
 	}

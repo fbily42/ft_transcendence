@@ -9,34 +9,44 @@ export class GameStats {
 	// scorePlayer1: number;
 	// scorePlayer2:number;
 	// gameState: String;
-	constructor() {
+	constructor(private level:string, map:string) {
 		this.canvas ={
 			height : 800,
 			width : 800,
+		}
+		let width = 30;
+		let rad = 20;
+		let speed = 2;
+		// console.log(widh)
+		if (map === 'BasicPong')
+		{
+			width /= 2;
+			rad /=2;
+			speed = 3;
 		}
 		this.ball = {
 			x: 200,
 			y: 200,
 			dx: 1,
 			dy: 1,
-			rad: 20,//
-			speed: 2,//15
+			rad: rad,//
+			speed: speed,//15
 			last : 0,
 		}
 		this.paddleOne = {
 			x: 10,
 			y: 20,
 			height : 80,
-			width : 30,
-			color : '#FFA62b',
+			width : width,
+			color : '#1B1B1B',
 
 		}
 		this.paddleTwo ={
 			x: 760,
 			y: 20,
 			height : 80,
-			width : 30,
-			color : '#FFA62b',
+			width : width,
+			color : '#1B1B1B',
 		}
 		this.gameStatus = {
 			scoreOne: 0,
@@ -46,6 +56,8 @@ export class GameStats {
 			int:1,
 			winner:'',
 			looser:'',
+			level: level,
+			map:map,
 		}
 	}
   
@@ -75,7 +87,9 @@ export class GameStats {
 		}
 		
 		if (this.ball.x - this.ball.rad <= 0) {
-		   this.gameStatus.scoreOne++; // But pour le joueur 1
+		   this.gameStatus.scoreOne++;
+		   if (this.gameStatus.level === 'hard')
+		  	 this.ball.speed = 2; // But pour le joueur 1
 		//    this.gameStatus.gameState = 'score';
 		//    setTimeout(() => {
 			this.gameStatus.gameState = 'playing';
@@ -85,6 +99,8 @@ export class GameStats {
 		// }, 1000);
 			
 		} else if (this.ball.x + this.ball.rad >= this.canvas.width) {
+			if (this.gameStatus.level === 'hard')
+				this.ball.speed = 2
 			// this.gameStatus.gameState = 'score';
 			this.gameStatus.scoreTwo++; // But pour le joueur 
 			// setTimeout(() => {
@@ -103,6 +119,8 @@ export class GameStats {
 		if (this.ball.x + this.ball.rad > paddle.x && this.ball.x - this.ball.rad < paddle.x + paddle.width) {
 			// Vérifie si la balle est au niveau de la hauteur de la raquette
 			if (this.ball.y + this.ball.rad > paddle.y && this.ball.y - this.ball.rad < paddle.y + paddle.height) {
+				if(this.gameStatus.level === 'hard')
+					this.ball.speed += 0.5;
 				// Calcule le point de collision sur la raquette (de -1 à 1)
 				let collidePoint = (this.ball.y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
 	
@@ -160,10 +178,13 @@ export class GameStats {
 	int:number;
 	winner:string;
 	looser:string;
+	level:string;
+	map:string;
   }
 
 export type RoomInfo = {
 	id: string;
 	websocket: string;
 	matchmaking : boolean;
+	uuid: string;
 }

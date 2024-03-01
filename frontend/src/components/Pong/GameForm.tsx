@@ -137,9 +137,12 @@ function GameForm({ closeDialog }) {
             setFriendMessage('true')
             const roomNameFriend: string = crypto.randomUUID()
             currentRoomFriend.current = roomNameFriend
+			console.log("useEffect : ", selectedLevel)
             socket?.webSocket?.emit('JoinRoomFriend', {
                 friend: search,
                 roomId: roomNameFriend,
+				level : selectedLevel,
+				map: selectedMap
             })
 
             socket?.webSocket?.on('JoinPartyFriend', (message: string) => {

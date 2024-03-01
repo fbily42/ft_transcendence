@@ -51,8 +51,6 @@ export const WebSocketProvider: React.FC = () => {
             )
         })
         ws?.on('GameInvitation', (data) => {
-            console.log('toaast')
-            console.log('roomId dans GameInviation', data)
             toast(`You have been invite to a game against ${data.friend}`, {
                 action: {
                     label: 'Accept',
@@ -60,6 +58,8 @@ export const WebSocketProvider: React.FC = () => {
                         ws?.emit('AcceptInvitation', {
                             friend: data.friend,
                             roomId: data.roomId,
+							level: data.level, 
+							map: data.map,
                         }),
                 },
                 duration: 5000,
