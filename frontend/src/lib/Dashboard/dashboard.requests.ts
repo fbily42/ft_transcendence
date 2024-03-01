@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { LeaderboardData, UserData } from './dashboard.types'
-// import { error } from 'console'
+import { BadgeDTO } from '../Profile/profile.types'
 
 export async function getUserMe(): Promise<UserData> {
     const response = await axios.get(
@@ -142,4 +142,15 @@ export async function getGameHistory(userId: string) {
         }
     )
     return response.data
+}
+
+export async function updateChosenBadge(data: BadgeDTO): Promise<void> {
+
+    await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/user/updateChosenBadge`,
+        data,
+        {
+            withCredentials: true
+        }
+    )
 }

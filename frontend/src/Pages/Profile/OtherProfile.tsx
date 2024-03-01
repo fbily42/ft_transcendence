@@ -9,7 +9,6 @@ import FriendsList from '@/components/Profile/FriendsList'
 import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 import OtherGameHistory from '@/components/Profile/OtherGameHistory/OtherGameHistory'
 import Seperator from '@/assets/other/Seperator.svg'
-import NotFound from '../NotFound/NotFound'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -26,15 +25,15 @@ function Profile() {
         }
     }, [])
 
-    const { data, isError, isLoading } = useQuery({
+    const { data, isError } = useQuery({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
         retry: 0,
     })
 
-    if (isLoading) {
-        return (<div></div>)
-    }
+    // if (isLoading) {
+    //     return <div></div>
+    // }
 
     if (isError) {
         return navigate('/')

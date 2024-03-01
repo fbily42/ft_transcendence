@@ -1,8 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LeaderboardDTO } from './dto/leaderboard.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UserData } from './types/user.types';
+import { AchievementType } from '@prisma/client';
+import { EMPTY } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -11,14 +13,45 @@ export class UserService {
 	) {}
 
 	async getInfo(name: string) {
-		const user = await this.prisma.user.findUnique({
-			where: {
-				name: name,
-			},
-		});
-		if (!user) return null;
-		delete user.jwt;
-		return user;
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					name: name,
+				},
+				select: {
+					id: true,
+					name: true,
+					pseudo: true,
+					score: true,
+					avatar: true,
+					rank: true,
+					wins: true,
+					games: true,
+					photo42: true,
+					friends: true,
+					looses: true,
+					chosenBadge: true,
+					allBadges: true,
+				}
+			});
+			if (!user) {
+				throw new HttpException('User does not exists', HttpStatus.BAD_REQUEST);
+			}
+			return user;
+		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			} else if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
 	async getUsers() {
@@ -48,6 +81,8 @@ export class UserService {
 					photo42: true,
 					friends: true,
 					looses: true,
+					chosenBadge: true,
+					allBadges: true,
 				},
 			});
 			if (!user) {
@@ -177,6 +212,97 @@ export class UserService {
 		});
 		return allUserGames
 	}
-}
 
+	async updateChosenBadge(userId: string, chosenBadge: AchievementType) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId,
+				},
+			})
+			if (!user) {
+				throw new HttpException(
+					'This user does not exist',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+			const userBadges = user.allBadges;
+			if (!userBadges.includes(chosenBadge)) {
+				throw new HttpException(
+					'This user does not have this badge',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+			else {
+				const updatedUser = await this.prisma.user.update({
+					where: {
+						id: userId,
+					},
+					data: {
+						chosenBadge: chosenBadge,
+					},
+				})
+			}
+		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			} else if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	async addBadge(userId: string, chosenBadge: AchievementType) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId,
+				},
+			})
+			if (!user) {
+				throw new HttpException(
+					'This user does not exist',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+			const userBadges = user.allBadges;
+			if (!userBadges.includes(chosenBadge)) {
+				userBadges.push(chosenBadge);
+			}
+			else {
+				return ;
+			}
+			const updatedUser = await this.prisma.user.update({
+				where: {
+					id: userId,
+				},
+				data: {
+					allBadges: userBadges,
+					chosenBadge: chosenBadge,
+				},
+			})
+			
+		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error;
+			} else if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+}
 

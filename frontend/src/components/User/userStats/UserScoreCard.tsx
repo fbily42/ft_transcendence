@@ -1,9 +1,24 @@
+import {
+    FirstChannel,
+    FirstFriend,
+    FirstGame,
+    FirstWin,
+} from '@/assets/badgesAssociation'
 import { getUserById } from '@/lib/Dashboard/dashboard.requests'
+import { AchievementType, Badge } from '@/lib/Profile/profile.types'
+import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
+import NoAchievements from '@/assets/badges/No achivement.png'
 
 export default function UserScoreCard() {
     const param = useParams()
+    const badges = new Map<AchievementType, Badge>([
+        ['FIRST_FRIEND', FirstFriend],
+        ['FIRST_CHANNEL', FirstChannel],
+        ['FIRST_GAME', FirstGame],
+        ['FIRST_WIN', FirstWin],
+    ])
 
     const { data: friend } = useQuery({
         queryKey: ['users', param.id],
@@ -25,8 +40,17 @@ export default function UserScoreCard() {
                         </div>
                     </div>
                 </div>
-                <div className="border-2 border-[#C1E2F7] rounded-full">
-                    <div className="w-[71px] h-[71px]"></div>
+                <div className="flex items-center justify-center w-[70px] h-[70px] border-[#C1E2F7] rounded-full">
+                    <Avatar className="aspect-square w-[100px] h-[100px] flex items-center justify-center">
+                        <AvatarImage
+                            className="rounded-full object-cover"
+                            src={
+                                friend?.chosenBadge
+                                    ? badges.get(friend.chosenBadge)?.src
+                                    : NoAchievements
+                            }
+                        ></AvatarImage>
+                    </Avatar>
                 </div>
             </div>
         </div>
