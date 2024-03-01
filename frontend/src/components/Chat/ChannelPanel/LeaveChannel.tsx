@@ -40,6 +40,16 @@ const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
         cmd.newOwner = newOwner
         leaveChannel(cmd, socket)
     }
+
+    function isAlone(): boolean {
+        if (users) {
+            for (const user of users) {
+                if (user.member || user.muted || user.admin) return false
+            }
+        }
+        return true
+    }
+
     if (variant === 'Owner') {
         return (
             <div className="h-full w-full justify-between flex flex-col gap-[30px]">
@@ -49,7 +59,7 @@ const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
                         className="absolute top-[-150px] right-0"
                     />
                 </div>
-                {users?.length! > 1 ? (
+                {!isAlone() ? (
                     <>
                         <div className="flex flex-col justify-between gap-[10px]">
                             <h2 className="font-semibold">

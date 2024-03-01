@@ -9,7 +9,6 @@ import FriendsList from '@/components/Profile/FriendsList'
 import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 import OtherGameHistory from '@/components/Profile/OtherGameHistory/OtherGameHistory'
 import Seperator from '@/assets/other/Seperator.svg'
-import NotFound from '../NotFound/NotFound'
 
 function Profile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
@@ -32,12 +31,14 @@ function Profile() {
         retry: 0,
     })
 
-    if (isLoading) {
-        return (<div></div>)
-    }
+    useEffect(() => {
+        if (isError) {
+            navigate('/')
+        }
+    }, [isError, navigate])
 
-    if (isError) {
-        return navigate('/')
+    if (isLoading) {
+        return <div></div>
     }
 
     const selectedAvatar = data?.avatar

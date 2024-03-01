@@ -62,26 +62,6 @@ export function Robby() {
     }
 }
 
-// export function Photo42(id: string) {
-//     const { data, isError, isSuccess } = useQuery<UserData>({
-//         queryKey: ['users', id],
-//         queryFn: () => getUserById(id),
-//     })
-
-//     if (isError || !isSuccess || !data) {
-//         return {
-//             id: '',
-//             imageProfile: '',
-//             imageBackground: '',
-//         }
-//     }
-//     return {
-//         id: data.id,
-//         imageProfile: data.photo42 || '',
-//         imageBackground: data.photo42 || '',
-//     }
-// }
-
 export function Photo42() {
     const { data } = useQuery<UserData>({
         queryKey: ['me'],

@@ -66,7 +66,7 @@ function CardCreate({ onClose }: CardCreateProps) {
                             <Label htmlFor="password">Password</Label>
                             <Input
                                 id="password"
-                                placeholder="Optionnal"
+                                placeholder="Optional"
                                 type="password"
                                 {...register('password', {
                                     setValueAs: (value) =>

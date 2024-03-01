@@ -10,6 +10,13 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum AchievementType {
+    FIRST_FRIEND
+    FIRST_GAME
+    FIRST_CHANNEL
+    FIRST_WIN
+}
+
 model User {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
@@ -41,12 +48,15 @@ model User {
     score  Int @default(0)
     rank   Int @default(0)
 
+    chosenBadge AchievementType?
+    allBadges   AchievementType[] @default([])
+
     friendship FriendShip[] @relation(name: "UserFriends")
     friends    FriendShip[] @relation(name: "FriendUsers")
 
     blocked String[]
 
-    UserGames Game[] @relation(name: "userGames")
+    UserGames     Game[] @relation(name: "userGames")
     OpponentGames Game[] @relation(name: "opponentGames")
 }
 
