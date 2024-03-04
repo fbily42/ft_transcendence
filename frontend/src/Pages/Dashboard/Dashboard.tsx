@@ -19,7 +19,7 @@ function Dashboard(): JSX.Element {
     const CloudsArray = new Array(10).fill(Clouds)
     const MountainsArray = new Array(10).fill(Mountains)
 
-    socket?.webSocket?.emit('refreshUsers');
+    socket?.webSocket?.emit('refreshSearchBar');
     return (
         <>
             <div

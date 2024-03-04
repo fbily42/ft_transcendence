@@ -32,6 +32,7 @@ export class UserService {
 					looses: true,
 					chosenBadge: true,
 					allBadges: true,
+					blocked: true,
 				}
 			});
 			if (!user) {
@@ -71,6 +72,7 @@ export class UserService {
 					looses: true,
 					chosenBadge: true,
 					allBadges: true,
+					blocked: true,
 				}
 			});
 			if (!user) {
@@ -116,6 +118,7 @@ export class UserService {
 					looses: true,
 					chosenBadge: true,
 					allBadges: true,
+					blocked: true,
 				},
 			});
 			if (!user) {

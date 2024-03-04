@@ -30,7 +30,6 @@ import { quitCmdDto } from './chat/dto/quitCmd.dto';
 	},
 	transports: ['websocket', 'polling'],
 	})
-	  
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	@WebSocketServer()
@@ -95,6 +94,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.emit("users", this.getClientsAsArray())
 	}
 
+	@SubscribeMessage('refreshSearchBar')
 	refreshSearchBar() {
 		this.server.emit('refreshSearchBar')
 	}

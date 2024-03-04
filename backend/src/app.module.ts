@@ -20,6 +20,6 @@ import { AppGateway } from './app.gateway';
 		UploadsModule,
 		FriendsModule,
 	],
-	providers: [AppGateway]
+	providers: [AppGateway],
 })
 export class AppModule {}
