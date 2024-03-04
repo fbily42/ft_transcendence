@@ -8,15 +8,18 @@ import PinguPlaying from '../../assets/other/Pingu.svg'
 import { Button } from '@/components/ui/button'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { ChevronsUp, Crown, Gamepad2 } from 'lucide-react'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 function Dashboard(): JSX.Element {
     const { data } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
+    const socket = useWebSocket() as WebSocketContextType
     const CloudsArray = new Array(10).fill(Clouds)
     const MountainsArray = new Array(10).fill(Mountains)
 
+    socket?.webSocket?.emit('refreshUsers');
     return (
         <>
             <div

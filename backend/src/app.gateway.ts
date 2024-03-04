@@ -31,7 +31,7 @@ import { quitCmdDto } from './chat/dto/quitCmd.dto';
 	transports: ['websocket', 'polling'],
 	})
 	  
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	@WebSocketServer()
 	server: Server;
@@ -93,6 +93,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.clients.delete(client.data.userName)
 		}
 		this.server.emit("users", this.getClientsAsArray())
+	}
+
+	refreshSearchBar() {
+		this.server.emit('refreshSearchBar')
 	}
 
 	@SubscribeMessage('messageToRoom')

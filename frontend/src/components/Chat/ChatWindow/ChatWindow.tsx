@@ -116,7 +116,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         }
     }, [msgError, meError, usersError])
 
-    console.log(me)
     return currentChannel ? (
         <div className="flex flex-col justify-between bg-customBlue w-full p-[20px] rounded-[36px] shadow-drop">
             <div className="bg-white flex flex-col justify-between w-full h-full rounded-[16px] p-[20px] shadow-drop">

@@ -718,7 +718,6 @@ export class ChatService {
 					'This user does not exists',
 					HttpStatus.BAD_REQUEST,
 				);
-			console.log(user)
 			if (user.blocked.includes(cmd.targetName)) {
 				return;
 			} else {
