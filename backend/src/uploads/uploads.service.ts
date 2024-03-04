@@ -5,7 +5,7 @@ import { AppGateway } from 'src/app.gateway';
 
 @Injectable({})
 export class UploadsService {
-	constructor(private prisma: PrismaService, private server: AppGateway) {}
+	constructor(private prisma: PrismaService) {}
 
 	async setProfile(file: Express.Multer.File | undefined, url: string | undefined, pseudo: string, req: Request) {
 		try{
@@ -33,7 +33,6 @@ export class UploadsService {
 					pseudo: pseudo
 				}
 			})
-			this.server.refreshSearchBar()
 		}
 		catch(error){
 			throw error

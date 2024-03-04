@@ -79,7 +79,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         data.target = currentChannel
         data.userName = me?.name!
         data.userId = me?.id!
-        socket.webSocket?.emit('messageToRoom', data)
+        socket?.webSocket?.emit('messageToRoom', data)
         reset({ message: '' })
     }
 
