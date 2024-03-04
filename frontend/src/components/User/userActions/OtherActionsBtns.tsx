@@ -101,7 +101,6 @@ export default function OtherActionsBtns() {
     const isRequested = friendRequest?.some(
         (request) => request.id === param.id
     )
-
     return (
         <div>
             {!isFriend && !isPending && !isRequested && (

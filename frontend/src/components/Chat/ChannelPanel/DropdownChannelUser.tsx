@@ -73,7 +73,7 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
                 >
                     Chat
                 </DropdownMenuItem>
-                {me?.blocked.includes(targetName) ? (
+                {me?.blocked?.includes(targetName) ? (
                     <DropdownMenuItem
                         className="w-full"
                         onClick={() => {
