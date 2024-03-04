@@ -45,6 +45,9 @@ function Pong() {
             setGameStatus('FINISH')
             setGameInfo(gameStats)
         })
+		return () => {
+			socket?.webSocket?.off('finish')
+		}
     }, [socket])
 
 	useEffect(() => {

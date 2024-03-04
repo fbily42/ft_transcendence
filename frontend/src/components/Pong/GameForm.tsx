@@ -24,7 +24,7 @@ import { randomUUID } from 'crypto'
 // interface GameFormprops {
 // 	onClose: () => void;
 // }
-function GameForm({ closeDialog }) {
+function GameForm({ closeDialog}) {
     const [search, setSearch] = useState<string>('')
     const socket = useWebSocket()
     // const [matchmaking, setMatchmaking] = useState(false)
@@ -137,7 +137,7 @@ function GameForm({ closeDialog }) {
             setFriendMessage('true')
             const roomNameFriend: string = crypto.randomUUID()
             currentRoomFriend.current = roomNameFriend
-			console.log("useEffect : ", selectedLevel)
+
             socket?.webSocket?.emit('JoinRoomFriend', {
                 friend: search,
                 roomId: roomNameFriend,
@@ -149,6 +149,9 @@ function GameForm({ closeDialog }) {
                 if (message.startsWith('Error')) {
                     setFriendMessage('Error2')
                     setLoadingFriend(false)
+                } else if (message.startsWith('InGame')) {
+                    setFriendMessage('InGame')
+                    setLoadingFriend(false)
                 } else if (message.startsWith('Go')) {
                     processingMessage.current = true
                     closeDialog()
@@ -157,6 +160,7 @@ function GameForm({ closeDialog }) {
                     //tout remettre a 0 pour les usestate
                     socket?.webSocket?.emit('leaveRoomBefore', roomNameFriend)
                     setFriendMessage('Decline')
+					setSearch(inputValue)
                     setLoadingFriend(false) //est ce que cela suffit et il va quitter la room au prochain useEffect
                 } else return //error
             })
@@ -194,7 +198,10 @@ function GameForm({ closeDialog }) {
                     processingMessage.current = true
                     closeDialog()
                     navigate('/pong')
-                } else return //error
+                } else 
+				{ setLoading(false)
+					return //error
+				}
             })
         } else if (currentRoom.current) {
             socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
@@ -410,7 +417,13 @@ function GameForm({ closeDialog }) {
                                                 return (
                                                     <p>
                                                         Submit (Friend is not online or
-                                                        dont exist)
+                                                        doesn't exist)
+                                                    </p>
+                                                )
+											case 'InGame':
+                                                return (
+                                                    <p>
+                                                        Submit (You are already in game)
                                                     </p>
                                                 )
                                             case 'Error3':

@@ -53,6 +53,7 @@ export const WebSocketProvider: React.FC = () => {
         ws?.on('GameInvitation', (data) => {
             toast(`You have been invite to a game against ${data.friend}`, {
                 action: {
+					
                     label: 'Accept',
                     onClick: () =>
                         ws?.emit('AcceptInvitation', {
@@ -69,6 +70,15 @@ export const WebSocketProvider: React.FC = () => {
                         roomId: data.roomId,
                     })
                 },
+				onDismiss() {
+					ws?.emit('DeclineInvitation', {
+                        friend: data.friend,
+                        roomId: data.roomId,
+                    })
+				},
+				
+				
+				
 				
             })
         })

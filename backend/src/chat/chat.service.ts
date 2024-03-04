@@ -859,8 +859,8 @@ export class ChatService {
 				data: {
 					userName : roomInfo[0].id,
 					opponentName: roomInfo[1].id,
-					userScore: gameStats.gameStatus.scoreTwo,
-					opponentScore: gameStats.gameStatus.scoreOne,
+					userScore: gameStats.gameStatus.scoreOne,
+					opponentScore: gameStats.gameStatus.scoreTwo,
 				}
 			})
 		}

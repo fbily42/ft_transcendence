@@ -55,64 +55,18 @@ const Board: React.FC<BoardProps> = ({
     roomName,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    // const [gameStatus, setGameStatus] = useState<'PLAYING' | 'FINISH'>(
-    //     'PLAYING'
-    // )
+
     const navigate = useNavigate()
     // const imgRef = useRef<HTMLImageElement | null>(null);
-    // const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
+
     // const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
     const socket = useWebSocket() as WebSocketContextType
 
-    // const [roomName, setRoomName] = useState<string>('')
-    // const [gameInfo, setGameInfo] = useState<GameStats>()
+
 
     const gameImages = new imageForGame()
 
-    // const handleKeyDown = (event: KeyboardEvent) => {
-    //     if (keys[event.key]) {
-    //         return
-    //     }
-    //     setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
-    // }
 
-    // const handleKeyUp = (event: KeyboardEvent) => {
-    //     setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
-    // }
-
-    // useEffect(() => {
-    //     socket?.webSocket?.on('finish', (gameStats: GameStats) => {
-    //         setGameStatus('FINISH')
-    //         setGameInfo(gameStats)
-    //     })
-    // }, [socket])
-
-    // useEffect(() => {
-    //     socket?.webSocket?.on('Ready', (room: string) => {
-    //         const roomName = room
-    //         setRoomName(roomName)
-    //         socket?.webSocket?.emit('CreateGameinfo', room)
-    //     })
-    //     socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
-    //         setGameInfo(gameStats)
-    //     })
-    //     window.addEventListener('keydown', handleKeyDown)
-    //     window.addEventListener('keyup', handleKeyUp)
-    //     return () => {
-    //         window.removeEventListener('keydown', handleKeyDown)
-    //         socket?.webSocket?.off('UpdateKey')
-    //         socket?.webSocket?.off('Ready')
-    //         window.removeEventListener('keyup', handleKeyUp)
-    //     }
-    // }, [socket])
-
-    // useEffect(() => {
-    //     console.log('finish')
-    //     return () => {
-    //         console.log('finish 2')
-    //         socket?.webSocket?.emit('leaveRoom', roomName)
-    //     }
-    // }, [roomName])
     gameImages.image.img_ice_bottom.src = ice_bottom
     gameImages.image.img_ice.src = ice
     gameImages.image.img_fish.src = fish
