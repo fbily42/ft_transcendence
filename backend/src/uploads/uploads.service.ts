@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
+import { AppGateway } from 'src/app.gateway';
 
 @Injectable({})
 export class UploadsService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService, private server: AppGateway) {}
 
 	async setProfile(file: Express.Multer.File | undefined, url: string | undefined, pseudo: string, req: Request) {
 		try{
@@ -32,6 +33,7 @@ export class UploadsService {
 					pseudo: pseudo
 				}
 			})
+			this.server.refreshSearchBar()
 		}
 		catch(error){
 			throw error
