@@ -40,8 +40,8 @@ export class UserController {
 	}
 
 	@Get('/profile/:id')
-	async getUserById(@Param('id') id: string) {
-		return this.userService.getUserById(id);
+	async getUserById(@Param('id') id: string, @User() user) {
+		return this.userService.getUserById(id, user.id);
 	}
 
 	@Post('updateRanks')
