@@ -29,8 +29,8 @@ import {
 import { block, directMessage, unblock } from '@/lib/Chat/chat.requests'
 import { CmdData } from '@/lib/Chat/chat.types'
 
-export default function OtherActionsBtns() {
-    const param = useParams()
+export default function OtherActionsBtns(): JSX.Element {
+    const param = useParams<string>()
     const { data: friendRequest } = useQuery<FriendData[]>({
         queryKey: ['request'],
         queryFn: getFriendRequest,
@@ -96,9 +96,9 @@ export default function OtherActionsBtns() {
         },
     })
 
-    const isFriend = friends?.some((friend) => friend.id === param.id)
-    const isPending = friendInvites?.some((invite) => invite.id === param.id)
-    const isRequested = friendRequest?.some(
+    const isFriend: boolean | undefined = friends?.some((friend) => friend.id === param.id)
+    const isPending: boolean | undefined = friendInvites?.some((invite) => invite.id === param.id)
+    const isRequested: boolean | undefined = friendRequest?.some(
         (request) => request.id === param.id
     )
     return (

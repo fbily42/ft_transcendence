@@ -5,7 +5,7 @@ import UserCards from '../User/userCards/UserCards'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import NoFriends from '@/assets/other/NoFriends.png'
 
-export default function MyFriendList() {
+export default function MyFriendList(): JSX.Element {
     const { data: myFriends } = useQuery<FriendData[]>({
         queryKey: ['userFriend'],
         queryFn: getMyFriends,
@@ -13,7 +13,7 @@ export default function MyFriendList() {
 
     const webSocket = useWebSocket() as WebSocketContextType
 
-    function getStatus(name: string) {
+    function getStatus(name: string): string {
         const webSocketStatus = webSocket.usersOn.has(name)
         let friendStatus: string
 

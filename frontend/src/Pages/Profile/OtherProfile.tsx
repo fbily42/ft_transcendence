@@ -10,10 +10,11 @@ import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 import OtherGameHistory from '@/components/Profile/OtherGameHistory/OtherGameHistory'
 import Seperator from '@/assets/other/Seperator.svg'
 import Mountain from '@/assets/other/mountain.svg'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 function Profile() {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
-    const param = useParams()
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
+    const param = useParams<string>()
     const navigate = useNavigate()
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -26,7 +27,7 @@ function Profile() {
         }
     }, [])
 
-    const { data, isError, isLoading } = useQuery({
+    const { data, isError, isLoading } = useQuery<UserData>({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
         retry: 0,
@@ -39,7 +40,7 @@ function Profile() {
     }, [isError, navigate])
 
     if (isLoading) {
-        return <div></div>
+        return <div>Loading...</div>
     }
 
     const selectedAvatar = data?.avatar

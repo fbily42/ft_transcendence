@@ -64,12 +64,15 @@ export default function MyUserScoreCard(): JSX.Element {
                             {me?.pseudo}
                         </h1>
                         <div>
-                            <p className="text-[12px]">{me?.score}</p>
+                            <p className="text-[12px]">
+                                {me?.score}
+                                <span className="opacity-70"> points</span>
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div
-                    className="flex items-center justify-center w-[70px] h-[70px] border-[#C1E2F7] rounded-full"
+                    className="cursor-pointer hover:opacity-80 flex items-center justify-center w-[70px] h-[70px] border-[#C1E2F7] rounded-full"
                     onClick={() => setOpen(true)}
                 >
                     <Avatar className="aspect-square w-[100px] h-[100px] flex items-center justify-center">
@@ -101,7 +104,7 @@ export default function MyUserScoreCard(): JSX.Element {
                                 return (
                                     <div
                                         key={badgeString}
-                                        className="flex items-center justify-center w-[70px] h-[70px] border-[#C1E2F7] rounded-full"
+                                        className="cursor-pointer flex items-center justify-center w-[70px] h-[70px] border-[#C1E2F7] rounded-full"
                                     >
                                         <Avatar
                                             onClick={() => {

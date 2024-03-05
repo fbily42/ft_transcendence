@@ -12,11 +12,13 @@ import {
 import axios from 'axios'
 import GameForm from '../Pong/GameForm'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+// import Logo from "../../assets/favicon/logo.png"
+import Logo from "../../../public/pingu.png"
 
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState<boolean>(false)
 
     useEffect(() => {
         const path = location.pathname
@@ -25,7 +27,6 @@ const VerticalNavbar: React.FC = () => {
                 setActive(1)
                 break
             case '/pong':
-                // setOpen(true)
                 setActive(2)
                 break
             case '/chat':
@@ -76,7 +77,6 @@ const VerticalNavbar: React.FC = () => {
     }
 
     const closeDialog = () => {
-        //faire un emit pour retirer la personne de la map du matchmaking car cela veut dire qu'elle a ferme la page, mais uniquement si elle a ferme la modal avant que la game commence
         setOpen(false)
     }
     return (
@@ -84,10 +84,10 @@ const VerticalNavbar: React.FC = () => {
             <div className="flex flex-col justify-between h-full">
                 <Link
                     to="/"
-                    className="text-black font-bold text-lg"
+                    className="text-black font-bold text-lg pr-4"
                     onClick={() => handleNavTabs(1)}
                 >
-                    Pingu
+                    <img src={Logo} alt="logo"/>
                 </Link>
                 <div className="flex flex-col items-start gap-[33px]">
                     <Link to="/" className="text-black">

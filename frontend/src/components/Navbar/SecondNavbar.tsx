@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { TwoFAContext } from '@/context/twoFAEnableContext'
+import { TwoFAContext, TwoFAContextType } from '@/context/twoFAEnableContext'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
@@ -10,7 +10,7 @@ import { Searchbar } from './Searchbar'
 export default function SecondNavbar(): JSX.Element {
     const navigate = useNavigate()
     const { twoFAenabled, enableTwoFA, disableTwoFA, twoFAverified } =
-        useContext(TwoFAContext)
+        useContext<TwoFAContextType>(TwoFAContext)
 
     const onCheckedChange = async () => {
         if (twoFAenabled) {

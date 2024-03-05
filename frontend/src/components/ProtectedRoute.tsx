@@ -11,7 +11,6 @@ function ProtectedRoute(): JSX.Element {
     const {
         data: me,
         isSuccess,
-        isPending,
     } = useQuery({
         queryKey: ['me'],
         queryFn: getUserMe,
