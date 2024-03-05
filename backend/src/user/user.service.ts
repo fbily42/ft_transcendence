@@ -1,16 +1,17 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+	HttpException,
+	HttpStatus,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LeaderboardDTO } from './dto/leaderboard.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { UserData } from './types/user.types';
 import { AchievementType } from '@prisma/client';
-import { EMPTY } from 'rxjs';
 
 @Injectable()
 export class UserService {
-	constructor(
-		private prisma: PrismaService,
-	) {}
+	constructor(private prisma: PrismaService) {}
 
 	async getInfo(name: string) {
 		try {
@@ -33,10 +34,13 @@ export class UserService {
 					chosenBadge: true,
 					allBadges: true,
 					blocked: true,
-				}
+				},
 			});
 			if (!user) {
-				throw new HttpException('User does not exists', HttpStatus.BAD_REQUEST);
+				throw new HttpException(
+					'User does not exists',
+					HttpStatus.BAD_REQUEST,
+				);
 			}
 			return user;
 		} catch (error) {
@@ -73,10 +77,13 @@ export class UserService {
 					chosenBadge: true,
 					allBadges: true,
 					blocked: true,
-				}
+				},
 			});
 			if (!user) {
-				throw new HttpException('User does not exists', HttpStatus.BAD_REQUEST);
+				throw new HttpException(
+					'User does not exists',
+					HttpStatus.BAD_REQUEST,
+				);
 			}
 			return user;
 		} catch (error) {
@@ -94,7 +101,7 @@ export class UserService {
 			);
 		}
 	}
-	
+
 	async getUserById(id: string, userId: string) {
 		try {
 			if (id === userId) {
@@ -122,46 +129,11 @@ export class UserService {
 				},
 			});
 			if (!user) {
-				throw new HttpException('User does not exists', HttpStatus.BAD_REQUEST);
-			}
-			return user;
-		} catch (error) {
-			if (error instanceof HttpException) {
-				throw error;
-			} else if (error instanceof PrismaClientKnownRequestError) {
 				throw new HttpException(
-					`Prisma error: ${error.code}`,
-					HttpStatus.INTERNAL_SERVER_ERROR,
-				);
-			}
-			throw new HttpException(
-				'Internal server error',
-				HttpStatus.INTERNAL_SERVER_ERROR,
-			);
-		}
-	}
-
-	async getOtherInfo(pseudo, currentUser) {
-		try {
-			const user = await this.prisma.user.findUnique({
-				where: {
-					pseudo: pseudo,
-				},
-				select: {
-					name: true,
-					pseudo: true,
-					score: true,
-					avatar: true,
-					rank: true,
-				},
-			});
-
-			if (!user && user.name == currentUser)
-				throw new HttpException(
-					'This user does not exist',
+					'User does not exists',
 					HttpStatus.BAD_REQUEST,
 				);
-
+			}
 			return user;
 		} catch (error) {
 			if (error instanceof HttpException) {
@@ -180,21 +152,38 @@ export class UserService {
 	}
 
 	async getLeaderboard() {
-		const leaderboardData = await this.prisma.user.findMany({
-			orderBy: {
-				score: 'desc',
-			},
-			select: {
-				photo42: true,
-				name: true,
-				rank: true,
-				score: true,
-				pseudo: true,
-				avatar: true,
-			},
-		});
-
-		return leaderboardData;
+		try {
+			const leaderboardData = await this.prisma.user.findMany({
+				orderBy: {
+					score: 'desc',
+				},
+				select: {
+					photo42: true,
+					name: true,
+					rank: true,
+					score: true,
+					pseudo: true,
+					avatar: true,
+				},
+			});
+			if (!leaderboardData)
+				throw new HttpException(
+					'Internal server error',
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			return leaderboardData;
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
 	async updateRanks(dto: LeaderboardDTO[]) {
@@ -214,39 +203,56 @@ export class UserService {
 	}
 
 	async GameHistory(userId: string) {
-		const allUserGames = await this.prisma.game.findMany({
-			where: {
-				OR:[
-					{
-						user:{
-							id:userId
-						}
-					},{
-						opponent:{
-							id:userId
-						}
-					}
-				],
-			},
-			orderBy: {
-				createdAt:"desc",
-			},
-			include: {
-				user: {
-					select: {
-						pseudo: true,
-						avatar: true,
-					}
+		try {
+			const allUserGames = await this.prisma.game.findMany({
+				where: {
+					OR: [
+						{
+							user: {
+								id: userId,
+							},
+						},
+						{
+							opponent: {
+								id: userId,
+							},
+						},
+					],
 				},
-				opponent: {
-					select: {
-						pseudo: true,
-						avatar: true,
-					}
-				}
-			},
-		});
-		return allUserGames
+				orderBy: {
+					createdAt: 'desc',
+				},
+				include: {
+					user: {
+						select: {
+							pseudo: true,
+							avatar: true,
+						},
+					},
+					opponent: {
+						select: {
+							pseudo: true,
+							avatar: true,
+						},
+					},
+				},
+			});
+			if (!allUserGames) {
+				throw new InternalServerErrorException();
+			}
+			return allUserGames;
+		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error: ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+			throw new HttpException(
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
 	async updateChosenBadge(userId: string, chosenBadge: AchievementType) {
@@ -255,7 +261,7 @@ export class UserService {
 				where: {
 					id: userId,
 				},
-			})
+			});
 			if (!user) {
 				throw new HttpException(
 					'This user does not exist',
@@ -268,8 +274,7 @@ export class UserService {
 					'This user does not have this badge',
 					HttpStatus.BAD_REQUEST,
 				);
-			}
-			else {
+			} else {
 				const updatedUser = await this.prisma.user.update({
 					where: {
 						id: userId,
@@ -277,7 +282,7 @@ export class UserService {
 					data: {
 						chosenBadge: chosenBadge,
 					},
-				})
+				});
 			}
 		} catch (error) {
 			if (error instanceof HttpException) {
@@ -301,7 +306,7 @@ export class UserService {
 				where: {
 					id: userId,
 				},
-			})
+			});
 			if (!user) {
 				throw new HttpException(
 					'This user does not exist',
@@ -311,9 +316,8 @@ export class UserService {
 			const userBadges = user.allBadges;
 			if (!userBadges.includes(chosenBadge)) {
 				userBadges.push(chosenBadge);
-			}
-			else {
-				return ;
+			} else {
+				return;
 			}
 			const updatedUser = await this.prisma.user.update({
 				where: {
@@ -323,8 +327,7 @@ export class UserService {
 					allBadges: userBadges,
 					chosenBadge: chosenBadge,
 				},
-			})
-			
+			});
 		} catch (error) {
 			if (error instanceof HttpException) {
 				throw error;
@@ -341,4 +344,3 @@ export class UserService {
 		}
 	}
 }
-
