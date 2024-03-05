@@ -76,7 +76,6 @@ const VerticalNavbar: React.FC = () => {
     }
 
     const closeDialog = () => {
-        //faire un emit pour retirer la personne de la map du matchmaking car cela veut dire qu'elle a ferme la page, mais uniquement si elle a ferme la modal avant que la game commence
         setOpen(false)
     }
     return (

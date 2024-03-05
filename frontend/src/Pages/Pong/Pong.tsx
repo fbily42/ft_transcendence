@@ -1,23 +1,14 @@
-import { Button } from '@/components/ui/button'
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import Dashboard from '../Dashboard/Dashboard'
-import Chat from '../Chat/Chat';
-import Modal from '@/components/Modal';
-import axios from 'axios';
-import GameForm from '@/components/Pong/GameForm';
+
+import { useEffect, useState } from 'react'
 import Board from './Game';
-import Basic from './BasicGame';
-import { useWebSocket } from '@/context/webSocketContext';
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext';
 import { GameStats } from '@/lib/Game/Game.types';
 import BasicGame from './BasicGame';
 
 
-// faire un decompte en blur ou on voit le jeu en arriere plan, prevoir le cas de la reconnection pour ne pas declencher le decompte dans ce cas la 
-// solution possible faire le decompte ici mais envoyer la fonction qui change le useState dans la fonction Board
 function Pong() {
 	const [roomName, setRoomName] = useState<string>('')
-	const socket = useWebSocket()
+	const socket = useWebSocket() as WebSocketContextType
 	const [gameInfo, setGameInfo] = useState<GameStats>()
 	const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
 	const [gameStatus, setGameStatus] = useState<'PLAYING' | 'FINISH'>(
@@ -28,16 +19,15 @@ function Pong() {
             socket?.webSocket?.emit('leaveRoom', roomName)
         }
     }, [roomName])
-	// État pour déterminer si le Board doit être affiché
 	const handleKeyDown = (event: KeyboardEvent) => {
         if (keys[event.key]) {
             return
         }
-        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
+        setKeys((prevKeys: { [key: string]: boolean }) => ({ ...prevKeys, [event.key]: true }))
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
-        setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
+        setKeys((prevKeys: { [key: string]: boolean }) => ({ ...prevKeys, [event.key]: false }))
     }
 
 	useEffect(() => {

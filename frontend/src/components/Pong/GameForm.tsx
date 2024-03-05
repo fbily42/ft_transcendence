@@ -1,40 +1,27 @@
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-
-import React, { useRef, KeyboardEvent } from 'react'
+import React, { useRef} from 'react'
 import { Search } from 'lucide-react'
 import { XCircle } from 'lucide-react'
-import axios from 'axios'
-import { useWebSocket } from '@/context/webSocketContext'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import pingu_duo from './../../assets/Pong_page/duo.png'
-import { Socket } from 'socket.io-client'
 import { useNavigate } from 'react-router-dom'
 import mapPingu from '../../assets/GameForm/ImageAllGame.svg'
 import BasicPong from '../../assets/GameForm/Pong_Image.svg'
 import { Checkbox } from '@/components/ui/checkbox'
-import { boolean } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { randomUUID } from 'crypto'
 
-// interface GameFormprops {
-// 	onClose: () => void;
-// }
-function GameForm({ closeDialog}) {
+function GameForm({ closeDialog }) {
     const [search, setSearch] = useState<string>('')
-    const socket = useWebSocket()
-    // const [matchmaking, setMatchmaking] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [loadingFriend, setLoadingFriend] = useState(false)
+    const socket = useWebSocket() as WebSocketContextType
+    const [loading, setLoading] = useState<boolean>(false)
+    const [loadingFriend, setLoadingFriend] = useState<boolean>(false)
     const [friendMessage, setFriendMessage] = useState<string>('Submit')
     const currentRoom = useRef<string | null>(null)
     const currentRoomFriend = useRef<string | null>(null)
-    const processingMessage = useRef(false)
-    const [inputValue, setInputValue] = useState('')
+    const processingMessage = useRef<boolean>(false)
+    const [inputValue, setInputValue] = useState<string>('')
     const [selectedMap, setSelectedMap] = useState<string>('mapPingu')
     const navigate = useNavigate()
     const [selectedLevel, setSelectedLevel] = useState<string>('easy')
@@ -42,7 +29,6 @@ function GameForm({ closeDialog}) {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
         if (search === '') {
-            // setInputValue('')
             setFriendMessage('submit')
         }
 
@@ -86,10 +72,6 @@ function GameForm({ closeDialog}) {
                 setSelectedLevel('false')
             else if (selectedLevel !== 'easy' && level === 'easy')
                 setSelectedLevel('easy')
-            if (selectedLevel === 'normal' && level === 'normal')
-                setSelectedLevel('false')
-            else if (selectedLevel !== 'normal' && level === 'normal')
-                setSelectedLevel('normal')
             if (selectedLevel === 'hard' && level === 'hard')
                 setSelectedLevel('false')
             else if (selectedLevel !== 'hard' && level === 'hard')
@@ -99,10 +81,7 @@ function GameForm({ closeDialog}) {
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        //verifier que l'utilisateur existe pour pourvoir derouler
-        // setSearch(inputValue)
     }
-
 
     const handleSearch = async (event: any) => {
         event.preventDefault()
@@ -114,7 +93,7 @@ function GameForm({ closeDialog}) {
             }
             if (loadingFriend != true) {
                 if (checkOnline(search)) {
-                    setFriendMessage('true') 
+                    setFriendMessage('true')
                     setLoadingFriend(true)
                 }
             } else if (loadingFriend) {
@@ -123,14 +102,7 @@ function GameForm({ closeDialog}) {
                 return
             }
         } catch (error) {}
-
-        // setResults([search]); // Mettez à jour cette ligne pour afficher les vrais résultats
-        // setSearch('')
     }
-
-    //j'ai besoin de la map selectionne, le niveau choisit ainsi que le nom de la personne invite
-    /* possible probleme :
-	- Annuler une invitation  */
 
     useEffect(() => {
         if (loadingFriend === true) {
@@ -141,8 +113,8 @@ function GameForm({ closeDialog}) {
             socket?.webSocket?.emit('JoinRoomFriend', {
                 friend: search,
                 roomId: roomNameFriend,
-				level : selectedLevel,
-				map: selectedMap
+                level: selectedLevel,
+                map: selectedMap,
             })
 
             socket?.webSocket?.on('JoinPartyFriend', (message: string) => {
@@ -157,22 +129,27 @@ function GameForm({ closeDialog}) {
                     closeDialog()
                     navigate('/pong')
                 } else if (message.startsWith('Decline')) {
-                    //tout remettre a 0 pour les usestate
                     socket?.webSocket?.emit('leaveRoomBefore', roomNameFriend)
                     setFriendMessage('Decline')
-					setSearch(inputValue)
-                    setLoadingFriend(false) //est ce que cela suffit et il va quitter la room au prochain useEffect
-                } else return //error
+                    setSearch(inputValue)
+                    setLoadingFriend(false)
+                } else return
             })
         } else if (currentRoomFriend.current) {
-            socket?.webSocket?.emit('leaveRoomBefore', currentRoomFriend.current)
+            socket?.webSocket?.emit(
+                'leaveRoomBefore',
+                currentRoomFriend.current
+            )
         }
         return () => {
             socket?.webSocket?.off('JoinPartyFriend')
 
             if (loadingFriend && !processingMessage.current) {
                 setLoadingFriend(false)
-                socket?.webSocket?.emit('leaveRoomBefore', currentRoomFriend.current)
+                socket?.webSocket?.emit(
+                    'leaveRoomBefore',
+                    currentRoomFriend.current
+                )
             }
         }
     }, [loadingFriend])
@@ -183,8 +160,6 @@ function GameForm({ closeDialog}) {
     }
 
     useEffect(() => {
-        //mettre fin au matchmaking des qu'il ferme le modal
-
         if (loading) {
             const roomName: string = crypto.randomUUID()
             currentRoom.current = roomName
@@ -198,10 +173,10 @@ function GameForm({ closeDialog}) {
                     processingMessage.current = true
                     closeDialog()
                     navigate('/pong')
-                } else 
-				{ setLoading(false)
-					return //error
-				}
+                } else {
+                    setLoading(false)
+                    return
+                }
             })
         } else if (currentRoom.current) {
             socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
@@ -233,8 +208,7 @@ function GameForm({ closeDialog}) {
     }, [search])
 
     return (
-        <div className=" p-5 bg-blue-800 mb-[20px] h-fit">
-            {/* image en haut a droite */}
+        <div className=" p-5 h-fit">
             <div className="fixed-0 ">
                 <img
                     src={pingu_duo}
@@ -242,17 +216,16 @@ function GameForm({ closeDialog}) {
                     className="absolute top-[-80px] right-0"
                 />
             </div>
-            {/* recherche d'amis */}
-            <div className="mb-[20px] bg-white h-fit">
+            <div className="bg-white h-fit">
                 <p className="mb-[14px]">
                     Choose an online friend to play with{' '}
                 </p>
                 <form
                     onSubmit={handleFormSubmit}
-                    className="w-full mb-10 border-2 border-black rounded-xl p-2 pr-2 mb-4 realtive flex items-center "
+                    className="w-full border-2 border-black rounded-xl p-2 pr-2 mb-4 realtive flex items-center "
                 >
                     <Search className="" />
-                    <div className="ml-[10px] bg-white">
+                    <div className="ml-[5px] bg-white">
                         <input
                             type="text"
                             value={inputValue}
@@ -273,10 +246,8 @@ function GameForm({ closeDialog}) {
                         }}
                     />
                 </form>
-                {/* //il faut aussi que loading soit a faux, dans le cas ou une
-                personne a lancer un matchmaking et veux ensuite inviter un ami */}
                 {search && (
-                    <div className="flex flex-col gap-[20px]">
+                    <div className="flex flex-col gap-[10px]">
                         <div className="flex flex-col gap-[5px]  ">
                             <div className="">
                                 <p className="inline underline">
@@ -298,21 +269,6 @@ function GameForm({ closeDialog}) {
                                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 >
                                     Easy
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="normal"
-                                    checked={selectedLevel === 'normal'}
-                                    onCheckedChange={() =>
-                                        handleselectedLevel('normal')
-                                    }
-                                />
-                                <label
-                                    htmlFor="normal"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Normal
                                 </label>
                             </div>
                             <div className="flex items-center space-x-2">
@@ -352,7 +308,6 @@ function GameForm({ closeDialog}) {
                                             )
                                                 setSelectedMap('mapPingu')
                                             else setSelectedMap('')
-
                                         }
                                     }}
                                 >
@@ -365,8 +320,6 @@ function GameForm({ closeDialog}) {
                                     <p className="text-center">
                                         Our creation ! PinguPlace
                                     </p>
-
-                                    {/* Ajoutez plus d'options ici si nécessaire */}
                                 </div>
                                 <div
                                     className={`realtive p-2 ${selectedMap === 'BasicPong' ? 'rounded border-4 border-blue-500 ' : ''}`}
@@ -387,8 +340,6 @@ function GameForm({ closeDialog}) {
                                         alt="description_of_the_image"
                                     />
                                     <p className="text-center">Bad Choice</p>
-
-                                    {/* Ajoutez plus d'options ici si nécessaire */}
                                 </div>
                             </div>
                         </div>
@@ -401,11 +352,7 @@ function GameForm({ closeDialog}) {
                                     {(() => {
                                         switch (friendMessage) {
                                             case 'true':
-                                                return (
-                                                    <p>
-                                                        Cancel Invitation
-                                                    </p>
-                                                )
+                                                return <p>Cancel Invitation</p>
                                             case 'Error':
                                                 return (
                                                     <p>
@@ -416,14 +363,15 @@ function GameForm({ closeDialog}) {
                                             case 'Error2':
                                                 return (
                                                     <p>
-                                                        Submit (Friend is not online or
-                                                        doesn't exist)
+                                                        Submit (Friend is not
+                                                        online or doesn't exist)
                                                     </p>
                                                 )
-											case 'InGame':
+                                            case 'InGame':
                                                 return (
                                                     <p>
-                                                        Submit (You are already in game)
+                                                        Submit (You are already
+                                                        in game)
                                                     </p>
                                                 )
                                             case 'Error3':
@@ -450,16 +398,9 @@ function GameForm({ closeDialog}) {
                     </div>
                 )}
             </div>
-            {/* Permet d'avoir un historique des recherchers */}
-            {/* <ul>
-				{results.map((result, index) => (
-					<li key={index}>{result}</li>
-				))}
-			</ul> */}
-            {/* MatchMaking */}
             {!search && (
                 <div
-                    className="flex flex-col  h-full mb-[20px] bg-yellow-300 justify-end gap-[20px]"
+                    className="flex flex-col  h-full mb-[20px] justify-end gap-[20px]"
                     style={{ height: '50%' }}
                 >
                     <p>Or find a random player </p>

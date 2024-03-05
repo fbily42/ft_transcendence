@@ -60,10 +60,10 @@ export function Paddle_1(
     socket: WebSocketContextType,
     roomName: string
 ) {
-    if (keys['a']) {
-        socket?.webSocket?.emit('key', { key: 'a', roomId: roomName })
-    } else if (keys['d']) {
-        socket?.webSocket?.emit('key', { key: 'd', roomId: roomName })
+    if (keys['w']) {
+        socket?.webSocket?.emit('key', { key: 'w', roomId: roomName })
+    } else if (keys['s']) {
+        socket?.webSocket?.emit('key', { key: 's', roomId: roomName })
     }
     if (gameInfo.gameStatus.map === 'mapPingu') {
         ctx.drawImage(

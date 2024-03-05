@@ -531,12 +531,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				// if(array[0].websocket == client.id)
 				// {
 		
-					if (data.key === "a") {
+					if (data.key === "w") {
 						if ((gameStats.paddleOne.y - 10) > 0 )
 							gameStats.paddleOne.y -= 5;
 						}
 		
-					else if (data.key === "d") {
+					else if (data.key === "s") {
 						if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
 						{
 							gameStats.paddleOne.y += 5;
