@@ -4,7 +4,7 @@ import {
 } from '@/components/Pong/Game utils/Ballmovement'
 import { Paddle_1, Paddle_2 } from '@/components/Pong/Game utils/Paddle'
 import React, { useEffect, useRef } from 'react'
-import Static_image, { decoration } from '@/components/Pong/Game utils/design'
+import { decoration } from '@/components/Pong/Game utils/design'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
@@ -52,7 +52,6 @@ const BasicGame: React.FC<BoardProps> = ({
             if (!ctx) return
             if (!gameInfo || !socket) return
             ctx?.clearRect(0, 0, canvas.width, canvas.height)
-            // Static_image(ctx, canvas, gameImages)
 			decoration(ctx, canvas )
             BallMovement(ctx, gameInfo, gameImages)
             Paddle_1(ctx, gameInfo, keys, gameImages, socket, roomName)

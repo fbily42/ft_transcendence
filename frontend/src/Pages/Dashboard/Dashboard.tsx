@@ -8,6 +8,9 @@ import PinguPlaying from '../../assets/other/Pingu.svg'
 import { Button } from '@/components/ui/button'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { ChevronsUp, Crown, Gamepad2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import GameForm from '@/components/Pong/GameForm'
+import { useState } from 'react'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 function Dashboard(): JSX.Element {
@@ -18,6 +21,10 @@ function Dashboard(): JSX.Element {
     const socket = useWebSocket() as WebSocketContextType
     const CloudsArray = new Array(10).fill(Clouds)
     const MountainsArray = new Array(10).fill(Mountains)
+	const [open, setOpen] = useState<boolean>(false)
+	const closeDialog = () => {
+        setOpen(false)
+    }
 
     socket?.webSocket?.emit('refreshSearchBar')
     return (
@@ -55,9 +62,18 @@ function Dashboard(): JSX.Element {
                                 <h1 className="text-white text-wrap text-center text-6xl font-semibold">
                                     Let's Play PinguPong
                                 </h1>
-                                <Button className="bg-customYellow hover:bg-customBlue hover:text-customDarkBlue">
-                                    Start a Game
-                                </Button>
+                                <Dialog open={open} onOpenChange={setOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button className="bg-customYellow hover:bg-customBlue hover:text-customDarkBlue">
+                                            Start a Game
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <GameForm
+                                            closeDialog={closeDialog}
+                                        ></GameForm>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
                         <div

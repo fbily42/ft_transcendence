@@ -1,18 +1,13 @@
 import {
     BallMovement,
-    WallCollision,
-    Paddle_Collision,
-    Paddle_hit,
     updatescore,
 } from '@/components/Pong/Game utils/Ballmovement'
 import { Paddle_1, Paddle_2 } from '@/components/Pong/Game utils/Paddle'
-// import Paddle_2 from "@/components/Pong/Game utils/Paddle";
-import data from '@/components/Pong/Game utils/data'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef} from 'react'
 import fish from './../../assets/Game/fish.svg'
 import filet from './../../assets/Game/filet.svg'
-import grey from './../../assets/Game/grey.svg'
-import pingu from './../../assets/Game/pingu.svg'
+import grey from './../../assets/Game/opponent.svg'
+import pingu from './../../assets/Game/pingu_player.svg'
 import Static_image from '@/components/Pong/Game utils/design'
 import pingu_score from './../../assets/Game/pingu_score.svg'
 import grey_score from './../../assets/Game/grey_score.svg'
@@ -21,25 +16,17 @@ import ice_bottom from './../../assets/Game/ice_bottom.svg'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import { Socket } from 'socket.io-client'
 import { GameStats, imageForGame } from '@/lib/Game/Game.types'
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@/components/ui/dialog'
-
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import loose_game from './../../assets/Game/loose_game.svg'
 import win_game from './../../assets/Game/win_game.svg'
-// import { Image } from "@/components/Pong/Game utils/data";
-
-//creer une map room pour lier l'ID de la room avec un objec, pour a chaque fois renvoyer l'objet modifier
 
 interface BoardProps {
     gameStatus: 'FINISH' | 'PLAYING'
@@ -47,7 +34,7 @@ interface BoardProps {
     keys: { [key: string]: boolean }
     roomName: string
 }
-//gameStatus, gameInfo, keys, roomName
+
 const Board: React.FC<BoardProps> = ({
     gameStatus,
     gameInfo,
@@ -55,64 +42,11 @@ const Board: React.FC<BoardProps> = ({
     roomName,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    // const [gameStatus, setGameStatus] = useState<'PLAYING' | 'FINISH'>(
-    //     'PLAYING'
-    // )
     const navigate = useNavigate()
-    // const imgRef = useRef<HTMLImageElement | null>(null);
-    // const [keys, setKeys] = useState<{ [key: string]: boolean }>({})
-    // const {data: me} = useQuery({queryKey:['me'], queryFn:getUserMe});//photo client me?.photo42
     const socket = useWebSocket() as WebSocketContextType
-
-    // const [roomName, setRoomName] = useState<string>('')
-    // const [gameInfo, setGameInfo] = useState<GameStats>()
-
     const gameImages = new imageForGame()
 
-    // const handleKeyDown = (event: KeyboardEvent) => {
-    //     if (keys[event.key]) {
-    //         return
-    //     }
-    //     setKeys((prevKeys) => ({ ...prevKeys, [event.key]: true }))
-    // }
 
-    // const handleKeyUp = (event: KeyboardEvent) => {
-    //     setKeys((prevKeys) => ({ ...prevKeys, [event.key]: false }))
-    // }
-
-    // useEffect(() => {
-    //     socket?.webSocket?.on('finish', (gameStats: GameStats) => {
-    //         setGameStatus('FINISH')
-    //         setGameInfo(gameStats)
-    //     })
-    // }, [socket])
-
-    // useEffect(() => {
-    //     socket?.webSocket?.on('Ready', (room: string) => {
-    //         const roomName = room
-    //         setRoomName(roomName)
-    //         socket?.webSocket?.emit('CreateGameinfo', room)
-    //     })
-    //     socket?.webSocket?.on('UpdateKey', (gameStats: GameStats) => {
-    //         setGameInfo(gameStats)
-    //     })
-    //     window.addEventListener('keydown', handleKeyDown)
-    //     window.addEventListener('keyup', handleKeyUp)
-    //     return () => {
-    //         window.removeEventListener('keydown', handleKeyDown)
-    //         socket?.webSocket?.off('UpdateKey')
-    //         socket?.webSocket?.off('Ready')
-    //         window.removeEventListener('keyup', handleKeyUp)
-    //     }
-    // }, [socket])
-
-    // useEffect(() => {
-    //     console.log('finish')
-    //     return () => {
-    //         console.log('finish 2')
-    //         socket?.webSocket?.emit('leaveRoom', roomName)
-    //     }
-    // }, [roomName])
     gameImages.image.img_ice_bottom.src = ice_bottom
     gameImages.image.img_ice.src = ice
     gameImages.image.img_fish.src = fish
@@ -135,21 +69,19 @@ const Board: React.FC<BoardProps> = ({
             if (!gameInfo || !socket) return
             ctx?.clearRect(0, 0, canvas.width, canvas.height)
             Static_image(ctx, canvas, gameImages)
-            BallMovement(ctx, gameInfo, gameImages) //envoie un update
-            Paddle_1(ctx, gameInfo, keys, gameImages, socket, roomName) //envoie un update si a ou d utilise
-            Paddle_2(ctx, gameInfo, keys, gameImages, socket, roomName) //envoie un update si Arrowup ou ArrowDown utilise, gerer l'image
+            BallMovement(ctx, gameInfo, gameImages)
+            Paddle_1(ctx, gameInfo, keys, gameImages, socket, roomName)
+            Paddle_2(ctx, gameInfo, keys, gameImages, socket, roomName)
             socket.webSocket?.emit('ballMov', roomName)
             updatescore(gameImages, gameInfo, ctx, canvas)
             animationFrameId = requestAnimationFrame(render)
         }
-        //  render()
+
         animationFrameId = requestAnimationFrame(render)
         return () => {
-            // socket?.webSocket?.emit('leaveRoom', roomName) // faire un autre else if gameInfo.gameStatus.gameState === "you adversaire leave" pour ensuite gerer comment rediriger le joueur qui est reste, donc dans le leave room il faut envoyer un emit a l'autre joueur
-            // window.removeEventListener('keydown', handleKeyDown);
+
             cancelAnimationFrame(animationFrameId)
         }
-        // }
     }, [gameStatus, gameInfo])
 
     const { data: me } = useQuery<UserData>({
@@ -167,7 +99,6 @@ const Board: React.FC<BoardProps> = ({
                                 navigate('/')
                             }}
                         >
-                            {/* <DialogHeader> */}
                             <DialogTitle>
                                 <div className="flex items-center justify-center">
                                     {gameInfo?.gameStatus.looser === me?.name &&
@@ -176,7 +107,6 @@ const Board: React.FC<BoardProps> = ({
                                         'Hurray ! You Won'}
                                 </div>
                             </DialogTitle>
-                            {/* <DialogDescription> */}
                             {gameInfo?.gameStatus.looser === me?.name ? (
                                 <div className="flex items-center justify-center">
                                     <img
@@ -186,8 +116,7 @@ const Board: React.FC<BoardProps> = ({
                                     />
                                 </div>
                             ) : (
-                                // {gameInfo?.gameStatus.winner ===
-                                //     me?.name &&
+
                                 <div className="flex items-center justify-center">
                                     <img
                                         src={win_game}
@@ -196,7 +125,6 @@ const Board: React.FC<BoardProps> = ({
                                     />
                                 </div>
                             )}
-                            {/* </DialogDescription> */}
                             <div className="flex justify-center items-center">
                                 <Button
                                     className="w-[50%]"
@@ -207,16 +135,8 @@ const Board: React.FC<BoardProps> = ({
                                     Leave the Game
                                 </Button>
                             </div>
-                            {/* </DialogHeader> */}
                         </DialogContent>
                     </Dialog>
-
-                    {/* <p> the winner is {gameInfo?.gameStatus.winner}</p>
-                    <p>The loser is {gameInfo?.gameStatus.looser}</p>
-                    <p>
-                        {gameInfo?.gameStatus.scoreOne}:
-                        {gameInfo?.gameStatus.scoreTwo}
-                    </p> */}
                 </div>
             )}
         </>

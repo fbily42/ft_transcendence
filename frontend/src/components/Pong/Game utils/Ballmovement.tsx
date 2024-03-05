@@ -93,13 +93,13 @@ export function updatescore(
         }
     }
     ctx.fillText(
-        `${gameInfo.gameStatus.scoreTwo}`,
+        `${gameInfo.gameStatus.scoreOne}`,
         canvas.width / 4,
         40,
         canvas.width / 5
     )
     ctx.fillText(
-        `${gameInfo.gameStatus.scoreOne}`,
+        `${gameInfo.gameStatus.scoreTwo}`,
         (3 * canvas.width) / 4,
         40,
         canvas.width / 5

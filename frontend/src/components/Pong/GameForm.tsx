@@ -1,40 +1,29 @@
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-
-import React, { useRef, KeyboardEvent } from 'react'
+import React, { useRef} from 'react'
 import { Search } from 'lucide-react'
 import { XCircle } from 'lucide-react'
-import axios from 'axios'
-import { useWebSocket } from '@/context/webSocketContext'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import pingu_duo from './../../assets/Pong_page/duo.png'
-import { Socket } from 'socket.io-client'
 import { useNavigate } from 'react-router-dom'
-import mapPingu from '../../assets/GameForm/ImageAllGame.svg'
-import BasicPong from '../../assets/GameForm/Pong_Image.svg'
+import mapPingu from '../../assets/GameForm/PinguPong.svg'
+import BasicPong from '../../assets/GameForm/PongBasic.svg'
 import { Checkbox } from '@/components/ui/checkbox'
-import { boolean } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { randomUUID } from 'crypto'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 
-// interface GameFormprops {
-// 	onClose: () => void;
-// }
 function GameForm({ closeDialog }) {
     const [search, setSearch] = useState<string>('')
-    const socket = useWebSocket()
-    // const [matchmaking, setMatchmaking] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [loadingFriend, setLoadingFriend] = useState(false)
+    const socket = useWebSocket() as WebSocketContextType
+    const [loading, setLoading] = useState<boolean>(false)
+    const [loadingFriend, setLoadingFriend] = useState<boolean>(false)
     const [friendMessage, setFriendMessage] = useState<string>('Submit')
     const currentRoom = useRef<string | null>(null)
     const currentRoomFriend = useRef<string | null>(null)
-    const processingMessage = useRef(false)
-    const [inputValue, setInputValue] = useState('')
+    const processingMessage = useRef<boolean>(false)
+    const [inputValue, setInputValue] = useState<string>('')
     const [selectedMap, setSelectedMap] = useState<string>('mapPingu')
     const navigate = useNavigate()
     const [selectedLevel, setSelectedLevel] = useState<string>('easy')
@@ -42,7 +31,6 @@ function GameForm({ closeDialog }) {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
         if (search === '') {
-            // setInputValue('')
             setFriendMessage('submit')
         }
 
@@ -86,10 +74,6 @@ function GameForm({ closeDialog }) {
                 setSelectedLevel('false')
             else if (selectedLevel !== 'easy' && level === 'easy')
                 setSelectedLevel('easy')
-            if (selectedLevel === 'normal' && level === 'normal')
-                setSelectedLevel('false')
-            else if (selectedLevel !== 'normal' && level === 'normal')
-                setSelectedLevel('normal')
             if (selectedLevel === 'hard' && level === 'hard')
                 setSelectedLevel('false')
             else if (selectedLevel !== 'hard' && level === 'hard')
@@ -99,10 +83,7 @@ function GameForm({ closeDialog }) {
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        //verifier que l'utilisateur existe pour pourvoir derouler
-        // setSearch(inputValue)
     }
-
 
     const handleSearch = async (event: any) => {
         event.preventDefault()
@@ -114,7 +95,7 @@ function GameForm({ closeDialog }) {
             }
             if (loadingFriend != true) {
                 if (checkOnline(search)) {
-                    setFriendMessage('true') 
+                    setFriendMessage('true')
                     setLoadingFriend(true)
                 }
             } else if (loadingFriend) {
@@ -123,52 +104,54 @@ function GameForm({ closeDialog }) {
                 return
             }
         } catch (error) {}
-
-        // setResults([search]); // Mettez à jour cette ligne pour afficher les vrais résultats
-        // setSearch('')
     }
-
-    //j'ai besoin de la map selectionne, le niveau choisit ainsi que le nom de la personne invite
-    /* possible probleme :
-	- Annuler une invitation  */
 
     useEffect(() => {
         if (loadingFriend === true) {
             setFriendMessage('true')
             const roomNameFriend: string = crypto.randomUUID()
             currentRoomFriend.current = roomNameFriend
-			console.log("useEffect : ", selectedLevel)
+
             socket?.webSocket?.emit('JoinRoomFriend', {
                 friend: search,
                 roomId: roomNameFriend,
-				level : selectedLevel,
-				map: selectedMap
+                level: selectedLevel,
+                map: selectedMap,
             })
 
             socket?.webSocket?.on('JoinPartyFriend', (message: string) => {
                 if (message.startsWith('Error')) {
                     setFriendMessage('Error2')
                     setLoadingFriend(false)
+                } else if (message.startsWith('InGame')) {
+                    setFriendMessage('InGame')
+                    setLoadingFriend(false)
                 } else if (message.startsWith('Go')) {
                     processingMessage.current = true
                     closeDialog()
                     navigate('/pong')
                 } else if (message.startsWith('Decline')) {
-                    //tout remettre a 0 pour les usestate
                     socket?.webSocket?.emit('leaveRoomBefore', roomNameFriend)
                     setFriendMessage('Decline')
-                    setLoadingFriend(false) //est ce que cela suffit et il va quitter la room au prochain useEffect
-                } else return //error
+                    setSearch(inputValue)
+                    setLoadingFriend(false)
+                } else return
             })
         } else if (currentRoomFriend.current) {
-            socket?.webSocket?.emit('leaveRoomBefore', currentRoomFriend.current)
+            socket?.webSocket?.emit(
+                'leaveRoomBefore',
+                currentRoomFriend.current
+            )
         }
         return () => {
             socket?.webSocket?.off('JoinPartyFriend')
 
             if (loadingFriend && !processingMessage.current) {
                 setLoadingFriend(false)
-                socket?.webSocket?.emit('leaveRoomBefore', currentRoomFriend.current)
+                socket?.webSocket?.emit(
+                    'leaveRoomBefore',
+                    currentRoomFriend.current
+                )
             }
         }
     }, [loadingFriend])
@@ -179,8 +162,6 @@ function GameForm({ closeDialog }) {
     }
 
     useEffect(() => {
-        //mettre fin au matchmaking des qu'il ferme le modal
-
         if (loading) {
             const roomName: string = crypto.randomUUID()
             currentRoom.current = roomName
@@ -194,7 +175,10 @@ function GameForm({ closeDialog }) {
                     processingMessage.current = true
                     closeDialog()
                     navigate('/pong')
-                } else return //error
+                } else {
+                    setLoading(false)
+                    return
+                }
             })
         } else if (currentRoom.current) {
             socket?.webSocket?.emit('leaveRoomBefore', currentRoom.current)
@@ -226,8 +210,7 @@ function GameForm({ closeDialog }) {
     }, [search])
 
     return (
-        <div className=" p-5 bg-blue-800 mb-[20px] h-fit">
-            {/* image en haut a droite */}
+        <div className="flex flex-col items-center w-full h-fit">
             <div className="fixed-0 ">
                 <img
                     src={pingu_duo}
@@ -235,47 +218,47 @@ function GameForm({ closeDialog }) {
                     className="absolute top-[-80px] right-0"
                 />
             </div>
-            {/* recherche d'amis */}
-            <div className="mb-[20px] bg-white h-fit">
-                <p className="mb-[14px]">
+            <div className="flex flex-col bg-white h-fit w-full gap-[18px] mt-[18px]">
+                <p className="text-center font-semibold">
                     Choose an online friend to play with{' '}
                 </p>
                 <form
                     onSubmit={handleFormSubmit}
-                    className="w-full mb-10 border-2 border-black rounded-xl p-2 pr-2 mb-4 realtive flex items-center "
+                    className="w-full rounded-xl realtive flex items-center "
                 >
-                    <Search className="" />
-                    <div className="ml-[10px] bg-white">
-                        <input
+                    <div className="flex w-full justify-between items-center gap-[10px] bg-white">
+						<Search className="opacity-30" />
+                        <Input
                             type="text"
                             value={inputValue}
                             onChange={handleInputChange}
-                            placeholder="Rechercher des amis"
-                            className="outline-none w-[350px]"
+                            placeholder="Search for Noots ..."
+                            className="outline-none w-full"
                             onBlur={(e) => {
                                 e.target.style.outline = 'none'
                             }}
                             required
-                        />
-                    </div>
+                        >
+							
+						</Input>
                     <XCircle
-                        className="fixed-0 "
+                        className="fixed-0 opacity-30 cursor-pointer hover:opacity-100 "
                         onClick={() => {
                             setInputValue('')
                             setSearch('')
                         }}
                     />
+                    </div>
+					
                 </form>
-                {/* //il faut aussi que loading soit a faux, dans le cas ou une
-                personne a lancer un matchmaking et veux ensuite inviter un ami */}
                 {search && (
-                    <div className="flex flex-col gap-[20px]">
-                        <div className="flex flex-col gap-[5px]  ">
+                    <div className="flex flex-col w-full gap-[20px]">
+                        <div className="flex flex-col gap-[10px]  ">
                             <div className="">
-                                <p className="inline underline">
-                                    Choose the level
+                                <p className="inline font-semibold">
+                                    Choose the level :
                                 </p>
-                                <span> :</span>
+
                             </div>
 
                             <div className="flex items-center space-x-2">
@@ -295,21 +278,6 @@ function GameForm({ closeDialog }) {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Checkbox
-                                    id="normal"
-                                    checked={selectedLevel === 'normal'}
-                                    onCheckedChange={() =>
-                                        handleselectedLevel('normal')
-                                    }
-                                />
-                                <label
-                                    htmlFor="normal"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Normal
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
                                     id="hard"
                                     checked={selectedLevel === 'hard'}
                                     onCheckedChange={() =>
@@ -325,17 +293,17 @@ function GameForm({ closeDialog }) {
                             </div>
                         </div>
 
-                        <div className="">
+                        <div className="flex flex-col gap-[10px]">
                             <div className="">
-                                <p className="inline underline">
-                                    {' '}
-                                    Choose the Map{' '}
+                                <p className="inline font-semibold">
+
+                                    Choose the Map :
                                 </p>
-                                <span> :</span>
+
                             </div>
-                            <div className="flex flex-row">
+                            <div className="flex flex-row items-center justify-evenly">
                                 <div
-                                    className={`realtive p-2 ${selectedMap === 'mapPingu' ? 'rounded border-4 border-blue-500 ' : ''}`}
+                                    className={`realtive p-1 ${selectedMap === 'mapPingu' ? 'rounded border-4 border-customBlue ' : ''}`}
                                     onClick={() => {
                                         if (loadingFriend !== true) {
                                             if (!selectedMap)
@@ -345,7 +313,6 @@ function GameForm({ closeDialog }) {
                                             )
                                                 setSelectedMap('mapPingu')
                                             else setSelectedMap('')
-
                                         }
                                     }}
                                 >
@@ -358,11 +325,9 @@ function GameForm({ closeDialog }) {
                                     <p className="text-center">
                                         Our creation ! PinguPlace
                                     </p>
-
-                                    {/* Ajoutez plus d'options ici si nécessaire */}
                                 </div>
                                 <div
-                                    className={`realtive p-2 ${selectedMap === 'BasicPong' ? 'rounded border-4 border-blue-500 ' : ''}`}
+                                    className={`realtive  ${selectedMap === 'BasicPong' ? 'rounded border-4 border-customBlue ' : ''}`}
                                     onClick={() => {
                                         if (loadingFriend !== true) {
                                             if (!selectedMap)
@@ -375,30 +340,24 @@ function GameForm({ closeDialog }) {
                                 >
                                     <img
                                         src={BasicPong}
-                                        width="250px"
-                                        height="250px"
+                                        width="200px"
+                                        height="200px"
                                         alt="description_of_the_image"
                                     />
                                     <p className="text-center">Bad Choice</p>
-
-                                    {/* Ajoutez plus d'options ici si nécessaire */}
                                 </div>
                             </div>
                         </div>
                         <div className="">
                             <form onSubmit={handleSearch}>
-                                <button
-                                    className="w-full  border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 gap-[10px]"
+                                <Button
+                                    className="w-full"
                                     type="submit"
                                 >
                                     {(() => {
                                         switch (friendMessage) {
                                             case 'true':
-                                                return (
-                                                    <p>
-                                                        Cancel Invitation
-                                                    </p>
-                                                )
+                                                return <p>Cancel Invitation</p>
                                             case 'Error':
                                                 return (
                                                     <p>
@@ -409,54 +368,55 @@ function GameForm({ closeDialog }) {
                                             case 'Error2':
                                                 return (
                                                     <p>
-                                                        Submit (Friend is not online or
-                                                        dont exist)
+                                                        Submit (Friend is not
+                                                        online or doesn't exist)
+                                                    </p>
+                                                )
+                                            case 'InGame':
+                                                return (
+                                                    <p>
+                                                        Submit (You are already
+                                                        in game)
                                                     </p>
                                                 )
                                             case 'Error3':
                                                 return (
                                                     <p>
-                                                        You cannot invite
+                                                        You can't invite
                                                         yourself
                                                     </p>
                                                 )
                                             case 'Decline':
                                                 return (
                                                     <p>
-                                                        Submit(Your friend
-                                                        decline)
+                                                        Submit (Your friend
+                                                        declined)
                                                     </p>
                                                 )
                                             default:
                                                 return <p>Submit</p>
                                         }
                                     })()}
-                                </button>
+                                </Button>
                             </form>
                         </div>
                     </div>
                 )}
             </div>
-            {/* Permet d'avoir un historique des recherchers */}
-            {/* <ul>
-				{results.map((result, index) => (
-					<li key={index}>{result}</li>
-				))}
-			</ul> */}
-            {/* MatchMaking */}
             {!search && (
                 <div
-                    className="flex flex-col  h-full mb-[20px] bg-yellow-300 justify-end gap-[20px]"
-                    style={{ height: '50%' }}
+                    className="flex flex-col w-full h-full items-center gap-[20px]"
                 >
-                    <p>Or find a random player </p>
-                    <form onSubmit={handleMatchmaking}>
-                        <button
-                            className="w-full  border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 gap-[10px]"
+                    <p>Or</p>
+                    <form 
+					className='w-full'
+					onSubmit={handleMatchmaking}>
+                        <Button
+                            className="w-full "
                             type="submit"
                         >
-                            {loading ? 'Matchmaking...(Just wait)' : 'Submit'}
-                        </button>
+                            {loading ? 'Matchmaking...(Just wait)' : 'Find a player'}
+                        </Button>
                     </form>
                 </div>
             )}

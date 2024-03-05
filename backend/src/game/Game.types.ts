@@ -6,9 +6,7 @@ export class GameStats {
 
 
 	canvas : {height:number; width :number;};
-	// scorePlayer1: number;
-	// scorePlayer2:number;
-	// gameState: String;
+
 	constructor(private level:string, map:string) {
 		this.canvas ={
 			height : 800,
@@ -17,7 +15,7 @@ export class GameStats {
 		let width = 30;
 		let rad = 20;
 		let speed = 2;
-		// console.log(widh)
+
 		if (map === 'BasicPong')
 		{
 			width /= 2;
@@ -87,7 +85,7 @@ export class GameStats {
 		}
 		
 		if (this.ball.x - this.ball.rad <= 0) {
-		   this.gameStatus.scoreOne++;
+		   this.gameStatus.scoreTwo++;
 		   if (this.gameStatus.level === 'hard')
 		  	 this.ball.speed = 2; // But pour le joueur 1
 		//    this.gameStatus.gameState = 'score';
@@ -102,7 +100,7 @@ export class GameStats {
 			if (this.gameStatus.level === 'hard')
 				this.ball.speed = 2
 			// this.gameStatus.gameState = 'score';
-			this.gameStatus.scoreTwo++; // But pour le joueur 
+			this.gameStatus.scoreOne++; // But pour le joueur 
 			// setTimeout(() => {
 				this.gameStatus.gameState = 'playing';
 			if(this.gameStatus.scoreTwo === 10)
