@@ -210,7 +210,7 @@ function GameForm({ closeDialog }) {
     }, [search])
 
     return (
-        <div className="flex flex-col items-center w-full h-fit">
+        <div className="flex flex-col items-center w-full h-fit gap-[20px]">
             <div className="fixed-0 ">
                 <img
                     src={pingu_duo}
