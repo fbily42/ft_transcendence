@@ -5,12 +5,14 @@ import { XCircle } from 'lucide-react'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import pingu_duo from './../../assets/Pong_page/duo.png'
 import { useNavigate } from 'react-router-dom'
-import mapPingu from '../../assets/GameForm/ImageAllGame.svg'
-import BasicPong from '../../assets/GameForm/Pong_Image.svg'
+import mapPingu from '../../assets/GameForm/PinguPong.svg'
+import BasicPong from '../../assets/GameForm/PongBasic.svg'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 
 function GameForm({ closeDialog }) {
     const [search, setSearch] = useState<string>('')
@@ -208,7 +210,7 @@ function GameForm({ closeDialog }) {
     }, [search])
 
     return (
-        <div className=" p-5 h-fit">
+        <div className="flex flex-col items-center w-full h-fit">
             <div className="fixed-0 ">
                 <img
                     src={pingu_duo}
@@ -216,44 +218,47 @@ function GameForm({ closeDialog }) {
                     className="absolute top-[-80px] right-0"
                 />
             </div>
-            <div className="bg-white h-fit">
-                <p className="mb-[14px]">
+            <div className="flex flex-col bg-white h-fit w-full gap-[18px] mt-[18px]">
+                <p className="text-center font-semibold">
                     Choose an online friend to play with{' '}
                 </p>
                 <form
                     onSubmit={handleFormSubmit}
-                    className="w-full border-2 border-black rounded-xl p-2 pr-2 mb-4 realtive flex items-center "
+                    className="w-full rounded-xl realtive flex items-center "
                 >
-                    <Search className="" />
-                    <div className="ml-[5px] bg-white">
-                        <input
+                    <div className="flex w-full justify-between items-center gap-[10px] bg-white">
+						<Search className="opacity-30" />
+                        <Input
                             type="text"
                             value={inputValue}
                             onChange={handleInputChange}
-                            placeholder="Rechercher des amis"
-                            className="outline-none w-[350px]"
+                            placeholder="Search for Noots ..."
+                            className="outline-none w-full"
                             onBlur={(e) => {
                                 e.target.style.outline = 'none'
                             }}
                             required
-                        />
-                    </div>
+                        >
+							
+						</Input>
                     <XCircle
-                        className="fixed-0 "
+                        className="fixed-0 opacity-30 cursor-pointer hover:opacity-100 "
                         onClick={() => {
                             setInputValue('')
                             setSearch('')
                         }}
                     />
+                    </div>
+					
                 </form>
                 {search && (
-                    <div className="flex flex-col gap-[10px]">
-                        <div className="flex flex-col gap-[5px]  ">
+                    <div className="flex flex-col w-full gap-[20px]">
+                        <div className="flex flex-col gap-[10px]  ">
                             <div className="">
-                                <p className="inline underline">
-                                    Choose the level
+                                <p className="inline font-semibold">
+                                    Choose the level :
                                 </p>
-                                <span> :</span>
+
                             </div>
 
                             <div className="flex items-center space-x-2">
@@ -288,17 +293,17 @@ function GameForm({ closeDialog }) {
                             </div>
                         </div>
 
-                        <div className="">
+                        <div className="flex flex-col gap-[10px]">
                             <div className="">
-                                <p className="inline underline">
-                                    {' '}
-                                    Choose the Map{' '}
+                                <p className="inline font-semibold">
+
+                                    Choose the Map :
                                 </p>
-                                <span> :</span>
+
                             </div>
-                            <div className="flex flex-row">
+                            <div className="flex flex-row items-center justify-evenly">
                                 <div
-                                    className={`realtive p-2 ${selectedMap === 'mapPingu' ? 'rounded border-4 border-blue-500 ' : ''}`}
+                                    className={`realtive p-1 ${selectedMap === 'mapPingu' ? 'rounded border-4 border-customBlue ' : ''}`}
                                     onClick={() => {
                                         if (loadingFriend !== true) {
                                             if (!selectedMap)
@@ -322,7 +327,7 @@ function GameForm({ closeDialog }) {
                                     </p>
                                 </div>
                                 <div
-                                    className={`realtive p-2 ${selectedMap === 'BasicPong' ? 'rounded border-4 border-blue-500 ' : ''}`}
+                                    className={`realtive  ${selectedMap === 'BasicPong' ? 'rounded border-4 border-customBlue ' : ''}`}
                                     onClick={() => {
                                         if (loadingFriend !== true) {
                                             if (!selectedMap)
@@ -335,8 +340,8 @@ function GameForm({ closeDialog }) {
                                 >
                                     <img
                                         src={BasicPong}
-                                        width="250px"
-                                        height="250px"
+                                        width="200px"
+                                        height="200px"
                                         alt="description_of_the_image"
                                     />
                                     <p className="text-center">Bad Choice</p>
@@ -345,8 +350,8 @@ function GameForm({ closeDialog }) {
                         </div>
                         <div className="">
                             <form onSubmit={handleSearch}>
-                                <button
-                                    className="w-full  border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 gap-[10px]"
+                                <Button
+                                    className="w-full"
                                     type="submit"
                                 >
                                     {(() => {
@@ -377,22 +382,22 @@ function GameForm({ closeDialog }) {
                                             case 'Error3':
                                                 return (
                                                     <p>
-                                                        You cannot invite
+                                                        You can't invite
                                                         yourself
                                                     </p>
                                                 )
                                             case 'Decline':
                                                 return (
                                                     <p>
-                                                        Submit(Your friend
-                                                        decline)
+                                                        Submit (Your friend
+                                                        declined)
                                                     </p>
                                                 )
                                             default:
                                                 return <p>Submit</p>
                                         }
                                     })()}
-                                </button>
+                                </Button>
                             </form>
                         </div>
                     </div>
@@ -400,17 +405,18 @@ function GameForm({ closeDialog }) {
             </div>
             {!search && (
                 <div
-                    className="flex flex-col  h-full mb-[20px] justify-end gap-[20px]"
-                    style={{ height: '50%' }}
+                    className="flex flex-col w-full h-full items-center gap-[20px]"
                 >
-                    <p>Or find a random player </p>
-                    <form onSubmit={handleMatchmaking}>
-                        <button
-                            className="w-full  border-2 bg-blue-200 border-blue-500 rounded-xl p-2 pr-2 gap-[10px]"
+                    <p>Or</p>
+                    <form 
+					className='w-full'
+					onSubmit={handleMatchmaking}>
+                        <Button
+                            className="w-full "
                             type="submit"
                         >
-                            {loading ? 'Matchmaking...(Just wait)' : 'Submit'}
-                        </button>
+                            {loading ? 'Matchmaking...(Just wait)' : 'Find a player'}
+                        </Button>
                     </form>
                 </div>
             )}

@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState<boolean>(false)
 
     useEffect(() => {
         const path = location.pathname
@@ -25,7 +25,6 @@ const VerticalNavbar: React.FC = () => {
                 setActive(1)
                 break
             case '/pong':
-                // setOpen(true)
                 setActive(2)
                 break
             case '/chat':
