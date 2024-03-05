@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { createContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
-type TwoFAContextType = {
+export type TwoFAContextType = {
   twoFAenabled : boolean,
   enableTwoFA : () => void,
   disableTwoFA : () => void,

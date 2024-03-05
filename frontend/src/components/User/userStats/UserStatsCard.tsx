@@ -5,14 +5,15 @@ import { ChevronsUp, Crown, Frown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-export default function UserStatsCard() {
-    const param = useParams()
+export default function UserStatsCard(): JSX.Element {
+    const param = useParams<string>()
+
     const { data: friend } = useQuery<UserData>({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
     })
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)

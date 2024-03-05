@@ -3,7 +3,7 @@ import { FriendData } from '@/lib/Dashboard/dashboard.types'
 import { useQuery } from '@tanstack/react-query'
 import UserCards from '../User/userCards/UserCards'
 
-export default function PendingInvitations() {
+export default function PendingInvitations(): JSX.Element {
     const { data: friendInvites } = useQuery<FriendData[]>({
         queryKey: ['pending'],
         queryFn: getPendingInvitations,

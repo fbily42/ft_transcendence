@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 import FriendRequest from '@/components/Profile/FriendRequest'
 import PendingInvitations from '@/components/Profile/PendingInvitations'
 import MyFriendList from '@/components/Profile/MyFriendList'
-import { FriendData } from '@/lib/Dashboard/dashboard.types'
+import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
 import MyUserStatsCard from '@/components/User/userStats/MyUserStatsCard'
 import MyUserScoreCard from '@/components/User/userStats/MyUserScoreCard'
 import MyGameHistory from '@/components/Profile/MyGameHistory/MyGameHistory'
@@ -19,7 +19,7 @@ import Seperator from '@/assets/other/Seperator.svg'
 import Mountain from '@/assets/other/mountain.svg'
 
 function Profile() {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -42,7 +42,7 @@ function Profile() {
         queryFn: getPendingInvitations,
     })
 
-    const { data } = useQuery({
+    const { data } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })

@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-
 import PinguProfile from '../../../assets/empty-state/pingu-face.svg'
 import PingaProfile from '../../../assets/avatar-assets/pinga-face.svg'
 import MamaProfile from '../../../assets/avatar-assets/mama-face.svg'

@@ -1,4 +1,4 @@
-import { FriendData } from '@/lib/Dashboard/dashboard.types'
+import { FriendData, UserData } from '@/lib/Dashboard/dashboard.types'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 import UserCards from '../User/userCards/UserCards'
 import { getFriends, getUserById } from '@/lib/Dashboard/dashboard.requests'
@@ -7,22 +7,22 @@ import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { useParams } from 'react-router-dom'
 import NoFriends from '@/assets/other/NoFriends.png'
 
-export default function FriendsList() {
-    const param = useParams()
+export default function FriendsList(): JSX.Element {
+    const param = useParams<string>()
 
-    const { data: friends } = useQuery({
+    const { data: friends } = useQuery<FriendData[]>({
         queryKey: ['userFriend'],
         queryFn: () => getFriends(param.id!),
     })
 
-    const { data: user } = useQuery({
+    const { data: user } = useQuery<UserData>({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
     })
 
     const webSocket = useWebSocket() as WebSocketContextType
 
-    function getStatus(name: string) {
+    function getStatus(name: string): string {
         const webSocketStatus = webSocket.usersOn.has(name)
         let friendStatus: string
 

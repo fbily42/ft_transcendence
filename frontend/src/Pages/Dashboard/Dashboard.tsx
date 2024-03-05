@@ -19,7 +19,7 @@ function Dashboard(): JSX.Element {
     const CloudsArray = new Array(10).fill(Clouds)
     const MountainsArray = new Array(10).fill(Mountains)
 
-    socket?.webSocket?.emit('refreshSearchBar');
+    socket?.webSocket?.emit('refreshSearchBar')
     return (
         <>
             <div
@@ -55,7 +55,7 @@ function Dashboard(): JSX.Element {
                                 <h1 className="text-white text-wrap text-center text-6xl font-semibold">
                                     Let's Play PinguPong
                                 </h1>
-                                <Button className="bg-customYellow">
+                                <Button className="bg-customYellow hover:bg-customBlue hover:text-customDarkBlue">
                                     Start a Game
                                 </Button>
                             </div>

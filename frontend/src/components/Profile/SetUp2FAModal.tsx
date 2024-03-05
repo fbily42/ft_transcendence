@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
-import Modal from '../Modal'
 import OtpForm from '../TwoFA/OtpForm'
 import QRCode from 'react-qr-code'
 import axios from 'axios'
 import { toast } from 'sonner'
-import { TwoFAContext } from '@/context/twoFAEnableContext'
+import { TwoFAContext, TwoFAContextType } from '@/context/twoFAEnableContext'
 
 type SetUp2FAModalProps = {
     open: boolean
@@ -22,7 +21,7 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
     const [token, setToken] = useState<string>('      ')
     const [isTokValid, setIsTokValid] = useState<string>('')
 
-    const { enableTwoFA, setTwoFAVerified } = useContext(TwoFAContext)
+    const { enableTwoFA, setTwoFAVerified } = useContext<TwoFAContextType>(TwoFAContext)
 
     // use effect
     // at mounted :

@@ -12,19 +12,20 @@ import SetUp2FAModal from '@/components/Profile/SetUp2FAModal'
 import SetProfileForm from '@/components/Auth/SetProfileForm'
 import { useQuery } from '@tanstack/react-query'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 export default function UserActionsBtns() {
     const [openSetUp2FA, setOpenSetUp2FA] = useState<boolean>(false)
     const [openProfileSettings, setOpenProfileSettings] =
         useState<boolean>(false)
 
-    const { data: currentUser } = useQuery({
+    const { data: currentUser } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
 
-    const initialAvatar = currentUser?.avatar
-    const initialPseudo = currentUser?.pseudo
+    const initialAvatar: string | undefined = currentUser?.avatar
+    const initialPseudo: string | undefined = currentUser?.pseudo
 
     return (
         <div
@@ -58,8 +59,7 @@ export default function UserActionsBtns() {
             <Dialog open={openSetUp2FA} onOpenChange={setOpenSetUp2FA}>
                 <DialogTrigger asChild>
                     <Button
-                        variant={'outlineBlue'}
-                        className="w-full"
+                        className="w-full bg-customBlue hover:bg-customBlue/80 text-customDarkBlue"
                         onClick={() => setOpenSetUp2FA(true)}
                     >
                         Setup 2FA

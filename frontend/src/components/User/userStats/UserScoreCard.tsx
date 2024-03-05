@@ -10,9 +10,10 @@ import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import NoAchievements from '@/assets/badges/No achivement.png'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 
-export default function UserScoreCard() {
-    const param = useParams()
+export default function UserScoreCard(): JSX.Element {
+    const param = useParams<string>()
     const badges = new Map<AchievementType, Badge>([
         ['FIRST_FRIEND', FirstFriend],
         ['FIRST_CHANNEL', FirstChannel],
@@ -20,7 +21,7 @@ export default function UserScoreCard() {
         ['FIRST_WIN', FirstWin],
     ])
 
-    const { data: friend } = useQuery({
+    const { data: friend } = useQuery<UserData>({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
     })
@@ -36,7 +37,10 @@ export default function UserScoreCard() {
                             {friend?.pseudo}
                         </h1>
                         <div>
-                            <p className="text-[12px]">{friend?.score}</p>
+                            <p className="text-[12px]">
+                                {friend?.score}
+                                <span className="opacity-70"> points</span>
+                            </p>
                         </div>
                     </div>
                 </div>

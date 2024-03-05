@@ -14,10 +14,9 @@ import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { Link } from 'react-router-dom'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
-export function Searchbar() {
-    const [isFocused, setIsFocused] = useState(false)
+export function Searchbar(): JSX.Element {
+    const [isFocused, setIsFocused] = useState<boolean>(false)
     const [searchTerm] = useState<string>('')
-    const [selectedUser] = useState(null)
     const socket = useWebSocket() as WebSocketContextType
     const queryClient = useQueryClient() as QueryClient
 
@@ -46,12 +45,6 @@ export function Searchbar() {
             socket?.webSocket?.off('refreshSearchBar')
         }
     }, [socket])
-
-    useEffect(() => {
-        if (selectedUser) {
-            window.location.href = `/profile/${selectedUser}`
-        }
-    }, [selectedUser])
 
     return (
         <div className="relative ">
