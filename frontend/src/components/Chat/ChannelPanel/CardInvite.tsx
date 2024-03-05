@@ -52,7 +52,9 @@ const CardInvite: React.FC<CardInviteProps> = ({ onClose, channel }) => {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Card className="border-none shadow-none">
                     <CardHeader>
-                        <CardTitle>Invite to channel</CardTitle>
+                        <CardTitle className="text-xl">
+                            Invite to channel
+                        </CardTitle>
                         <CardDescription>
                             Enter noot's name to invite him in this channel.
                         </CardDescription>

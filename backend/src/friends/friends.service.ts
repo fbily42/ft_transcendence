@@ -1,11 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FriendData } from './types/friend.types';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class FriendsService {
 	constructor(
 		private prisma:PrismaService,
+		private userService: UserService
 	) {}
 
 	async getFriends(friendId: string) {
@@ -170,6 +172,10 @@ export class FriendsService {
 				accepted: true,
 			}
 		})
+
+		this.userService.addBadge(userId, "FIRST_FRIEND")
+		this.userService.addBadge(friendId, "FIRST_FRIEND")
+
 		return acceptFriend
 	}
 
