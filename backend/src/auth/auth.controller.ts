@@ -19,12 +19,12 @@ import { AuthGuard } from './auth.guard';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { OtpDto, UuidDto, TokenDto } from './auth.dto';
 import { User } from '@prisma/client';
-
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 type all_token = {
 	signedJwt: string;
 	signedrefreshToken: string;
-}
+};
 
 @Controller('auth')
 export class AuthController {
@@ -49,10 +49,7 @@ export class AuthController {
 			const { login, photo } = await this.authService.getUserLogin(token);
 
 			// Find if User exists, create if doesnt
-			const user: User = await this.authService.findUser(
-				login,
-				photo,
-			);
+			const user: User = await this.authService.findUser(login, photo);
 
 			if (user.otpEnabled && user.otpVerified) {
 				const uuid = await this.authService.setrequestUuid(user);
@@ -67,14 +64,12 @@ export class AuthController {
 			res.cookie('jwt', all_token.signedJwt, {
 				sameSite: 'strict',
 				httpOnly: true,
-				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
 			res.cookie('jwt_refresh', all_token.signedrefreshToken, {
 				sameSite: 'strict',
 				httpOnly: true,
-				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 			if (!user.avatar || !user.pseudo) {
@@ -241,21 +236,24 @@ export class AuthController {
 			res.cookie('jwt', tokens.signedJwt, {
 				sameSite: 'strict',
 				httpOnly: true,
-				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
 			res.cookie('jwt_refresh', tokens.signedrefreshToken, {
 				sameSite: 'strict',
 				httpOnly: true,
-				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
 			res.status(HttpStatus.ACCEPTED);
 			res.send({ message: '2FA token successfully validated' });
 		} catch (error) {
-			// throw error
+			if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
 			throw new HttpException(
 				'Internal server error',
 				HttpStatus.INTERNAL_SERVER_ERROR,
@@ -278,6 +276,12 @@ export class AuthController {
 				twoFAVerified: isTwoFAVerified,
 			});
 		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
 			throw new HttpException(
 				'Internal server error',
 				HttpStatus.INTERNAL_SERVER_ERROR,
@@ -294,6 +298,12 @@ export class AuthController {
 				message: '2FA successfully disabled',
 			});
 		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
 			throw new HttpException(
 				'Internal server error',
 				HttpStatus.INTERNAL_SERVER_ERROR,
@@ -319,6 +329,12 @@ export class AuthController {
 				message: '2FA successfully enabled',
 			});
 		} catch (error) {
+			if (error instanceof PrismaClientKnownRequestError) {
+				throw new HttpException(
+					`Prisma error : ${error.code}`,
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
 			throw new HttpException(
 				'Internal server error',
 				HttpStatus.INTERNAL_SERVER_ERROR,
@@ -332,14 +348,12 @@ export class AuthController {
 			const token_refresh = req.cookies['jwt_refresh'] as string;
 			res.clearCookie('jwt', { path: '/' });
 
-			const signNewToken: string = await this.authService.refreshTheToken(
-				token_refresh
-			);
+			const signNewToken: string =
+				await this.authService.refreshTheToken(token_refresh);
 			res.cookie('jwt', signNewToken, {
 				path: '/',
 				sameSite: 'strict',
 				httpOnly: true,
-				// secure : true,
 				domain: process.env.FRONTEND_DOMAIN,
 			});
 
@@ -350,13 +364,10 @@ export class AuthController {
 	}
 
 	@Put('logout')
-	// @UseGuards(AuthGuard)
 	async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
 		try {
 			const jwt_refresh = req.cookies['jwt_refresh'] as string;
-			//supprimer le cookie
 
-			//gerer la mise a jour de mon token
 			res.clearCookie('jwt', { path: '/' });
 			res.clearCookie('jwt_refresh', { path: '/' });
 			await this.authService.deleteTokens(jwt_refresh);
@@ -366,10 +377,3 @@ export class AuthController {
 		}
 	}
 }
-/*
-
-To find Cookie in Chrome :
-
-	Inspect (F12) -> Appplication -> Cookies
-
-*/

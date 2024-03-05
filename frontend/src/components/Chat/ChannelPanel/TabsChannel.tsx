@@ -1,11 +1,7 @@
-import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CardCreate from './CardCreate'
 import CardJoin from './CardJoin'
-
-interface TabsChannelProps {
-    onClose: () => void
-}
+import { TabsChannelProps } from '@/lib/Chat/chat.types'
 
 function TabsChannel({ onClose }: TabsChannelProps) {
     return (

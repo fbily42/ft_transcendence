@@ -1,5 +1,5 @@
 import { InviteFormValues } from '@/lib/Chat/chat.types'
-import { useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useQueryClient } from '@tanstack/react-query'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { Socket, io } from 'socket.io-client'
@@ -29,9 +29,8 @@ export const useWebSocket = () => useContext(WebSocketContext)
 export const WebSocketProvider: React.FC = () => {
     const [webSocket, setWebSocket] = useState<Socket | null>(null)
     const [usersOn, setUsersOn] = useState(new Map<string, string[]>())
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient() as QueryClient
     const navigate = useNavigate()
-    const socket = useWebSocket()
 
     useEffect(() => {
         const ws: Socket = io(`${import.meta.env.VITE_WSCHAT_URL}`, {
@@ -41,7 +40,7 @@ export const WebSocketProvider: React.FC = () => {
 
         ws?.on('channelInvite', (invite: InviteFormValues) => {
             toast(
-                `You have been invite to ${invite.channel} by ${invite.sentBy}`,
+                `You have been invited to ${invite.channel} by ${invite.sentBy}`,
                 {
                     action: {
                         label: 'Go to chat window',
@@ -51,15 +50,15 @@ export const WebSocketProvider: React.FC = () => {
             )
         })
         ws?.on('GameInvitation', (data) => {
-            toast(`You have been invite to a game against ${data.friend}`, {
+            toast(`You have been invited to a game against ${data.friend}`, {
                 action: {
                     label: 'Accept',
                     onClick: () =>
                         ws?.emit('AcceptInvitation', {
                             friend: data.friend,
                             roomId: data.roomId,
-							level: data.level, 
-							map: data.map,
+                            level: data.level,
+                            map: data.map,
                         }),
                 },
                 duration: 5000,
@@ -69,7 +68,6 @@ export const WebSocketProvider: React.FC = () => {
                         roomId: data.roomId,
                     })
                 },
-				
             })
         })
 
@@ -106,11 +104,11 @@ export const WebSocketProvider: React.FC = () => {
         })
 
         ws?.on('setAdmin', (channel: string) => {
-            toast(`You have been promote to administrator on ${channel}.`)
+            toast(`You have been promoted to administrator on ${channel}.`)
         })
 
         ws?.on('setMember', (channel: string) => {
-            toast(`You have been demote to member on ${channel}.`)
+            toast(`You have been demoted to member on ${channel}.`)
         })
 
         ws?.on('muted', (channel: string) => {
@@ -122,7 +120,7 @@ export const WebSocketProvider: React.FC = () => {
         })
 
         ws?.on('newOwner', (channel: string) => {
-            toast(`You have been promote to owner in ${channel}`)
+            toast(`You have been promoted to owner in ${channel}`)
         })
 
         ws?.on('refreshFriendlist', () => {

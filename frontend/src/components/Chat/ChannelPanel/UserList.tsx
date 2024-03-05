@@ -1,6 +1,6 @@
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { getChannelUsers } from '@/lib/Chat/chat.requests'
-import { UserInChannel } from '@/lib/Chat/chat.types'
+import { UserInChannel, UserListProps } from '@/lib/Chat/chat.types'
 import { getMyrole, getRole, getUserStatus } from '@/lib/Chat/chat.utils'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
@@ -8,10 +8,6 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useEffect } from 'react'
 import CardChannelUser from './CardChannelUser'
 import { useNavigate } from 'react-router-dom'
-
-interface UserListProps {
-    channel: string
-}
 
 const UserList: React.FC<UserListProps> = ({ channel }) => {
     const socket = useWebSocket() as WebSocketContextType

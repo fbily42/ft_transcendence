@@ -589,7 +589,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelKick')
-	async channelKick(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+	async channelKick(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const kickedUser = await this.chatService.kickUser(cmd)
 			if (kickedUser) {
@@ -618,7 +618,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelBan')
-	async channelBan(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+	async channelBan(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const bannedUser = await this.chatService.banUser(cmd)
 			if (bannedUser){
@@ -647,7 +647,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelUnban')
-	async channelUnban(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+	async channelUnban(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const unbanUser = await this.chatService.unbanUser(cmd)
 			if (unbanUser) {

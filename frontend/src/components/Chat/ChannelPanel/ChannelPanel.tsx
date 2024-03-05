@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import React, { useEffect, useState } from 'react'
 import TabsChannel from './TabsChannel'
 import { getChannels } from '@/lib/Chat/chat.requests'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Share } from 'lucide-react'
 import UserList from './UserList'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
@@ -11,15 +11,10 @@ import { getDirectName } from '@/lib/Chat/chat.utils'
 import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useNavigate } from 'react-router-dom'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
-import { Channel } from '@/lib/Chat/chat.types'
+import { Channel, ChannelPanelProps } from '@/lib/Chat/chat.types'
 import CardChannel from './CardChannel'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import Floe from '../../../assets/other/mountain.svg'
-
-interface ChannelPanelProps {
-    setCurrentChannel: React.Dispatch<React.SetStateAction<string>>
-    currentChannel: string
-}
 
 const ChannelPanel: React.FC<ChannelPanelProps> = ({
     setCurrentChannel,
@@ -29,7 +24,7 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
     const [open, setOpen] = useState<boolean>(false)
     const [open2, setOpen2] = useState<boolean>(false)
     const [hide, setHide] = useState<boolean>(true)
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient() as QueryClient
     const socket = useWebSocket() as WebSocketContextType
 
     const { data: channels, error: channelError } = useQuery<Channel[]>({

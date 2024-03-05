@@ -9,18 +9,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
 import PinguAvatar from '../../../assets/empty-state/pingu-face.svg'
 import DropdownChannelUser from './DropdownChannelUser'
 import { getAvatarBorderColor, getTextColor } from '@/lib/Chat/chat.utils'
+import { CardChannelUserProps } from '@/lib/Chat/chat.types'
 
-interface CardChannelUser {
-    targetPseudo: string
-    targetId: string
-    targetPicture: string
-    targetName: string
-    targetRole: string
-    userRole: string
-    channel: string
-}
-
-const CardChannelUser: React.FC<CardChannelUser> = ({
+const CardChannelUser: React.FC<CardChannelUserProps> = ({
     targetPseudo,
     targetId,
     targetName,
