@@ -10,7 +10,7 @@ import PinguFamily from '../../../assets/empty-state/pingu-family.svg'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import DropdownChannel from './DropdownChannel'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { UserInChannel } from '@/lib/Chat/chat.types'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
@@ -30,7 +30,7 @@ const CardChannel: React.FC<CardChannel> = ({
     bgColor,
 }) => {
     const socket = useWebSocket() as WebSocketContextType
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient() as QueryClient
     const navigate = useNavigate()
 
     const { data: users, error: usersError } = useQuery<UserInChannel[]>({

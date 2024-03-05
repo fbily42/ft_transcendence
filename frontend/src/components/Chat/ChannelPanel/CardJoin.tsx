@@ -11,21 +11,21 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from 'react-hook-form'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { JoinChannelProps, JoinFormValues } from '@/lib/Chat/chat.types'
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+    CardJoinProps,
+    JoinChannelProps,
+    JoinFormValues,
+} from '@/lib/Chat/chat.types'
 import { joinChannel } from '@/lib/Chat/chat.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import ChatCard from '../../../assets/other/chat-modal.svg'
-
-interface CardJoinProps {
-    onClose: () => void
-}
 
 function CardJoin({ onClose }: CardJoinProps) {
     const { register, handleSubmit } = useForm<JoinFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
     const socket = useWebSocket() as WebSocketContextType
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient() as QueryClient
     const mutation = useMutation({
         mutationFn: (data: JoinChannelProps) =>
             joinChannel(data.data, data.setErrorMessage, data.onClose),
