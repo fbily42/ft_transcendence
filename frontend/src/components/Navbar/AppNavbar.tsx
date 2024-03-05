@@ -12,6 +12,8 @@ import {
 import axios from 'axios'
 import GameForm from '../Pong/GameForm'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+// import Logo from "../../assets/favicon/logo.png"
+import Logo from "../../../public/pingu.png"
 
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
@@ -82,10 +84,10 @@ const VerticalNavbar: React.FC = () => {
             <div className="flex flex-col justify-between h-full">
                 <Link
                     to="/"
-                    className="text-black font-bold text-lg"
+                    className="text-black font-bold text-lg pr-4"
                     onClick={() => handleNavTabs(1)}
                 >
-                    Pingu
+                    <img src={Logo} alt="logo"/>
                 </Link>
                 <div className="flex flex-col items-start gap-[33px]">
                     <Link to="/" className="text-black">

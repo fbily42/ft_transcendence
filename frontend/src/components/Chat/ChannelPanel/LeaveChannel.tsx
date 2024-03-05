@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
-import { LeaveChannelData, UserInChannel } from '@/lib/Chat/chat.types'
+import {
+    LeaveChannelData,
+    LeaveChannelProps,
+    UserInChannel,
+} from '@/lib/Chat/chat.types'
 import PinguFlag from '../../../assets/other/PinguFlag.svg'
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import {
@@ -15,11 +19,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getChannelUsers, leaveChannel } from '@/lib/Chat/chat.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import { DialogClose } from '@radix-ui/react-dialog'
-
-type LeaveChannelProps = {
-    cmd: LeaveChannelData
-    variant: 'Owner' | 'Other'
-}
 
 const LeaveChannel: React.FC<LeaveChannelProps> = ({ cmd, variant }) => {
     const { data: users } = useQuery<UserInChannel[]>({

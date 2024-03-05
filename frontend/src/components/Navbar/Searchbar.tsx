@@ -7,16 +7,18 @@ import {
     CommandList,
 } from '@/components/ui/command'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { getUserMe, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { Link } from 'react-router-dom'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
-export function Searchbar() {
-    const [isFocused, setIsFocused] = useState(false)
+export function Searchbar(): JSX.Element {
+    const [isFocused, setIsFocused] = useState<boolean>(false)
     const [searchTerm] = useState<string>('')
-    const [selectedUser] = useState(null)
+    const socket = useWebSocket() as WebSocketContextType
+    const queryClient = useQueryClient() as QueryClient
 
     const { data: users } = useQuery<UserData[]>({
         queryKey: ['users'],
@@ -35,10 +37,14 @@ export function Searchbar() {
     })
 
     useEffect(() => {
-        if (selectedUser) {
-            window.location.href = `/profile/${selectedUser}`
+        socket?.webSocket?.on('refreshSearchBar', () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+        })
+
+        return () => {
+            socket?.webSocket?.off('refreshSearchBar')
         }
-    }, [selectedUser])
+    }, [socket])
 
     return (
         <div className="relative ">

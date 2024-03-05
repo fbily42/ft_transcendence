@@ -11,20 +11,20 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useForm } from 'react-hook-form'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateChannelProps, CreateFormValues } from '@/lib/Chat/chat.types'
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+    CardCreateProps,
+    CreateChannelProps,
+    CreateFormValues,
+} from '@/lib/Chat/chat.types'
 import { createChannel } from '@/lib/Chat/chat.requests'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 import ChatCard from '../../../assets/other/chat-modal.svg'
 
-interface CardCreateProps {
-    onClose: () => void
-}
-
 function CardCreate({ onClose }: CardCreateProps) {
     const { register, handleSubmit } = useForm<CreateFormValues>()
     const [errorMessage, setErrorMessage] = useState<string>('')
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient() as QueryClient
     const socket = useWebSocket() as WebSocketContextType
     const mutation = useMutation({
         mutationFn: (data: CreateChannelProps) =>

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
+import { AppGateway } from 'src/app.gateway';
 
 @Injectable({})
 export class UploadsService {

@@ -1,17 +1,15 @@
-import { Message } from '@/lib/Chat/chat.types'
+import { SelfMessageProps } from '@/lib/Chat/chat.types'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import React from 'react'
 import { format } from 'date-fns'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import { getAvatarBorderColor, getMessageBgColor } from '@/lib/Chat/chat.utils'
 
-interface MessageProps {
-    message: Message
-    picture: string
-    role: string
-}
-
-const SelfMessage: React.FC<MessageProps> = ({ message, picture, role }) => {
+const SelfMessage: React.FC<SelfMessageProps> = ({
+    message,
+    picture,
+    role,
+}) => {
     const formattedDate = format(message.sentAt, 'hh:mm a')
     return (
         <div id="full-div" className="flex justify-end w-full">

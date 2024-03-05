@@ -4,13 +4,13 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronsUp, Crown, Frown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-export default function MyUserStatsCard() {
+export default function MyUserStatsCard(): JSX.Element {
     const { data: me } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
 
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)

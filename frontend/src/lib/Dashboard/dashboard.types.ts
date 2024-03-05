@@ -21,7 +21,7 @@ export type UserData = {
 	avatar: string;
 	pseudo: string;
   looses: number;
-	blocked: string
+	blocked: string[];
   chosenBadge: AchievementType;
   allBadges: AchievementType[];
 }

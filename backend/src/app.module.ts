@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { FriendsModule } from './friends/friends.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
 	imports: [
@@ -19,5 +20,6 @@ import { FriendsModule } from './friends/friends.module';
 		UploadsModule,
 		FriendsModule,
 	],
+	providers: [AppGateway],
 })
 export class AppModule {}

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import UserCards from '../User/userCards/UserCards'
 import PinguAvatar from '../../assets/empty-state/pingu-face.svg'
 
-export default function FriendRequest() {
+export default function FriendRequest(): JSX.Element {
     const { data: friendRequest } = useQuery<FriendData[]>({
         queryKey: ['request'],
         queryFn: getFriendRequest,

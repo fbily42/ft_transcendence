@@ -11,12 +11,14 @@ import { ChevronsUp, Crown, Gamepad2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import GameForm from '@/components/Pong/GameForm'
 import { useState } from 'react'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 function Dashboard(): JSX.Element {
     const { data } = useQuery<UserData>({
         queryKey: ['me'],
         queryFn: getUserMe,
     })
+    const socket = useWebSocket() as WebSocketContextType
     const CloudsArray = new Array(10).fill(Clouds)
     const MountainsArray = new Array(10).fill(Mountains)
 	const [open, setOpen] = useState<boolean>(false)
@@ -24,6 +26,7 @@ function Dashboard(): JSX.Element {
         setOpen(false)
     }
 
+    socket?.webSocket?.emit('refreshSearchBar')
     return (
         <>
             <div
@@ -61,7 +64,7 @@ function Dashboard(): JSX.Element {
                                 </h1>
                                 <Dialog open={open} onOpenChange={setOpen}>
                                     <DialogTrigger asChild>
-                                        <Button className="bg-customYellow">
+                                        <Button className="bg-customYellow hover:bg-customBlue hover:text-customDarkBlue">
                                             Start a Game
                                         </Button>
                                     </DialogTrigger>

@@ -29,8 +29,8 @@ import {
 import { block, directMessage, unblock } from '@/lib/Chat/chat.requests'
 import { CmdData } from '@/lib/Chat/chat.types'
 
-export default function OtherActionsBtns() {
-    const param = useParams()
+export default function OtherActionsBtns(): JSX.Element {
+    const param = useParams<string>()
     const { data: friendRequest } = useQuery<FriendData[]>({
         queryKey: ['request'],
         queryFn: getFriendRequest,
@@ -96,27 +96,78 @@ export default function OtherActionsBtns() {
         },
     })
 
-    const isFriend = friends?.some((friend) => friend.id === param.id)
-    const isPending = friendInvites?.some((invite) => invite.id === param.id)
-    const isRequested = friendRequest?.some(
+    const isFriend: boolean | undefined = friends?.some((friend) => friend.id === param.id)
+    const isPending: boolean | undefined = friendInvites?.some((invite) => invite.id === param.id)
+    const isRequested: boolean | undefined = friendRequest?.some(
         (request) => request.id === param.id
     )
-
     return (
         <div>
             {!isFriend && !isPending && !isRequested && (
-                <div>
+                <div className="w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar">
                     <Button
-                        className="w-full"
+                        className="w-full bg-green-500 hover:bg-green-500/80"
                         onClick={() => addNewFriendMutation.mutate(param.id!)}
                     >
                         Add Friend
                     </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="w-full" variant="default">
+                                Actions
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-fit ">
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        directMessage(user?.name!, socket)
+                                    }
+                                >
+                                    Send PM
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    Play PinguPong
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                {me?.blocked?.includes(user?.name!) ? (
+                                    <DropdownMenuItem
+                                        className="w-full"
+                                        onClick={() => {
+                                            unblock(cmdData, queryClient)
+                                        }}
+                                    >
+                                        Unblock
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem
+                                        className="w-full"
+                                        onClick={() => {
+                                            block(cmdData, queryClient)
+                                        }}
+                                    >
+                                        Block
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             )}
             {isFriend && (
                 <>
                     <div className="w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar">
+                        <Button
+                            className="w-full"
+                            variant={'destructive'}
+                            onClick={() =>
+                                removeFriendMutation.mutate(param.id!)
+                            }
+                        >
+                            Remove
+                        </Button>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button className="w-full" variant="default">
@@ -160,33 +211,110 @@ export default function OtherActionsBtns() {
                                 </DropdownMenuGroup>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        <Button
-                            className="w-full"
-                            variant={'destructive'}
-                            onClick={() =>
-                                removeFriendMutation.mutate(param.id!)
-                            }
-                        >
-                            Remove
-                        </Button>
                     </div>
                 </>
             )}
             {isPending && !isFriend && (
-                <div>
+                <div className="w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar">
                     <Button className="w-full" variant={'outline'}>
                         Pending Invitation
                     </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="w-full" variant="default">
+                                Actions
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-fit ">
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        directMessage(user?.name!, socket)
+                                    }
+                                >
+                                    Send PM
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    Play PinguPong
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                {me?.blocked?.includes(user?.name!) ? (
+                                    <DropdownMenuItem
+                                        className="w-full"
+                                        onClick={() => {
+                                            unblock(cmdData, queryClient)
+                                        }}
+                                    >
+                                        Unblock
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem
+                                        className="w-full"
+                                        onClick={() => {
+                                            block(cmdData, queryClient)
+                                        }}
+                                    >
+                                        Block
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             )}
             {isRequested && !isFriend && (
-                <div>
+                <div className="w-full flex gap-[12px] md:gap-[8px] lg:gap-[26px] no-scrollbar">
                     <Button
-                        className="w-full"
+                        className="w-full bg-green-500 hover:bg-green-500/80"
                         onClick={() => acceptFriendMutation.mutate(param.id!)}
                     >
                         Accept Friendship
                     </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="w-full" variant="default">
+                                Actions
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-fit ">
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        directMessage(user?.name!, socket)
+                                    }
+                                >
+                                    Send PM
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    Play PinguPong
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                {me?.blocked?.includes(user?.name!) ? (
+                                    <DropdownMenuItem
+                                        className="w-full"
+                                        onClick={() => {
+                                            unblock(cmdData, queryClient)
+                                        }}
+                                    >
+                                        Unblock
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem
+                                        className="w-full"
+                                        onClick={() => {
+                                            block(cmdData, queryClient)
+                                        }}
+                                    >
+                                        Block
+                                    </DropdownMenuItem>
+                                )}
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             )}
         </div>

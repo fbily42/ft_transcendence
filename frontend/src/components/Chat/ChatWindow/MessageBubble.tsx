@@ -1,4 +1,4 @@
-import { Message } from '@/lib/Chat/chat.types'
+import { MessageBubbleProps } from '@/lib/Chat/chat.types'
 import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import React from 'react'
 import { format } from 'date-fns'
@@ -8,15 +8,7 @@ import {
     getMessageBorderColor,
 } from '@/lib/Chat/chat.utils'
 
-interface MessageProps {
-    pseudo: string
-    message: Message
-    picture: string
-    role: string
-    blocked: boolean
-}
-
-const MessageBubble: React.FC<MessageProps> = ({
+const MessageBubble: React.FC<MessageBubbleProps> = ({
     pseudo,
     message,
     picture,

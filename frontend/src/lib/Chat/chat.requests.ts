@@ -1,25 +1,36 @@
-import axios from "axios";
-import { Channel, CmdData, CreateFormValues, JoinFormValues, LeaveChannelData, Message, PasswordCmd, UserInChannel } from "./chat.types";
-import { Dispatch, SetStateAction } from "react";
-import { WebSocketContextType } from "@/context/webSocketContext";
-import { QueryClient } from "@tanstack/react-query";
+import axios from 'axios'
+import {
+    Channel,
+    CmdData,
+    CreateFormValues,
+    JoinFormValues,
+    LeaveChannelData,
+    Message,
+    UserInChannel,
+} from './chat.types'
+import { Dispatch, SetStateAction } from 'react'
+import { WebSocketContextType } from '@/context/webSocketContext'
+import { QueryClient } from '@tanstack/react-query'
 
 export async function getChannels(): Promise<Channel[]> {
-	try {
-		const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,{
-			withCredentials: true,
-		})
-		return response.data
-	} catch (error) {
-		throw error
-	}
-};
+    try {
+        const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/all`,
+            {
+                withCredentials: true,
+            }
+        )
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
 
 export async function createChannel(
     data: CreateFormValues,
     setErrorMessage: Dispatch<SetStateAction<string>>,
     onClose: () => void
-) : Promise<void> {
+): Promise<void> {
     try {
         const response = await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/chat/add`,
@@ -36,29 +47,28 @@ export async function createChannel(
 }
 
 export async function joinChannel(
-	data: JoinFormValues,
-	setErrorMessage: Dispatch<SetStateAction<string>>,
-	onClose: () => void
-) : Promise<void> {
-	try {
-		const response = await axios.post(
-			`${import.meta.env.VITE_BACKEND_URL}/chat/join`,
-			data,
-			{
-				withCredentials: true,
-			}
-		)
-		onClose()
-	} catch (error: any) {
-		setErrorMessage(error.response.data.message)
-		throw error
-	}
+    data: JoinFormValues,
+    setErrorMessage: Dispatch<SetStateAction<string>>,
+    onClose: () => void
+): Promise<void> {
+    try {
+        const response = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/chat/join`,
+            data,
+            {
+                withCredentials: true,
+            }
+        )
+        onClose()
+    } catch (error: any) {
+        setErrorMessage(error.response.data.message)
+        throw error
+    }
 }
 
 export async function getChannelUsers(name: string): Promise<UserInChannel[]> {
     try {
-		if (!name)
-			throw new Error('No channel name')
+        if (!name) throw new Error('No channel name')
         const response = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/chat/channel/users/${name}`,
             {
@@ -73,8 +83,7 @@ export async function getChannelUsers(name: string): Promise<UserInChannel[]> {
 
 export async function getMessages(name: string): Promise<Message[]> {
     try {
-		if (!name)
-			throw new Error('No channel name')
+        if (!name) throw new Error('No channel name')
         const response = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/chat/channel/messages/${name}`,
             {
@@ -115,40 +124,45 @@ export function unmute(data: CmdData, socket: WebSocketContextType) {
     socket?.webSocket?.emit('channelUnmute', data)
 }
 
-export function leaveChannel(cmd: LeaveChannelData, socket: WebSocketContextType) {
-	socket?.webSocket?.emit('quitChannel', cmd)
+export function leaveChannel(
+    cmd: LeaveChannelData,
+    socket: WebSocketContextType
+) {
+    socket?.webSocket?.emit('quitChannel', cmd)
 }
 
 export function directMessage(name: string, socket: WebSocketContextType) {
-	socket.webSocket?.emit('privateMessage', name)
+    socket.webSocket?.emit('privateMessage', name)
 }
 
 export async function block(cmd: CmdData, queryClient: QueryClient) {
-	try {
-		const response = await axios.patch(
-            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/block`, cmd,
+    try {
+        const response = await axios.patch(
+            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/block`,
+            cmd,
             {
                 withCredentials: true,
             }
         )
-		queryClient.invalidateQueries({ queryKey: ['me'] })
+        queryClient.invalidateQueries({ queryKey: ['me'] })
         return response.data
-	} catch (error) {
-		throw error
-	}
+    } catch (error) {
+        throw error
+    }
 }
 
 export async function unblock(cmd: CmdData, queryClient: QueryClient) {
-	try {
-		const response = await axios.patch(
-            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/unblock`, cmd,
+    try {
+        const response = await axios.patch(
+            `${import.meta.env.VITE_BACKEND_URL}/chat/channel/unblock`,
+            cmd,
             {
                 withCredentials: true,
             }
         )
-		queryClient.invalidateQueries({ queryKey: ['me'] })
+        queryClient.invalidateQueries({ queryKey: ['me'] })
         return response.data
-	} catch (error) {
-		throw error
-	}
+    } catch (error) {
+        throw error
+    }
 }

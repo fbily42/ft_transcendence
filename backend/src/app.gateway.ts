@@ -30,8 +30,7 @@ import { quitCmdDto } from './chat/dto/quitCmd.dto';
 	},
 	transports: ['websocket', 'polling'],
 	})
-	  
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	@WebSocketServer()
 	server: Server;
@@ -93,6 +92,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.clients.delete(client.data.userName)
 		}
 		this.server.emit("users", this.getClientsAsArray())
+	}
+
+	@SubscribeMessage('refreshSearchBar')
+	refreshSearchBar() {
+		this.server.emit('refreshSearchBar')
 	}
 
 	@SubscribeMessage('messageToRoom')
@@ -619,7 +623,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelKick')
-	async channelKick(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+	async channelKick(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const kickedUser = await this.chatService.kickUser(cmd)
 			if (kickedUser) {
@@ -648,7 +652,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelBan')
-	async channelBan(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+	async channelBan(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const bannedUser = await this.chatService.banUser(cmd)
 			if (bannedUser){
@@ -677,7 +681,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('channelUnban')
-	async channelUnban(@ConnectedSocket() client: Socket, @MessageBody() cmd: ChannelCmdDto) {
+	async channelUnban(@MessageBody() cmd: ChannelCmdDto) {
 		try {
 			const unbanUser = await this.chatService.unbanUser(cmd)
 			if (unbanUser) {

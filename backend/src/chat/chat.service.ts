@@ -18,7 +18,10 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChatService {
-	constructor(private prisma: PrismaService, private userService: UserService) {}
+	constructor(
+		private prisma: PrismaService,
+		private userService: UserService,
+	) {}
 
 	async createChannel(userId: string, dto: NewChannelDto): Promise<string> {
 		try {
@@ -38,7 +41,7 @@ export class ChatService {
 					owner: true,
 				},
 			});
-			this.userService.addBadge(userId, 'FIRST_CHANNEL')
+			this.userService.addBadge(userId, 'FIRST_CHANNEL');
 			return channel.name;
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -276,10 +279,10 @@ export class ChatService {
 				where: {
 					pseudo: dto.name,
 				},
-				select:{
-					id:true,
-					name:true,
-				}
+				select: {
+					id: true,
+					name: true,
+				},
 			});
 			if (!user)
 				throw new HttpException(
@@ -826,7 +829,7 @@ export class ChatService {
 					'You are not authorized to change the password',
 					HttpStatus.BAD_REQUEST,
 				);
-			const hash = await argon.hash(dto.newPassword)
+			const hash = await argon.hash(dto.newPassword);
 			const updatedChannel = await this.prisma.channel.update({
 				where: {
 					id: channel.id,
@@ -836,9 +839,9 @@ export class ChatService {
 				},
 				select: {
 					name: true,
-				}
-			})
-			return updatedChannel
+				},
+			});
+			return updatedChannel;
 		} catch (error) {
 			if (error instanceof HttpException) throw error;
 			else if (error instanceof PrismaClientKnownRequestError)
@@ -853,20 +856,19 @@ export class ChatService {
 		}
 	}
 
-	async addGameInfo(roomInfo : RoomInfo[], gameStats: GameStats)
-	{
-		try{
+	async addGameInfo(roomInfo: RoomInfo[], gameStats: GameStats) {
+		try {
 			const game = await this.prisma.game.create({
 				data: {
-					userName : roomInfo[0].id,
+					userName: roomInfo[0].id,
 					opponentName: roomInfo[1].id,
 					userScore: gameStats.gameStatus.scoreOne,
 					opponentScore: gameStats.gameStatus.scoreTwo,
-				}
-			})
-		}
-		catch(error)
-		{
+				},
+			});
+			this.userService.addBadge(roomInfo[0].uuid, 'FIRST_GAME');
+			this.userService.addBadge(roomInfo[1].uuid, 'FIRST_GAME');
+		} catch (error) {
 			if (error instanceof HttpException) throw error;
 			else if (error instanceof PrismaClientKnownRequestError)
 				throw new HttpException(
@@ -880,19 +882,18 @@ export class ChatService {
 		}
 	}
 
-	async updateUserStat(roomInfo : RoomInfo[], gameStats : GameStats)
-	{
-		try{
+	async updateUserStat(roomInfo: RoomInfo[], gameStats: GameStats) {
+		try {
 			const winner = await this.prisma.user.findUnique({
 				where: {
-						name: gameStats.gameStatus.winner,
-				}
-			})
+					name: gameStats.gameStatus.winner,
+				},
+			});
 			const looser = await this.prisma.user.findUnique({
 				where: {
-						name: gameStats.gameStatus.looser,
-				}
-			})
+					name: gameStats.gameStatus.looser,
+				},
+			});
 
 			winner.games += 1;
 			winner.wins += 1;
@@ -901,37 +902,31 @@ export class ChatService {
 			looser.looses += 1;
 			if (gameStats.gameStatus.scoreOne < gameStats.gameStatus.scoreTwo)
 				looser.score += gameStats.gameStatus.scoreOne;
-			else
-				looser.score += gameStats.gameStatus.scoreTwo;
+			else looser.score += gameStats.gameStatus.scoreTwo;
 
+			this.userService.addBadge(winner.id, 'FIRST_WIN');
 			await this.prisma.user.update({
-				where:  {
+				where: {
 					id: winner.id,
 				},
-				data:
-				{
+				data: {
 					games: winner.games,
 					wins: winner.wins,
 					score: winner.score,
-
-				}
-			})
+				},
+			});
 			await this.prisma.user.update({
-				where:  {
+				where: {
 					id: looser.id,
 				},
-				data:
-				{
+				data: {
 					games: looser.games,
 					looses: looser.looses,
 					score: looser.score,
-					
-				}
-			})
-			await this.updateRank()
-		}
-		catch(error)
-		{
+				},
+			});
+			await this.updateRank();
+		} catch (error) {
 			if (error instanceof HttpException) throw error;
 			else if (error instanceof PrismaClientKnownRequestError)
 				throw new HttpException(
@@ -950,8 +945,8 @@ export class ChatService {
 			const users = await this.prisma.user.findMany({
 				orderBy: {
 					score: 'desc',
-				}
-			})
+				},
+			});
 			const updates = users.map((user, index) => {
 				return this.prisma.user.update({
 					where: { id: user.id },
@@ -966,8 +961,8 @@ export class ChatService {
 					HttpStatus.INTERNAL_SERVER_ERROR,
 				);
 			throw new HttpException(
-			'Internal server error',
-			HttpStatus.INTERNAL_SERVER_ERROR,
+				'Internal server error',
+				HttpStatus.INTERNAL_SERVER_ERROR,
 			);
 		}
 	}

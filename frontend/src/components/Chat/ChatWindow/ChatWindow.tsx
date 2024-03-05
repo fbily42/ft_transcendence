@@ -16,17 +16,7 @@ import Pingu from '../../../assets/empty-state/pingu-face.svg'
 import { getRole } from '@/lib/Chat/chat.utils'
 import { useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-
-type MessageFormValues = {
-    userId: string
-    userName: string
-    target: string
-    message: string
-}
-
-interface ChatWindowProps {
-    currentChannel: string
-}
+import { ChatWindowProps, MessageFormValues } from '@/lib/Chat/chat.types'
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
     const [open, setOpen] = useState<boolean>(false)
@@ -79,7 +69,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
         data.target = currentChannel
         data.userName = me?.name!
         data.userId = me?.id!
-        socket.webSocket?.emit('messageToRoom', data)
+        socket?.webSocket?.emit('messageToRoom', data)
         reset({ message: '' })
     }
 
@@ -139,7 +129,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ currentChannel }) => {
                                     picture={getAvatar(message.sentByName)}
                                     role={getSenderRole(message.sentByName)}
                                     blocked={
-                                        me?.blocked.includes(
+                                        me?.blocked?.includes(
                                             message.sentByName
                                         )!
                                     }

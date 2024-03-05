@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { LeaveChannelData, PasswordCmd } from '@/lib/Chat/chat.types'
+import { CardPasswordProps, LeaveChannelData, PasswordCmd } from '@/lib/Chat/chat.types'
 import PinguFlag from '../../../assets/other/PinguFlag.svg'
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@radix-ui/react-dialog'
@@ -10,10 +10,6 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 
-type CardPasswordProps = {
-    channel: string
-    closeDialog: () => void
-}
 
 const CardPassword: React.FC<CardPasswordProps> = ({
     channel,

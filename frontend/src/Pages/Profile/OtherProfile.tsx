@@ -9,10 +9,12 @@ import FriendsList from '@/components/Profile/FriendsList'
 import OtherActionsBtns from '@/components/User/userActions/OtherActionsBtns'
 import OtherGameHistory from '@/components/Profile/OtherGameHistory/OtherGameHistory'
 import Seperator from '@/assets/other/Seperator.svg'
+import Mountain from '@/assets/other/mountain.svg'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
 
 function Profile() {
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 900)
-    const param = useParams()
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 900)
+    const param = useParams<string>()
     const navigate = useNavigate()
     const handleResize = () => {
         setIsMobile(window.innerWidth < 900)
@@ -25,7 +27,7 @@ function Profile() {
         }
     }, [])
 
-    const { data, isError, isLoading } = useQuery({
+    const { data, isError, isLoading } = useQuery<UserData>({
         queryKey: ['users', param.id],
         queryFn: () => getUserById(param.id!),
         retry: 0,
@@ -38,7 +40,7 @@ function Profile() {
     }, [isError, navigate])
 
     if (isLoading) {
-        return <div></div>
+        return <div>Loading...</div>
     }
 
     const selectedAvatar = data?.avatar
@@ -89,10 +91,22 @@ function Profile() {
                 id="User friends"
                 className={`${isMobile ? 'w-full' : 'w-[40%] sm:w-[40%] md:w-[30%] lg:w-[30%]'} ${isMobile ? 'h-fit' : 'h-full'} flex flex-col bg-white rounded-[26px] md:rounded-[30px] lg:rounded-[36px] shadow-drop`}
             >
-                <div className="bg-[#C1E2F7] flex justify-start items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px]">
+                <div className="bg-[#C1E2F7] relative flex justify-start items-center w-full h-[70px] px-[15px] sm:px-[15px] md:px-[20px] lg:px-[30px] py-[15px] sm:py-[15px] md:py-[15px] lg:py-[30px] rounded-t-[26px] md:rounded-t-[30px] lg:rounded-t-[36px] overflow-hidden">
                     <h1 className="flex justify-start items-center h-[31px] text-base sm:text-md md:text-lg lg:text-2xl font-semibold">
                         Noot Friends
                     </h1>
+                        <img
+                            src={Mountain}
+                            className="absolute -bottom-2 left-0"
+                        />
+                        <img
+                            src={Mountain}
+                            className="absolute -bottom-2 left-[310px]"
+                        />
+                        <img
+                            src={Mountain}
+                            className="absolute -bottom-2 left-[620px]"
+                        />
                 </div>
                 <FriendsList />
             </div>

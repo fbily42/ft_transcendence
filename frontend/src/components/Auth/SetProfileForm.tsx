@@ -11,6 +11,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SetProfileFormprops, ProfileFormProps } from '@/lib/Auth/auth.types'
 import { setProfileFn } from '@/lib/Auth/auth.request'
+import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
 
 const zodSchema = z.object({
     pseudo: z
@@ -41,6 +42,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
     const [selectedAvatar, setSelectedAvatar] = useState<string>(currentAvatar)
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
     const queryClient = useQueryClient()
+    const socket = useWebSocket() as WebSocketContextType
     const mutation = useMutation({
         mutationFn: (data: ProfileFormProps) =>
             setProfileFn(
@@ -53,6 +55,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
         onSuccess: (_, data) => {
             queryClient.invalidateQueries({ queryKey: ['me'] })
             queryClient.invalidateQueries({ queryKey: ['users'] })
+            socket?.webSocket?.emit('refreshSearchBar')
         },
     })
 
