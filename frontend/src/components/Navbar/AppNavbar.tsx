@@ -75,10 +75,9 @@ const VerticalNavbar: React.FC = () => {
             throw error
         }
     }
-
-    const closeDialog = () => {
-        setOpen(false)
-    }
+    // const closeDialog  = () => {
+    //     setOpen(false)
+    // }
     return (
         <nav className="fixed bg-white shadow-drop h-screen w-[86px] flex flex-col justify-center pl-[18px] py-[36px]">
             <div className="flex flex-col justify-between h-full">
@@ -129,7 +128,7 @@ const VerticalNavbar: React.FC = () => {
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
-                            <GameForm closeDialog={closeDialog}></GameForm>
+                            <GameForm handleClose={() => setOpen(false)} name={undefined}></GameForm>
                         </DialogContent>
                     </Dialog>
                     <Link to="/chat" className="text-black">

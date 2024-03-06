@@ -48,6 +48,7 @@ export type DropdownChannelUserProps = {
     targetName: string
     role: string
     targetRole: string
+	targetPseudo: string
     channel: string
 }
 

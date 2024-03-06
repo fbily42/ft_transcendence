@@ -38,6 +38,7 @@ const BasicGame: React.FC<BoardProps> = ({
 		queryFn: getUserMe,
 	})
 	
+	
 
     useEffect(() => {
         if (gameStatus === 'FINISH') {
@@ -71,8 +72,8 @@ const BasicGame: React.FC<BoardProps> = ({
             <canvas
                 id="canvas_pongBasic"
                 ref={canvasRef}
-                height={800}
-                width={800}
+                height={1000}
+                width={1200}
             />
             {gameStatus === 'FINISH' && (
                 <div className="h-screen w-screen fixed top-0 left-0 ">

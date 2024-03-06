@@ -1,4 +1,6 @@
+import GameForm from '@/components/Pong/GameForm'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,6 +25,7 @@ import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MoreHorizontal } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
@@ -30,9 +33,11 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
     targetName,
     role,
     targetRole,
+	targetPseudo,
     channel,
 }) => {
     const navigate = useNavigate()
+	const [openGame, setOpenGame] = useState<boolean>(false)
     const socket = useWebSocket() as WebSocketContextType
     const queryClient = useQueryClient() as QueryClient
     const { data: me } = useQuery<UserData>({
@@ -54,9 +59,22 @@ const DropdownChannelUser: React.FC<DropdownChannelUserProps> = ({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex flex-col gap-1">
-                <DropdownMenuItem className="w-full">
-                    Play Pingu
-                </DropdownMenuItem>
+                <Dialog open={openGame} onOpenChange={setOpenGame}>
+                    <DialogTrigger asChild>
+                        <DropdownMenuItem
+                            className="w-full"
+                            onSelect={(e) => e.preventDefault()}
+                        >
+                            Play PinguPong
+                        </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <GameForm
+                            handleClose={() => setOpenGame(false)}
+                            name={targetPseudo}
+                        ></GameForm>
+                    </DialogContent>
+                </Dialog>
                 <DropdownMenuItem
                     className="w-full"
                     onClick={() => {

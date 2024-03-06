@@ -46,6 +46,7 @@ const CardChannelUser: React.FC<CardChannelUserProps> = ({
                     <DropdownChannelUser
                         targetId={targetId}
                         targetName={targetName}
+						targetPseudo={targetPseudo}
                         role={userRole}
                         targetRole={targetRole}
                         channel={channel}
