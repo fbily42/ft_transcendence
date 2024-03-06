@@ -229,21 +229,26 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			for (let [key, value] of this.gamesRoom)
 			{
+				console.log("friend ", data.friend)
 
-				if(value[0]?.id === client.data.userName)
+				if(value[0]?.id === client.data.userName || value[0]?.id === data.friend)
 				{
+					console.log("here")
 
 					this.server.to(client.id).emit('JoinPartyFriend', 'InGame')
 					return ; 
 				}
-				if(value.length > 1 && value[1]?.id === client.data.userName)
+				console.log("deuxieme joueur",value[1]?.id)
+				if((value[1]?.id === client.data.userName || value[1]?.id === data.friend))
 				{
+					console.log("la")
 
 					this.server.to(client.id).emit('JoinPartyFriend', 'InGame')
 					return ;
 				}
 
 			}
+			
 			if(this.clients.has(data.friend))
 			{
 				this.gamesRoom.set(data.roomId, [{id: client.data.userName, websocket: client.id, matchmaking:false, uuid: client.data.userId}]);
