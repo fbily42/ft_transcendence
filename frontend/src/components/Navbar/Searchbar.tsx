@@ -13,6 +13,8 @@ import { getUserMe, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
 import { Link } from 'react-router-dom'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
+import { AvatarFallback } from '../ui/avatar'
+import PinguAvatar from '@/assets/empty-state/pingu-face.svg'
 
 export function Searchbar(): JSX.Element {
     const [isFocused, setIsFocused] = useState<boolean>(false)
@@ -79,6 +81,15 @@ export function Searchbar(): JSX.Element {
                                                             className="rounded-full object-cover w-[40px] h-[40px]"
                                                             src={user.avatar}
                                                         />
+                                                        <AvatarFallback>
+                                                            <img
+                                                                className="w-full h-full rounded-full object-cover"
+                                                                src={
+                                                                    PinguAvatar
+                                                                }
+                                                                alt="pingu"
+                                                            />
+                                                        </AvatarFallback>
                                                     </Avatar>
                                                     <span className="font-semibold">
                                                         {user.pseudo}

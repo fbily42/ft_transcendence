@@ -91,6 +91,7 @@ model Game {
     id        Int       @id @default(autoincrement())
     createdAt DateTime  @default(now())
     endAt     DateTime?
+	key		  String @unique
 
     userName String
     user   User   @relation(name: "userGames", fields: [userName], references: [name], onDelete: Cascade)

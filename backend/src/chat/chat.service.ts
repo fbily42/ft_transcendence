@@ -856,10 +856,11 @@ export class ChatService {
 		}
 	}
 
-	async addGameInfo(roomInfo: RoomInfo[], gameStats: GameStats) {
+	async addGameInfo(roomInfo: RoomInfo[], gameStats: GameStats, key: string) {
 		try {
 			const game = await this.prisma.game.create({
 				data: {
+					key: key,
 					userName: roomInfo[0].id,
 					opponentName: roomInfo[1].id,
 					userScore: gameStats.gameStatus.scoreOne,
@@ -897,7 +898,7 @@ export class ChatService {
 
 			winner.games += 1;
 			winner.wins += 1;
-			winner.score += 10;
+			winner.score += 11;
 			looser.games += 1;
 			looser.looses += 1;
 			if (gameStats.gameStatus.scoreOne < gameStats.gameStatus.scoreTwo)

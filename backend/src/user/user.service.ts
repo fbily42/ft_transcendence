@@ -154,6 +154,11 @@ export class UserService {
 	async getLeaderboard() {
 		try {
 			const leaderboardData = await this.prisma.user.findMany({
+				where: {
+					NOT: {
+						pseudo: null
+					}
+				},
 				orderBy: {
 					score: 'desc',
 				},
