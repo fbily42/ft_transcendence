@@ -18,7 +18,7 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
     env_file:
-      - ./backend/.env
+      - ./backend/.env.local
     volumes:
       - ./backend/:/app
     networks:
@@ -31,7 +31,7 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - ./backend/.env
+      - ./backend/.env.local
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
@@ -51,7 +51,7 @@ services:
     environment:
       WATCHPACK_POLLING: "true"
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.local
     volumes:
       - ./frontend/:/app
     networks:
