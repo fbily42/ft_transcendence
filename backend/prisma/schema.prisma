@@ -2,97 +2,131 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum AchievementType {
+    FIRST_FRIEND
+    FIRST_GAME
+    FIRST_CHANNEL
+    FIRST_WIN
 }
 
 model User {
-	id 			Int @id @default(autoincrement())
-	createdAt 	DateTime @default(now())
-	updateAt 	DateTime @updatedAt
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updateAt  DateTime @updatedAt
 
-	name		String @unique // 42 login
-	hash 		String
+    name    String  @unique // 42 login
+    pseudo  String? @unique
+    avatar  String?
+    photo42 String
 
-	tokenAuth 	String // peut etre optionnel si attribution apres creation
-	pseudo 		String? @unique
-	//friends 	User[]
-	//channels 	Channel[] @relation("channel_member")
-	channelsOwn	Channel[] @relation("channel_owner")
-	//channelsAdm	Channel[] @relation("channel_admins")
-	//channelBan
-	//channelInvit
-	//channelMute
-	status 		String
-	//history	Game[]
-	nb_win		Int @default(0)
-	nb_loose	Int @default(0) 
-	nb_game		Int @default(0)
-	total_point	Int @default(0)
-	level		Int @default(0)
-	rank		Int @default(0)
-	//avatar		String //Voir methode stockage ? photo ou url ?
-	twoFA			Boolean  @default(false)
-	//notifs		String []
-	messages	Message[]
+    //Auth
+    jwt          String[]
+    banJwt       String[]
+    refreshToken String?
+
+    //2FA
+    otpEnabled  Boolean @default(false)
+    otpVerified Boolean @default(false)
+    otpSecret   String?
+    otpUrl      String?
+    requestUuid String? @unique
+
+    channels ChannelUser[]
+    messages Message[]
+
+    wins   Int @default(0)
+    looses Int @default(0)
+    games  Int @default(0)
+    score  Int @default(0)
+    rank   Int @default(0)
+
+    chosenBadge AchievementType?
+    allBadges   AchievementType[] @default([])
+
+    friendship FriendShip[] @relation(name: "UserFriends")
+    friends    FriendShip[] @relation(name: "FriendUsers")
+
+    blocked String[]
+
+    UserGames     Game[] @relation(name: "userGames")
+    OpponentGames Game[] @relation(name: "opponentGames")
 }
 
-model	Channel {
-	id 			Int @id @default(autoincrement())
-	createdAt 	DateTime @default(now())
-	updateAt 	DateTime @updatedAt
+model Channel {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updateAt  DateTime @updatedAt
 
-	name		String	@unique
-	hash		String?
-	private		Boolean @default(false)
-	
-	owner		User @relation(name: "channel_owner", fields: [ownerId], references: [id])
-	ownerId		Int
+    name    String  @unique
+    hash    String?
+    private Boolean @default(false)
+    direct  Boolean @default(false)
 
-	//admins	User[] @relation(name: "channel_admins", fields: [adminsIds], references: [id])
-	//adminsIds	Int[]
-	//members	User[] @relation(name: "channel_member", fields: [membersIds]
-	//membersIds Int[]
-	//invite	User[] @relation(name: "channel_invite", fields: [inviteIds]
-	//inviteIds Int[]
-	//banned	User[] @relation(name: "channel_banned", fields: [bannedIds]
-	//bannedIds Int[]
-	//mute	User[] @relation(name: "channel_mute", fields: [muteIds]
-	//muteIds Int[]
-	messages	Message[] 
+    users    ChannelUser[]
+    messages Message[]
 }
 
-model	Message {
-	id 			Int @id @default(autoincrement())
-	sendAt		DateTime @default(now())
-	sendBy		User	@relation(fields: [sendById], references: [id])
-	sendById	Int
-	channel		Channel @relation(fields: [channelId], references: [id])
-	channelId	Int
-	content		String
+model Message {
+    id     Int      @id @default(autoincrement())
+    sentAt DateTime @default(now())
+
+    sentBy     User   @relation(fields: [sentByName], references: [name], onDelete: Cascade)
+    sentByName String
+
+    channel     Channel @relation(fields: [channelName], references: [name], onDelete: Cascade)
+    channelName String
+
+    content String
 }
 
-model	Game {
-	id 			Int @id @default(autoincrement())
-	createdAt 	DateTime @default(now())
-	endAt 		DateTime?
+model Game {
+    id        Int       @id @default(autoincrement())
+    createdAt DateTime  @default(now())
+    endAt     DateTime?
 
-	live		Boolean
-	//creator		User
-	//guest			User
-	winnerId	Int?
-	looserId	Int?
-	scoreCreator Int @default(0)
-	scoreGuest	Int	@default(0)
-	//socket ? 
-	//theme		String ou Url ? (same avatar)
-	difficulty	Int @default(1)
-	matchmaking	Boolean
+    userName String
+    user   User   @relation(name: "userGames", fields: [userName], references: [name], onDelete: Cascade)
+
+    opponentName    String
+    opponent      User   @relation(name: "opponentGames", fields: [opponentName], references: [name], onDelete: Cascade)
+    userScore     Int
+    opponentScore Int
 }
 
-// Use "npx prisma generate" = create TSClass from Schema for our code.
-// => import { User } from '@prisma/client';
+// Relation table for many-to-many relation
+model ChannelUser {
+    channelId Int
+    channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    owner   Boolean @default(false)
+    admin   Boolean @default(false)
+    member  Boolean @default(false)
+    banned  Boolean @default(false)
+    muted   Boolean @default(false)
+    invited Boolean @default(false)
+
+    @@id([channelId, userId])
+}
+
+model FriendShip {
+    userId String
+    user   User   @relation(name: "UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+
+    friendId String
+    friend   User   @relation(name: "FriendUsers", fields: [friendId], references: [id], onDelete: Cascade)
+
+    accepted Boolean @default(false)
+
+    @@id([userId, friendId])
+}

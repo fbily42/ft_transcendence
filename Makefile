@@ -1,12 +1,13 @@
 APP = nest-api
 FRONT = frontend
+BACK = backend
 DB = postgres
 NETWORK = transendence
 COMPOSE_FILE = ./docker-compose.yml
 
 all:
 	@echo "$(BOLD)$(YELLOW)\n ----- Building app ----- \n$(RESET)"
-	@docker-compose -f $(COMPOSE_FILE) up --build -d
+	@docker compose -f $(COMPOSE_FILE) up --build -d
 	@echo "\n$(BOLD)$(GREEN)App ready [ ✔ ]\n$(RESET)"
 
 start:
@@ -95,19 +96,29 @@ removes_network:
 		echo "\n$(BOLD)$(RED)No Docker network found.\n$(RESET)"; \
 	fi
 
-clean: remove_containers remove_volumes remove_images removes_network
+prune:
+	@echo "$(YELLOW)\n. . . pruning docker system . . . \n$(RESET)"
+	@docker system prune -fa
+	@echo "\n$(BOLD)$(GREEN)Pruned [ ✔ ]\n$(RESET)"
+
+clean: remove_containers remove_volumes remove_images removes_network prune
 	@if [ -d ./$(FRONT)/node_modules ]; then \
 		echo "$(BOLD)$(YELLOW)\n ----- Removing local node_modules  ----- \n$(RESET)"; \
 		rm -rf ./$(FRONT)/node_modules; \
+		rm -rf ./${BACK}/node_modules; \
+		rm -rf ./${BACK}/dist; \
 	fi
 	@echo "\n$(BOLD)$(GREEN)Cleaned [ ✔ ]\n$(RESET)"
+
+studio:
+	docker exec -it nest-api npx prisma studio
 
 re:
 	make clean
 	make all
 
 .PHONY: all re clean removes_network remove_images remove_volumes remove_containers \
-	status restart start stop logs_nest logs_db
+	status restart start stop logs_nest logs_db studio
 
 # COLORS
 RESET = \033[0m

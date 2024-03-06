@@ -5,14 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
+RUN npm install -g npm@latest
 RUN npm install
-RUN npx prisma generate
 
-# WORKDIR /app/dev
-
-# COPY src ./src
-# COPY prisma ./prisma
-# COPY .env /
-
-CMD [ "npm", "run", "start:dev" ]
-
+CMD ["/bin/sh", "-c","npx prisma db push && npm run start:dev" ]

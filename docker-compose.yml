@@ -1,8 +1,7 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
-# PROD-VERSION
+  # PROD-VERSION
   # nest-api:
   #   container_name: nest-api
   #   build:
@@ -17,7 +16,7 @@ services:
   #   networks:
   #     - transendence
 
-# DEV-VERSION
+  # DEV-VERSION
   nest-api:
     container_name: nest-api
     restart: always
@@ -25,16 +24,18 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     ports:
-      - 3001:3000
+      - 3333:3000
+      - 5555:5555
+      - 8081:8081
     depends_on:
       - postgres
     environment:
       CHOKIDAR_USEPOLLING: "true"
     env_file:
       - ./backend/.env
+      - ./backend/.env.local
     volumes:
       - ./backend/:/app
-      # - ignore:/app/node_modules/
     networks:
       - transendence
 
@@ -51,7 +52,7 @@ services:
     networks:
       - transendence
 
-# DEV-VERSION
+  # DEV-VERSION
   frontend:
     container_name: frontend
     restart: always
@@ -65,8 +66,8 @@ services:
       - nest-api
     environment:
       WATCHPACK_POLLING: "true"
-    # env_file:
-    #   - ./frontend/.env
+    env_file:
+      - ./frontend/.env.local
     volumes:
       - ./frontend/:/app
     networks:
@@ -74,11 +75,10 @@ services:
     command: >
       bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
       && npm run dev && rm -rf /cache/node_modules"
-  
+
 volumes:
   postgres:
     name: nest-db
-  # ignore: {}
 
 networks:
   transendence:
