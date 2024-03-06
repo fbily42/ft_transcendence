@@ -18,4 +18,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 2500,
+    rollupOptions: {
+      onwarn(warning, rollupWarn) {
+        if (warning.code) {
+          rollupWarn(warning);
+        }
+      },
+    },
+  }
 })

@@ -13,6 +13,7 @@ import { getUserMe, getUsers } from '@/lib/Dashboard/dashboard.requests'
 import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
+import { v4 as uuid } from 'uuid'
 
 type GameFormProps = {
     handleClose: () => void
@@ -117,7 +118,8 @@ function GameForm({ handleClose, name }: GameFormProps) {
         }
         if (loadingFriend === true) {
             setFriendMessage('true')
-            const roomNameFriend: string = crypto.randomUUID()
+            const roomNameFriend: string = uuid()
+
             currentRoomFriend.current = roomNameFriend
 
             socket?.webSocket?.emit('JoinRoomFriend', {
@@ -171,7 +173,7 @@ function GameForm({ handleClose, name }: GameFormProps) {
 
     useEffect(() => {
         if (loading) {
-            const roomName: string = crypto.randomUUID()
+            const roomName: string = uuid()
             currentRoom.current = roomName
             socket?.webSocket?.emit('JoinRoom', roomName)
             socket?.webSocket?.on('JoinParty', (message: string) => {

@@ -15,12 +15,14 @@ export class GameStats {
 		let width = 30;
 		let rad = 20;
 		let speed = 2;
+		let x = 40
 
 		if (map === 'BasicPong')
 		{
 			width /= 2;
 			rad /=2;
 			speed = 3;
+			x = 25
 		}
 		this.ball = {
 			x: 200,
@@ -40,7 +42,7 @@ export class GameStats {
 
 		}
 		this.paddleTwo ={
-			x: this.canvas.width - 40,
+			x: this.canvas.width - x,
 			y: 20,
 			height : 80,
 			width : width,
