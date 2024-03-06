@@ -12,7 +12,6 @@ import {
 import axios from 'axios'
 import GameForm from '../Pong/GameForm'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-// import Logo from "../../assets/favicon/logo.png"
 import Logo from "../../../public/pingu.png"
 
 const VerticalNavbar: React.FC = () => {
@@ -75,9 +74,6 @@ const VerticalNavbar: React.FC = () => {
             throw error
         }
     }
-    // const closeDialog  = () => {
-    //     setOpen(false)
-    // }
     return (
         <nav className="fixed bg-white shadow-drop h-screen w-[86px] flex flex-col justify-center pl-[18px] py-[36px]">
             <div className="flex flex-col justify-between h-full">

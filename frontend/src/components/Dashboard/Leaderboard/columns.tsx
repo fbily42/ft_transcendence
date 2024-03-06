@@ -14,9 +14,7 @@ export const columns: ColumnDef<LeaderboardData>[] = [
         cell: ({ row }) => {
             const playerName: string | undefined = row.original.pseudo
 
-            if (playerName !== undefined) {
-                // const firstChar = playerName.charAt(0)
-
+            if (playerName) {
                 return (
                     <div className="text-right font-medium flex items-center gap-[20px]">
                         <Avatar className="border-[3px] rounded-full border-customDarkBlue">

@@ -52,7 +52,7 @@ const SetProfileForm: React.FC<SetProfileFormprops> = ({
                 data.setErrorMessage,
                 data.onClose
             ),
-        onSuccess: (_, data) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['me'] })
             queryClient.invalidateQueries({ queryKey: ['users'] })
             socket?.webSocket?.emit('refreshSearchBar')

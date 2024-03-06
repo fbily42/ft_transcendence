@@ -22,7 +22,7 @@ model User {
     createdAt DateTime @default(now())
     updateAt  DateTime @updatedAt
 
-    name    String  @unique // 42 login
+    name    String  @unique
     pseudo  String? @unique
     avatar  String?
     photo42 String
@@ -91,6 +91,7 @@ model Game {
     id        Int       @id @default(autoincrement())
     createdAt DateTime  @default(now())
     endAt     DateTime?
+	key		  String @unique
 
     userName String
     user   User   @relation(name: "userGames", fields: [userName], references: [name], onDelete: Cascade)

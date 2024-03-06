@@ -49,7 +49,7 @@ function TwoFA(): JSX.Element {
                     window.performance.getEntriesByType('navigation')
                 if (
                     navigationEntries.length > 0 &&
-                    navigationEntries[0].type !== 'navigate'
+                    (navigationEntries[0] as PerformanceNavigationTiming).type !== 'navigate'
                 ) {
                     throw new Error()
                 }

@@ -1,11 +1,6 @@
 import { WebSocketContextType } from '@/context/webSocketContext'
-
 import { GameStats, imageForGame } from '@/lib/Game/Game.types'
 
-// type keyData = {
-// 	key: string,
-// 	roomId: string,
-// }
 export function Paddle_2(
     ctx: CanvasRenderingContext2D,
     gameInfo: GameStats,
@@ -15,7 +10,6 @@ export function Paddle_2(
     roomName: string
 ) {
     if (keys['ArrowUp']) {
-        // const data: keyData = {key: 'ArrowUp', roomId: roomName}
         socket?.webSocket?.emit('key', { key: 'ArrowUp', roomId: roomName })
     } else if (keys['ArrowDown']) {
         socket?.webSocket?.emit('key', { key: 'ArrowDown', roomId: roomName })

@@ -372,30 +372,34 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameStats.WallCollision();
 
 				
-				if (gameStats.gameStatus.scoreOne === 10 || gameStats.gameStatus.scoreTwo === 10 ){
-
+				if (gameStats.gameStatus.scoreOne === 11 || gameStats.gameStatus.scoreTwo === 11 ){
+					gameStats.gameStatus.gameState = "finish";
 					let gamesRoom = this.gamesRoom.get(room)
-					if (gameStats.gameStatus.scoreOne == 10)
+					if (gameStats.gameStatus.scoreOne == 11)
 					{
 
 
 						gameStats.gameStatus.winner = gamesRoom[0].id;
 						gameStats.gameStatus.looser = gamesRoom[1].id;
 					}
-					else if(gameStats.gameStatus.scoreTwo == 10)
+					else if(gameStats.gameStatus.scoreTwo == 11)
 					{
 
 
 						gameStats.gameStatus.winner = gamesRoom[1].id;
 						gameStats.gameStatus.looser = gamesRoom[0].id;
 					}
-					this.server.to(room).emit('finish', gameStats);
-					await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats)
-					await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
-					this.gamesRoom.delete(room);
-					this.gamesInfo.delete(room);
-					this.server.emit('inGameUsers', this.getInGameClient())
-					return;
+					if(this.gamesInfo.has(room))
+					{
+
+						this.server.to(room).emit('finish', gameStats);
+						await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats, room)
+						await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
+						this.gamesRoom.delete(room);
+						this.gamesInfo.delete(room);
+						this.server.emit('inGameUsers', this.getInGameClient())
+						return;
+					}
 				}
 
 				if (gameStats !== undefined && gameStats.PaddleCollision !== undefined)
@@ -456,10 +460,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameStats.gameStatus.looser = gamesRoom[0].id;
 				gameStats.gameStatus.winner = gamesRoom[1].id;
 				gameStats.gameStatus.scoreOne = 0;
-				gameStats.gameStatus.scoreTwo = 10;
+				gameStats.gameStatus.scoreTwo = 11;
 				this.server.to(room).emit('finish', gameStats);
-				
-				await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats)
+				await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats, room)
 				await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
 				this.gamesRoom.delete(room);
 				this.gamesInfo.delete(room);
@@ -471,10 +474,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameStats.gameStatus.winner = gamesRoom[0].id;
 				gameStats.gameStatus.looser = gamesRoom[1].id;
 				gameStats.gameStatus.scoreTwo = 0;
-				gameStats.gameStatus.scoreOne = 10;
+				gameStats.gameStatus.scoreOne = 11;
 				this.server.to(room).emit('finish', gameStats);
-				
-				await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats)
+				await this.chatService.addGameInfo(this.gamesRoom.get(room), gameStats, room)
 				await this.chatService.updateUserStat(this.gamesRoom.get(room), gameStats)
 				this.gamesRoom.delete(room);
 				this.gamesInfo.delete(room);
@@ -500,12 +502,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				if(array[0].websocket == client.id)
 				{
 		
-					if (data.key === "w") {
+					if (data.key === "ArrowUp") {
 						if ((gameStats.paddleOne.y - 10) > 0 )
 							gameStats.paddleOne.y -= 5;
 						}
 		
-					else if (data.key === "s") {
+					else if (data.key === "ArrowDown") {
 						if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
 						{
 							gameStats.paddleOne.y += 5;

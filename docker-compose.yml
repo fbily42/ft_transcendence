@@ -1,28 +1,82 @@
 version: "3.8"
 
 services:
-  # PROD-VERSION
-  # nest-api:
-  #   container_name: nest-api
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 5000:3000
-  #   depends_on:
-  #     - postgres
-  #   env_file:
-  #     - ./backend/.env
-  #   networks:
-  #     - transendence
 
-  # DEV-VERSION
+#   DEV VERSION
+#   nest-api:
+#     container_name: nest-api
+#     restart: always
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     ports:
+#       - 3333:3000
+#       - 5555:5555
+#       - 8081:8081
+#     depends_on:
+#       - postgres
+#     environment:
+#       CHOKIDAR_USEPOLLING: "true"
+#     env_file:
+#       - ./backend/.env
+#       - ./backend/.env.local
+#     volumes:
+#       - ./backend/:/app
+#     networks:
+#       - transendence
+
+#   postgres:
+#     image: postgres:13
+#     container_name: postgres
+#     restart: always
+#     ports:
+#       - 5432:5432
+#     env_file:
+#       - ./backend/.env
+#     volumes:
+#       - postgres:/var/lib/postgresql/data
+#     networks:
+#       - transendence
+
+#   frontend:
+#     container_name: frontend
+#     restart: always
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - 3000:3000
+#     depends_on:
+#       - postgres
+#       - nest-api
+#     environment:
+#       WATCHPACK_POLLING: "true"
+#     env_file:
+#       - ./frontend/.env.local
+#     volumes:
+#       - ./frontend/:/app
+#     networks:
+#       - transendence
+#     command: >
+#       bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
+#       && npm run dev && rm -rf /cache/node_modules"
+
+# volumes:
+#   postgres:
+#     name: nest-db
+
+# networks:
+#   transendence:
+#     name: transendence
+#     driver: bridge
+
+# PROD VERSION
   nest-api:
     container_name: nest-api
     restart: always
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - 3333:3000
       - 5555:5555
@@ -34,8 +88,6 @@ services:
     env_file:
       - ./backend/.env
       - ./backend/.env.local
-    volumes:
-      - ./backend/:/app
     networks:
       - transendence
 
@@ -52,13 +104,12 @@ services:
     networks:
       - transendence
 
-  # DEV-VERSION
   frontend:
     container_name: frontend
     restart: always
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     ports:
       - 3000:3000
     depends_on:
@@ -68,13 +119,8 @@ services:
       WATCHPACK_POLLING: "true"
     env_file:
       - ./frontend/.env.local
-    volumes:
-      - ./frontend/:/app
     networks:
       - transendence
-    command: >
-      bash -c "cp -rfu /cache/node_modules/. /app/node_modules/  
-      && npm run dev && rm -rf /cache/node_modules"
 
 volumes:
   postgres:

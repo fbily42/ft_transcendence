@@ -11,22 +11,11 @@ type SetUp2FAModalProps = {
 }
 
 const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
-    //set 3 states
-    // secret key : string
-    // set otp url : string
-    // set token : string
-    // set isTokValid : string
     const [key, setKey] = useState<string>('')
     const [otpUrl, setOtpUrl] = useState<string>('')
     const [token, setToken] = useState<string>('      ')
     const [isTokValid, setIsTokValid] = useState<string>('')
-
     const { enableTwoFA, setTwoFAVerified } = useContext<TwoFAContextType>(TwoFAContext)
-
-    // use effect
-    // at mounted :
-    // post /generate and retrieve key and otp url
-    // sets key and otpUrl
     useEffect(() => {
         async function generateOTPkey() {
             try {
@@ -91,7 +80,6 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
 
     return (
         <div className="w-full h-full">
-            {/* <Modal open={open} onClose={onClose}> */}
             <div className="flex flex-col gap-[20px] p-[24px] border-10">
                 <div>
                     <p className="text-lg font-bold">
@@ -151,7 +139,6 @@ const SetUp2FAModal: React.FC<SetUp2FAModalProps> = ({ open, onClose }) => {
                     />
                 </div>
             </div>
-            {/* </Modal> */}
         </div>
     )
 }
