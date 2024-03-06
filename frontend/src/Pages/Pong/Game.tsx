@@ -46,7 +46,6 @@ const Board: React.FC<BoardProps> = ({
     const socket = useWebSocket() as WebSocketContextType
     const gameImages = new imageForGame()
 
-
     gameImages.image.img_ice_bottom.src = ice_bottom
     gameImages.image.img_ice.src = ice
     gameImages.image.img_fish.src = fish
@@ -90,7 +89,7 @@ const Board: React.FC<BoardProps> = ({
     })
     return (
         <>
-            <canvas id="canvas_pong" ref={canvasRef} height={800} width={800} />
+            <canvas id="canvas_pong" ref={canvasRef} height={1000} width={1200} />
             {gameStatus === 'FINISH' && (
                 <div className="h-screen w-screen fixed top-0 left-0 ">
                     <Dialog defaultOpen={true}>

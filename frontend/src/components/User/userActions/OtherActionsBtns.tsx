@@ -28,6 +28,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { block, directMessage, unblock } from '@/lib/Chat/chat.requests'
 import { CmdData } from '@/lib/Chat/chat.types'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { useState } from 'react'
+import GameForm from '@/components/Pong/GameForm'
 
 export default function OtherActionsBtns(): JSX.Element {
     const param = useParams<string>()
@@ -35,6 +38,7 @@ export default function OtherActionsBtns(): JSX.Element {
         queryKey: ['request'],
         queryFn: getFriendRequest,
     })
+    const [openGame, setOpenGame] = useState<boolean>(false)
 
     const { data: friendInvites } = useQuery<FriendData[]>({
         queryKey: ['pending'],
@@ -96,8 +100,12 @@ export default function OtherActionsBtns(): JSX.Element {
         },
     })
 
-    const isFriend: boolean | undefined = friends?.some((friend) => friend.id === param.id)
-    const isPending: boolean | undefined = friendInvites?.some((invite) => invite.id === param.id)
+    const isFriend: boolean | undefined = friends?.some(
+        (friend) => friend.id === param.id
+    )
+    const isPending: boolean | undefined = friendInvites?.some(
+        (invite) => invite.id === param.id
+    )
     const isRequested: boolean | undefined = friendRequest?.some(
         (request) => request.id === param.id
     )
@@ -126,9 +134,27 @@ export default function OtherActionsBtns(): JSX.Element {
                                 >
                                     Send PM
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    Play PinguPong
-                                </DropdownMenuItem>
+                                <Dialog
+                                    open={openGame}
+                                    onOpenChange={setOpenGame}
+                                >
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem
+                                            className="w-full"
+                                            onSelect={(e) => e.preventDefault()}
+                                        >
+                                            Play PinguPong
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <GameForm
+                                            handleClose={() =>
+                                                setOpenGame(false)
+                                            }
+                                            name={user?.pseudo!}
+                                        ></GameForm>
+                                    </DialogContent>
+                                </Dialog>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
@@ -183,9 +209,29 @@ export default function OtherActionsBtns(): JSX.Element {
                                     >
                                         Send PM
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        Play PinguPong
-                                    </DropdownMenuItem>
+                                    <Dialog
+                                        open={openGame}
+                                        onOpenChange={setOpenGame}
+                                    >
+                                        <DialogTrigger asChild>
+                                            <DropdownMenuItem
+                                                className="w-full"
+                                                onSelect={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                            >
+                                                Play PinguPong
+                                            </DropdownMenuItem>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <GameForm
+                                                handleClose={() =>
+                                                    setOpenGame(false)
+                                                }
+                                                name={user?.pseudo!}
+                                            ></GameForm>
+                                        </DialogContent>
+                                    </Dialog>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
@@ -234,9 +280,27 @@ export default function OtherActionsBtns(): JSX.Element {
                                 >
                                     Send PM
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    Play PinguPong
-                                </DropdownMenuItem>
+                                <Dialog
+                                    open={openGame}
+                                    onOpenChange={setOpenGame}
+                                >
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem
+                                            className="w-full"
+                                            onSelect={(e) => e.preventDefault()}
+                                        >
+                                            Play PinguPong
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <GameForm
+                                            handleClose={() =>
+                                                setOpenGame(false)
+                                            }
+                                            name={user?.pseudo!}
+                                        ></GameForm>
+                                    </DialogContent>
+                                </Dialog>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
@@ -287,9 +351,27 @@ export default function OtherActionsBtns(): JSX.Element {
                                 >
                                     Send PM
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    Play PinguPong
-                                </DropdownMenuItem>
+                                <Dialog
+                                    open={openGame}
+                                    onOpenChange={setOpenGame}
+                                >
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem
+                                            className="w-full"
+                                            onSelect={(e) => e.preventDefault()}
+                                        >
+                                            Play PinguPong
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <GameForm
+                                            handleClose={() =>
+                                                setOpenGame(false)
+                                            }
+                                            name={user?.pseudo!}
+                                        ></GameForm>
+                                    </DialogContent>
+                                </Dialog>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>

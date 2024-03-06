@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 export type WebSocketContextType = {
     webSocket: Socket | null
     usersOn: Map<string, string[]>
+    inGame: string[]
 }
 
 export type SocketUsers = {
@@ -29,6 +30,7 @@ export const useWebSocket = () => useContext(WebSocketContext)
 export const WebSocketProvider: React.FC = () => {
     const [webSocket, setWebSocket] = useState<Socket | null>(null)
     const [usersOn, setUsersOn] = useState(new Map<string, string[]>())
+    const [inGame, setInGame] = useState<string[]>([])
     const queryClient = useQueryClient() as QueryClient
     const navigate = useNavigate()
 
@@ -52,7 +54,6 @@ export const WebSocketProvider: React.FC = () => {
         ws?.on('GameInvitation', (data) => {
             toast(`You have been invited to a game against ${data.friend}`, {
                 action: {
-					
                     label: 'Accept',
                     onClick: () =>
                         ws?.emit('AcceptInvitation', {
@@ -69,19 +70,17 @@ export const WebSocketProvider: React.FC = () => {
                         roomId: data.roomId,
                     })
                 },
-				        onDismiss() {
-					          ws?.emit('DeclineInvitation', {
+                onDismiss() {
+                    ws?.emit('DeclineInvitation', {
                         friend: data.friend,
                         roomId: data.roomId,
                     })
-				        },
+                },
             })
         })
 
         ws?.on('ReadyForGame', (message: string) => {
             if (message.startsWith('Joined')) {
-                // processingMessage.current = true
-                // closeDialog()
                 navigate('/pong')
             }
         })
@@ -89,6 +88,10 @@ export const WebSocketProvider: React.FC = () => {
         ws?.on('users', (users: SocketUsers) => {
             const usersMap: Map<string, string[]> = arrayToMap(users)
             setUsersOn(usersMap)
+        })
+
+        ws?.on('inGameUsers', (users: string[]) => {
+            setInGame(users)
         })
 
         ws?.on('privateMessage', () => {
@@ -154,6 +157,7 @@ export const WebSocketProvider: React.FC = () => {
                     'GameInvitation',
                     'newOwner',
                     'refreshFriendlist',
+                    'inGameUsers',
                 ]
                 events.forEach((event) => {
                     ws.off(event)
@@ -164,7 +168,7 @@ export const WebSocketProvider: React.FC = () => {
     }, [])
 
     return (
-        <WebSocketContext.Provider value={{ webSocket, usersOn }}>
+        <WebSocketContext.Provider value={{ webSocket, usersOn, inGame }}>
             <Outlet />
         </WebSocketContext.Provider>
     )

@@ -5,9 +5,6 @@ import { GameStats } from '@/lib/Game/Game.types'
 import BasicGame from './BasicGame'
 // import { Button } from '@/components/ui/button'
 import PinguPlaying from '../../assets/Game/pingu_player.svg'
-import Clouds from '../../assets/other/cloud.svg'
-import Mountains from '../../assets/other/mountain.svg'
-import { Pingu } from '@/assets/avatarAssociation'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import GameForm from '@/components/Pong/GameForm'
@@ -20,12 +17,8 @@ function Pong() {
         'PLAYING'
     )
     const [open, setOpen] = useState<boolean>(false)
-    const closeDialog = () => {
-        setOpen(false)
-    }
     useEffect(() => {
         const cleanup = () => {
-            // Call all your cleanup functions here
             socket?.webSocket?.emit('leaveRoom', roomName)
         }
 
@@ -41,11 +34,6 @@ function Pong() {
         }
     }, [roomName])
 
-    // useEffect(() => {
-    //     return () => {
-    //         socket?.webSocket?.emit('leaveRoom', roomName)
-    //     }
-    // }, [roomName])
     const handleKeyDown = (event: KeyboardEvent) => {
         if (keys[event.key]) {
             return
@@ -114,7 +102,7 @@ function Pong() {
                     <h2 className="flex justify-center font-semibold text-2xl text-center">
                         ¡ What the Noooot are you doing here !
                     </h2>
-                    <div className='flex gap-[10px]'>
+                    <div className="flex gap-[10px]">
                         <img
                             className="w-[100%]"
                             src={PinguPlaying}
@@ -123,11 +111,14 @@ function Pong() {
                         <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
                                 <Button className="bg-customYellow">
-								ここをクリック
+                                    ここをクリック
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
-                                <GameForm closeDialog={closeDialog}></GameForm>
+                                <GameForm
+                                    handleClose={() => setOpen(false)}
+                                    name={undefined}
+                                ></GameForm>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -137,74 +128,3 @@ function Pong() {
     )
 }
 export default Pong
-
-// {!gameInfo && (
-// 	<div
-// 		id="bento"
-// 		className="flex flex-col justify-between pl-[122px] pb-[36px] pr-[36px] h-[90vh] gap-[36px]"
-// 	>
-// 		<div
-// 			id="top bento"
-// 			className="flex w-[100%] h-[50%] justify-between lg:gap-[36px] md:gap-[26px] sm:gap-[26px] gap-[26px]"
-// 		>
-// 			<div
-// 				id="play box"
-// 				className="relative bg-customDarkBlue w-[80%] h-full rounded-[30px] overflow-hidden border-none shadow-drop"
-// 			>
-// 				<div
-// 					id="content w/o clouds and mountain"
-// 					className="z-20 absolute h-full w-full flex items-center pl-6 pb-2"
-// 				>
-// 					<div
-// 						id="pingu div"
-// 						className="z-20 h-full w-[40%] flex items-end pl-7 pb-3 "
-// 					>
-// 						<img
-// 							className="h-fit"
-// 							src={PinguPlaying}
-// 							alt="Pingu playing ball"
-// 						></img>
-// 					</div>
-// 					<div
-// 						id="cta div"
-// 						className="z-20 h-full w-full flex flex-col items-center justify-center gap-[36px]"
-// 					>
-// 						<h1 className="text-white text-wrap text-center text-6xl font-semibold">
-// 							Let's Play PinguPong
-// 						</h1>
-
-// 					</div>
-// 				</div>
-// 				<div
-// 					id="clouds + mountains"
-// 					className="z-0 absolute flex flex-col justify-between h-full border-t-[20px] border-b-[20px] border-white"
-// 				>
-// 					<div
-// 						id="clouds"
-// 						className="flex -space-x-[20px]"
-// 					>
-// 						{CloudsArray.map((cloud, index) => (
-// 							<img
-// 								key={index}
-// 								src={cloud}
-// 								alt="Clouds"
-// 							/>
-// 						))}
-// 					</div>
-// 					<div
-// 						id="mountain"
-// 						className="flex -space-x-[10px]"
-// 					>
-// 						{MountainsArray.map((mountain, index) => (
-// 							<img
-// 								key={index}
-// 								src={mountain}
-// 								alt="Mountains"
-// 							/>
-// 						))}
-// 					</div>
-// 				</div>
-// 			</div>
-// 		</div>
-// 	</div>
-// )}

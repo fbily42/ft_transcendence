@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import React, { useRef} from 'react'
+import React, { useRef } from 'react'
 import { Search } from 'lucide-react'
 import { XCircle } from 'lucide-react'
 import { WebSocketContextType, useWebSocket } from '@/context/webSocketContext'
@@ -14,7 +14,12 @@ import { UserData } from '@/lib/Dashboard/dashboard.types'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
-function GameForm({ closeDialog }) {
+type GameFormProps = {
+    handleClose: () => void
+    name: string | undefined
+}
+
+function GameForm({ handleClose, name }: GameFormProps) {
     const [search, setSearch] = useState<string>('')
     const socket = useWebSocket() as WebSocketContextType
     const [loading, setLoading] = useState<boolean>(false)
@@ -33,7 +38,6 @@ function GameForm({ closeDialog }) {
         if (search === '') {
             setFriendMessage('submit')
         }
-
         setSearch(e.target.value)
     }
 
@@ -107,6 +111,10 @@ function GameForm({ closeDialog }) {
     }
 
     useEffect(() => {
+        if (name) {
+            setInputValue(name)
+            setSearch(name)
+        }
         if (loadingFriend === true) {
             setFriendMessage('true')
             const roomNameFriend: string = crypto.randomUUID()
@@ -128,7 +136,7 @@ function GameForm({ closeDialog }) {
                     setLoadingFriend(false)
                 } else if (message.startsWith('Go')) {
                     processingMessage.current = true
-                    closeDialog()
+                    handleClose()
                     navigate('/pong')
                 } else if (message.startsWith('Decline')) {
                     socket?.webSocket?.emit('leaveRoomBefore', roomNameFriend)
@@ -169,11 +177,11 @@ function GameForm({ closeDialog }) {
             socket?.webSocket?.on('JoinParty', (message: string) => {
                 if (message.startsWith('Joined')) {
                     processingMessage.current = true
-                    closeDialog()
+                    handleClose()
                     navigate('/pong')
                 } else if (message.startsWith('Go')) {
                     processingMessage.current = true
-                    closeDialog()
+                    handleClose()
                     navigate('/pong')
                 } else {
                     setLoading(false)
@@ -227,7 +235,7 @@ function GameForm({ closeDialog }) {
                     className="w-full rounded-xl realtive flex items-center "
                 >
                     <div className="flex w-full justify-between items-center gap-[10px] bg-white">
-						<Search className="opacity-30" />
+                        <Search className="opacity-30" />
                         <Input
                             type="text"
                             value={inputValue}
@@ -238,18 +246,15 @@ function GameForm({ closeDialog }) {
                                 e.target.style.outline = 'none'
                             }}
                             required
-                        >
-							
-						</Input>
-                    <XCircle
-                        className="fixed-0 opacity-30 cursor-pointer hover:opacity-100 "
-                        onClick={() => {
-                            setInputValue('')
-                            setSearch('')
-                        }}
-                    />
+                        ></Input>
+                        <XCircle
+                            className="fixed-0 opacity-30 cursor-pointer hover:opacity-100 "
+                            onClick={() => {
+                                setInputValue('')
+                                setSearch('')
+                            }}
+                        />
                     </div>
-					
                 </form>
                 {search && (
                     <div className="flex flex-col w-full gap-[20px]">
@@ -258,7 +263,6 @@ function GameForm({ closeDialog }) {
                                 <p className="inline font-semibold">
                                     Choose the level :
                                 </p>
-
                             </div>
 
                             <div className="flex items-center space-x-2">
@@ -296,10 +300,8 @@ function GameForm({ closeDialog }) {
                         <div className="flex flex-col gap-[10px]">
                             <div className="">
                                 <p className="inline font-semibold">
-
                                     Choose the Map :
                                 </p>
-
                             </div>
                             <div className="flex flex-row items-center justify-evenly">
                                 <div
@@ -350,10 +352,7 @@ function GameForm({ closeDialog }) {
                         </div>
                         <div className="">
                             <form onSubmit={handleSearch}>
-                                <Button
-                                    className="w-full"
-                                    type="submit"
-                                >
+                                <Button className="w-full" type="submit">
                                     {(() => {
                                         switch (friendMessage) {
                                             case 'true':
@@ -404,18 +403,13 @@ function GameForm({ closeDialog }) {
                 )}
             </div>
             {!search && (
-                <div
-                    className="flex flex-col w-full h-full items-center gap-[20px]"
-                >
+                <div className="flex flex-col w-full h-full items-center gap-[20px]">
                     <p>Or</p>
-                    <form 
-					className='w-full'
-					onSubmit={handleMatchmaking}>
-                        <Button
-                            className="w-full "
-                            type="submit"
-                        >
-                            {loading ? 'Matchmaking...(Just wait)' : 'Find a player'}
+                    <form className="w-full" onSubmit={handleMatchmaking}>
+                        <Button className="w-full " type="submit">
+                            {loading
+                                ? 'Matchmaking...(Just wait)'
+                                : 'Find a player'}
                         </Button>
                     </form>
                 </div>

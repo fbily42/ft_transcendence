@@ -21,10 +21,7 @@ function Dashboard(): JSX.Element {
     const socket = useWebSocket() as WebSocketContextType
     const CloudsArray = new Array(10).fill(Clouds)
     const MountainsArray = new Array(10).fill(Mountains)
-	const [open, setOpen] = useState<boolean>(false)
-	const closeDialog = () => {
-        setOpen(false)
-    }
+    const [open, setOpen] = useState<boolean>(false)
 
     socket?.webSocket?.emit('refreshSearchBar')
     return (
@@ -70,7 +67,8 @@ function Dashboard(): JSX.Element {
                                     </DialogTrigger>
                                     <DialogContent>
                                         <GameForm
-                                            closeDialog={closeDialog}
+                                            handleClose={() => setOpen(false)}
+                                            name={undefined}
                                         ></GameForm>
                                     </DialogContent>
                                 </Dialog>

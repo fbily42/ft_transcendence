@@ -4,7 +4,7 @@ import filet from './../../../assets/Game/filet.svg'
 export default function Static_image(
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
-    gameImages: imageForGame
+    gameImages: imageForGame,
 ) {
     // img_filet.onload = function (){
     // 	requestAnimationFrame(render);

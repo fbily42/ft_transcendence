@@ -27,7 +27,11 @@ export default function FriendsList(): JSX.Element {
         let friendStatus: string
 
         if (webSocketStatus === true) {
-            friendStatus = 'Online'
+            if (webSocket.inGame?.includes(name)) {
+                friendStatus = 'In Game'
+            } else {
+                friendStatus = 'Online'
+            }
         } else {
             friendStatus = 'Offline'
         }

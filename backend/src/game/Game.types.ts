@@ -9,8 +9,8 @@ export class GameStats {
 
 	constructor(private level:string, map:string) {
 		this.canvas ={
-			height : 800,
-			width : 800,
+			height : 1000,
+			width : 1200,
 		}
 		let width = 30;
 		let rad = 20;
@@ -40,7 +40,7 @@ export class GameStats {
 
 		}
 		this.paddleTwo ={
-			x: 760,
+			x: this.canvas.width - 40,
 			y: 20,
 			height : 80,
 			width : width,

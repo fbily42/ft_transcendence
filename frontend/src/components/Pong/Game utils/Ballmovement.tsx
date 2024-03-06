@@ -7,43 +7,43 @@ export function BallMovement(
     gameInfo: GameStats,
     gameImages: imageForGame
 ) {
-	if (gameInfo.gameStatus.map === 'mapPingu')
-	{
-		if (gameImages.image.img_fish.complete) {
-			ctx.drawImage(
-				gameImages.image.img_fish,
-				gameInfo.ball.x - gameInfo.ball.rad,
-				gameInfo.ball.y - gameInfo.ball.rad,
-				gameInfo.ball.rad * 2,
-				gameInfo.ball.rad * 2
-			)
-			// ctx.closePath()
-		} else {
-			gameImages.image.img_fish.onload = function () {
-				ctx.drawImage(
-					gameImages.image.img_fish,
-					gameInfo.ball.x - gameInfo.ball.rad,
-					gameInfo.ball.y - gameInfo.ball.rad,
-					gameInfo.ball.rad * 2,
-					gameInfo.ball.rad * 2
-				)
-				// ctx.closePath()
-			}
-		}
-		
-	}
-	else
-	{
-
-		ctx.beginPath()
-		ctx.arc(gameInfo.ball.x, gameInfo.ball.y , gameInfo.ball.rad, 0, 2 * Math.PI);
-		ctx.fillStyle = 'red'
-		ctx.strokeStyle = 'black'
-		ctx.lineWidth = 1
-		ctx?.fill()
-		ctx.stroke()
-	
-	}
+    if (gameInfo.gameStatus.map === 'mapPingu') {
+        if (gameImages.image.img_fish.complete) {
+            ctx.drawImage(
+                gameImages.image.img_fish,
+                gameInfo.ball.x - gameInfo.ball.rad,
+                gameInfo.ball.y - gameInfo.ball.rad,
+                gameInfo.ball.rad * 2,
+                gameInfo.ball.rad * 2
+            )
+            // ctx.closePath()
+        } else {
+            gameImages.image.img_fish.onload = function () {
+                ctx.drawImage(
+                    gameImages.image.img_fish,
+                    gameInfo.ball.x - gameInfo.ball.rad,
+                    gameInfo.ball.y - gameInfo.ball.rad,
+                    gameInfo.ball.rad * 2,
+                    gameInfo.ball.rad * 2
+                )
+                // ctx.closePath()
+            }
+        }
+    } else {
+        ctx.beginPath()
+        ctx.arc(
+            gameInfo.ball.x,
+            gameInfo.ball.y,
+            gameInfo.ball.rad,
+            0,
+            2 * Math.PI
+        )
+        ctx.fillStyle = 'red'
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 1
+        ctx?.fill()
+        ctx.stroke()
+    }
 }
 
 export function updatescore(
@@ -52,56 +52,19 @@ export function updatescore(
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement
 ) {
-    ctx.font = '40px Arial'
+    ctx.font = 'bold 60px Fredoka'
     ctx.fillStyle = '#45A0E3'
-    if (gameImages.image.img_pingu_score.complete) {
-        ctx.drawImage(
-            gameImages.image.img_pingu_score,
-            canvas.width / 4 - (canvas.width / canvas.width) * 45,
-            (canvas.height / canvas.height) * 7.5,
-            (canvas.width / canvas.width) * 41,
-            (canvas.height / canvas.height) * 41
-        )
-    } else {
-        gameImages.image.img_pingu_score.onload = function () {
-            ctx.drawImage(
-                gameImages.image.img_pingu_score,
-                canvas.width / 4 - (canvas.width / canvas.width) * 45,
-                (canvas.height / canvas.height) * 7.5,
-                (canvas.width / canvas.width) * 41,
-                (canvas.height / canvas.height) * 41
-            )
-        }
-    }
-    if (gameImages.image.img_grey_score.complete) {
-        ctx.drawImage(
-            gameImages.image.img_grey_score,
-            (3 * canvas.width) / 4 - (canvas.width / canvas.width) * 45,
-            (canvas.height / canvas.height) * 7.5,
-            (canvas.width / canvas.width) * 41,
-            (canvas.height / canvas.height) * 41
-        )
-    } else {
-        gameImages.image.img_grey_score.onload = function () {
-            ctx.drawImage(
-                gameImages.image.img_grey_score,
-                (3 * canvas.width) / 4 - (canvas.width / canvas.width) * 45,
-                (canvas.height / canvas.height) * 7.5,
-                (canvas.width / canvas.width) * 41,
-                (canvas.height / canvas.height) * 41
-            )
-        }
-    }
+
     ctx.fillText(
         `${gameInfo.gameStatus.scoreOne}`,
         canvas.width / 4,
-        40,
+        60,
         canvas.width / 5
     )
     ctx.fillText(
         `${gameInfo.gameStatus.scoreTwo}`,
         (3 * canvas.width) / 4,
-        40,
+        60,
         canvas.width / 5
     )
 }
@@ -119,4 +82,3 @@ export function WallCollision(
     updatescore(gameImages, gameInfo, ctx, canvas)
     return 0
 }
-
