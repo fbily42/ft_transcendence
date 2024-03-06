@@ -47,7 +47,6 @@ export default function SecondNavbar(): JSX.Element {
                         onClick: () => navigate('/profile/me'),
                     },
                 })
-                // toast.error("Impossible to enable 2FA. Please set up 2FA.")
             }
         }
     }
@@ -64,7 +63,6 @@ export default function SecondNavbar(): JSX.Element {
                         id="double-auth"
                         checked={twoFAenabled}
                         onCheckedChange={onCheckedChange}
-                        // disabled={!twoFAverified}
                     />
                     <Label htmlFor="double-auth">
                         Two Factor Authentication

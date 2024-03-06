@@ -1,9 +1,6 @@
-// import axios from 'axios';
-import axios, {Axios, AxiosResponse} from 'axios';
-import { useNavigate } from 'react-router-dom';
+import axios, {AxiosResponse} from 'axios';
 
 let isRefreshing = false;
-// const navigate = useNavigate();
 let failedQueue: { resolve: Function, reject: Function }[] = [];
 
 const processQueue = (error: Error | null , tokenRefreshResponse: AxiosResponse| null = null) => {
@@ -36,7 +33,6 @@ instance.interceptors.response.use(
 					})
 					.catch(e => {
 						isRefreshing = false;
-						// navigate('/auth');
 						processQueue(e, null);
 					});
 			}
@@ -46,7 +42,7 @@ instance.interceptors.response.use(
 			}).then(() => { 
 				return instance(originalRequest);
 			}).catch(() => {
-				return Promise.reject(error); // Ici, nous rejetons la promesse avec l'erreur initiale
+				return Promise.reject(error);
 			  });
 		}
 

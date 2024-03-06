@@ -66,6 +66,5 @@ export interface BallObj {
 	y: number;
 	height: number;
 	width: number;
-	// rad: number;
 	color: string;
   }

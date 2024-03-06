@@ -51,7 +51,6 @@ const OtpInput: React.FC<OtpInputProps> = ({
             value.substring(idx + 1, valueLength)
 
         onChange(newValue.substring(0, valueLength))
-        // onChange(newValue);
 
         if (!isTargetValueDigit) return
 

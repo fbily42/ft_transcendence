@@ -1,4 +1,3 @@
-// import SetUp2FAModal from '@/components/Profile/SetUp2FAModal';
 import UserActionsBtns from '@/components/User/userActions/UserActionsBtns'
 import {
     getFriendRequest,

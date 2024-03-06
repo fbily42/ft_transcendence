@@ -40,7 +40,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ open, uuid, onClose }) => {
             if (response.status === 202) {
                 navigate('/')
             }
-        } catch (error) {
+        } catch (error: any) {
             if (error.response.status === 401)
                 setIsTokValid('Token is not valid')
             else if (error.response.status === 500)

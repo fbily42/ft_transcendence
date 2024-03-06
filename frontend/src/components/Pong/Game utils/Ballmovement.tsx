@@ -16,7 +16,6 @@ export function BallMovement(
                 gameInfo.ball.rad * 2,
                 gameInfo.ball.rad * 2
             )
-            // ctx.closePath()
         } else {
             gameImages.image.img_fish.onload = function () {
                 ctx.drawImage(
@@ -26,7 +25,7 @@ export function BallMovement(
                     gameInfo.ball.rad * 2,
                     gameInfo.ball.rad * 2
                 )
-                // ctx.closePath()
+
             }
         }
     } else {
@@ -47,7 +46,6 @@ export function BallMovement(
 }
 
 export function updatescore(
-    gameImages: imageForGame,
     gameInfo: GameStats,
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement
@@ -73,12 +71,11 @@ export function WallCollision(
     gameInfo: GameStats,
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
-    gameImages: imageForGame,
     socket: WebSocketContextType,
     room: string
 ) {
     socket.webSocket?.emit('ballMov', room)
 
-    updatescore(gameImages, gameInfo, ctx, canvas)
+    updatescore(gameInfo, ctx, canvas)
     return 0
 }

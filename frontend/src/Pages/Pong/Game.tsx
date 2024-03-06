@@ -72,7 +72,7 @@ const Board: React.FC<BoardProps> = ({
             Paddle_1(ctx, gameInfo, keys, gameImages, socket, roomName)
             Paddle_2(ctx, gameInfo, keys, gameImages, socket, roomName)
             socket.webSocket?.emit('ballMov', roomName)
-            updatescore(gameImages, gameInfo, ctx, canvas)
+            updatescore(gameInfo, ctx, canvas)
             animationFrameId = requestAnimationFrame(render)
         }
 

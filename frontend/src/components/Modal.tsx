@@ -42,4 +42,3 @@ export const ModalGame: React.FC<propTypes> = ({open, onClose, children}) => {
 }
 
 export default Modal;
-// https://www.youtube.com/watch?v=1CN7C6u31zA
