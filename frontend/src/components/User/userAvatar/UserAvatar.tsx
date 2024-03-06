@@ -7,8 +7,8 @@ type UserAvatarProps = {
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ selectedAvatar }) => {
     return (
-        <div className="flex items-center justify-center h-full lg:h-full w-full bg-red-400">
-            <Avatar className="w-full h-full rounded-full object-cover bg-red-300">
+        <div className="flex items-center justify-center h-full lg:h-full w-full">
+            <Avatar className="w-full h-full rounded-full object-cover">
                 <AvatarImage
                     className="w-full h-full rounded-full object-cover"
                     src={selectedAvatar}
