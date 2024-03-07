@@ -11,14 +11,21 @@ export function getDirectName(channel: string, user: string | null): string {
 export function getUserStatus(
     socket: WebSocketContextType,
     user: string
-): boolean {
+): string {
     const webSocketStatus = socket.usersOn.has(user)
+    let status: string = '';
 
     if (webSocketStatus === true) {
-        return true
+        if (socket.inGame?.includes(user)) {
+            status = 'In Game'
+        }
+        else {
+            status = 'Online'
+        }
     } else {
-        return false
+        status = 'Offline'
     }
+    return status
 }
 
 export function getRole(user: UserInChannel): string {
