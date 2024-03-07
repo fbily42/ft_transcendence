@@ -223,26 +223,19 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
 	@SubscribeMessage('JoinRoomFriend')
-	joinGameRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string; level: string; map:string; })
+	joinGameRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { friend: string; roomId: string; level: string; map:string; pseudo:string })
 	{
 		try {
 
 			for (let [key, value] of this.gamesRoom)
 			{
-				console.log("friend ", data.friend)
-
 				if(value[0]?.id === client.data.userName || value[0]?.id === data.friend)
 				{
-					console.log("here")
-
 					this.server.to(client.id).emit('JoinPartyFriend', 'InGame')
 					return ; 
 				}
-				console.log("deuxieme joueur",value[1]?.id)
 				if((value[1]?.id === client.data.userName || value[1]?.id === data.friend))
 				{
-					console.log("la")
-
 					this.server.to(client.id).emit('JoinPartyFriend', 'InGame')
 					return ;
 				}
@@ -258,7 +251,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				{
 					clientIds.forEach ((socketId) => {
 
-						this.server.to(socketId).emit('GameInvitation', {friend: data.friend, roomId: data.roomId, level: data.level, map: data.map})
+						this.server.to(socketId).emit('GameInvitation', {friend: data.friend, roomId: data.roomId, level: data.level, map: data.map, pseudo: data.pseudo})
 					}
 					)
 				}
@@ -509,13 +502,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 					if (data.key === "ArrowUp") {
 						if ((gameStats.paddleOne.y - 10) > 0 )
-							gameStats.paddleOne.y -= 5;
+							gameStats.paddleOne.y -= 7;
 						}
 		
 					else if (data.key === "ArrowDown") {
 						if ((gameStats.paddleOne.y + 10 + 60) < gameStats.canvas.height )
 						{
-							gameStats.paddleOne.y += 5;
+							gameStats.paddleOne.y += 7;
 						}
 					}
 					else
@@ -526,13 +519,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				{
 					if (data.key === "ArrowUp" ) {
 						if ((gameStats.paddleTwo.y - 10) > 0 )
-							gameStats.paddleTwo.y -= 5;
+							gameStats.paddleTwo.y -= 7;
 						}
 			
 					else if (data.key === "ArrowDown") {
 						if ((gameStats.paddleTwo.y + 10 + 60) < gameStats.canvas.height )
 						{
-							gameStats.paddleTwo.y += 5;
+							gameStats.paddleTwo.y += 7;
 						}
 					}
 					else
