@@ -92,7 +92,7 @@ export class GameStats {
 		  	 this.ball.speed = 2;
 
 			this.gameStatus.gameState = 'playing';
-			if (this.gameStatus.scoreOne === 1 )
+			if (this.gameStatus.scoreOne === 11 )
 				this.gameStatus.gameState = 'finish'
 			this.ResetBall(1);
 

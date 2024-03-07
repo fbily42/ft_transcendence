@@ -1,5 +1,4 @@
 import { GameStats, imageForGame } from '@/lib/Game/Game.types'
-import { BallObj, PaddleObj } from './data'
 import { WebSocketContextType } from '@/context/webSocketContext'
 
 export function BallMovement(

@@ -16,7 +16,7 @@ function Pong() {
         'PLAYING'
     )
     const [open, setOpen] = useState<boolean>(false)
-    useEffect(() => {
+	useEffect(() => {
         const cleanup = () => {
             socket?.webSocket?.emit('leaveRoom', roomName)
         }
@@ -24,12 +24,17 @@ function Pong() {
         const handleBeforeUnload = () => {
             cleanup()
         }
+        const handlePopState = () => {
+            cleanup()
+        }
 
         window.addEventListener('beforeunload', handleBeforeUnload)
+        window.addEventListener('popstate', handlePopState)
 
         return () => {
             cleanup()
             window.removeEventListener('beforeunload', handleBeforeUnload)
+            window.removeEventListener('popstate', handlePopState)
         }
     }, [roomName])
 

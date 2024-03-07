@@ -9,8 +9,8 @@ export class GameStats {
 
 	constructor() {
 		this.canvas ={
-			height : 800,
-			width : 800,
+			height : 1000,
+			width : 1200,
 		}
 		this.ball = {
 			x: 200,
