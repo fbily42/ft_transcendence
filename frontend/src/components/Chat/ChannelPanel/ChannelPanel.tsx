@@ -136,7 +136,10 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                             </h1>
                             <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
-                                    channel.direct ? (
+                                    channel.direct &&
+                                    !me?.blocked?.includes(
+                                        getDirectName(channel.name, me?.name)
+                                    ) ? (
                                         <div
                                             key={index}
                                             onClick={() =>
@@ -252,7 +255,10 @@ const ChannelPanel: React.FC<ChannelPanelProps> = ({
                             </h1>
                             <div className="flex flex-col overflow-y-auto no-scrollbar">
                                 {channels?.map((channel, index) =>
-                                    channel.direct ? (
+                                    channel.direct &&
+                                    !me?.blocked?.includes(
+                                        getDirectName(channel.name, me?.name)
+                                    ) ? (
                                         <div
                                             key={index}
                                             onClick={() =>

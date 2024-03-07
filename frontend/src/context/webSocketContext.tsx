@@ -133,6 +133,10 @@ export const WebSocketProvider: React.FC = () => {
             toast(`You have been promoted to owner in ${channel}`)
         })
 
+		ws?.on('blockedUser', () => {
+			toast(`Please unblock this user before chatting with them.`)
+		})
+
         ws?.on('refreshFriendlist', () => {
             queryClient.invalidateQueries({ queryKey: ['request'] })
             queryClient.invalidateQueries({ queryKey: ['pending'] })
@@ -158,6 +162,7 @@ export const WebSocketProvider: React.FC = () => {
                     'newOwner',
                     'refreshFriendlist',
                     'inGameUsers',
+					'blockedUser',
                 ]
                 events.forEach((event) => {
                     ws.off(event)

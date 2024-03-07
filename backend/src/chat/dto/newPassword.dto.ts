@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
 export class NewPasswordDto {
 	@IsNotEmpty()
@@ -11,5 +11,9 @@ export class NewPasswordDto {
 
 	@IsString()
 	@IsNotEmpty()
+	@MinLength(8)
+	@Matches(/^[a-zA-Z0-9!@#$%&*()_+\-=]*$/, {
+		message: 'Password should only contain alphanumeric characters and the special characters : !@#$%^&*()_+-=',
+	})
 	readonly newPassword: string;
 }

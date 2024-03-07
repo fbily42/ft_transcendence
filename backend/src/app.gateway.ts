@@ -20,6 +20,7 @@ import { InviteChannelDto, ChannelCmdDto, MessageDto } from './chat/dto';
 import { ChatService } from './chat/chat.service';
 import { GameStats, RoomInfo } from './game/Game.types';
 import { quitCmdDto } from './chat/dto/quitCmd.dto';
+import e from 'express';
 
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsExceptionFilter())
@@ -572,7 +573,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (error instanceof PrismaClientKnownRequestError)
 				throw new WsException(`Prisma error code : ${error.code}`)
 			else if (error instanceof Error)
+			{
+				if (error.message === 'You have blocked this user') {
+					this.server.to(client.id).emit('blockedUser')
+					return ;
+				}
 				throw new WsException(error.message)
+			}
 			else
 				throw new WsException('Internal server error')
 		}

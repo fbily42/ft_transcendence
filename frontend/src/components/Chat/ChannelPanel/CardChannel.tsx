@@ -135,9 +135,7 @@ const CardChannel: React.FC<CardChannel> = ({
                                     {getUserStatus(
                                         socket,
                                         getDirectName(channelName, me?.name!)
-                                    )
-                                        ? 'Online'
-                                        : 'Offline'}
+                                    )}
                                 </CardDescription>
                             </CardHeader>
                         </div>
