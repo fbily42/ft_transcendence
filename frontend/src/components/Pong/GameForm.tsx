@@ -127,6 +127,7 @@ function GameForm({ handleClose, name }: GameFormProps) {
                 roomId: roomNameFriend,
                 level: selectedLevel,
                 map: selectedMap,
+				pseudo: inputValue
             })
 
             socket?.webSocket?.on('JoinPartyFriend', (message: string) => {
@@ -136,6 +137,7 @@ function GameForm({ handleClose, name }: GameFormProps) {
                 } else if (message.startsWith('InGame')) {
                     setFriendMessage('InGame')
                     setLoadingFriend(false)
+					setSearch(inputValue)
                 } else if (message.startsWith('Go')) {
                     processingMessage.current = true
                     handleClose()
@@ -376,8 +378,7 @@ function GameForm({ handleClose, name }: GameFormProps) {
                                             case 'InGame':
                                                 return (
                                                     <p>
-                                                        Submit (You are already
-                                                        in game)
+                                                        Submit (You or your friend is in Game)
                                                     </p>
                                                 )
                                             case 'Error3':

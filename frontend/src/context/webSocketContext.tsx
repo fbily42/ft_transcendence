@@ -52,7 +52,7 @@ export const WebSocketProvider: React.FC = () => {
             )
         })
         ws?.on('GameInvitation', (data) => {
-            toast(`You have been invited to a game against ${data.friend}`, {
+            toast(`You have been invited to a game against ${data.pseudo}`, {
                 action: {
                     label: 'Accept',
                     onClick: () =>

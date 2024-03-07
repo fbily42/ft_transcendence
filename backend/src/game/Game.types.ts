@@ -14,15 +14,18 @@ export class GameStats {
 		}
 		let width = 30;
 		let rad = 20;
-		let speed = 2;
+		let speed = 3;
 		let x = 40
 
 		if (map === 'BasicPong')
 		{
 			width /= 2;
 			rad /=2;
-			speed = 3;
 			x = 25
+		}
+		if(level === 'hard')
+		{
+			speed = 2;
 		}
 		this.ball = {
 			x: 200,
@@ -110,7 +113,7 @@ export class GameStats {
 		if (this.ball.x + this.ball.rad > paddle.x && this.ball.x - this.ball.rad < paddle.x + paddle.width) {
 			if (this.ball.y + this.ball.rad > paddle.y && this.ball.y - this.ball.rad < paddle.y + paddle.height) {
 				if(this.gameStatus.level === 'hard')
-					this.ball.speed += 0.5;
+					this.ball.speed += 1;
 				let collidePoint = (this.ball.y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
 				let angleRad = collidePoint * Math.PI/4;
 				angleRad = Math.round(angleRad * 100) / 100;
