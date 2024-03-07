@@ -17,5 +17,8 @@ export class NewChannelDto {
 	@IsString()
 	@IsOptional()
 	@MinLength(8)
+	@Matches(/^[a-zA-Z0-9!@#$%&*()_+\-=]*$/, {
+		message: 'Password should only contain alphanumeric characters and the special characters : !@#$%^&*()_+-=',
+	})
 	readonly password: string;
 }

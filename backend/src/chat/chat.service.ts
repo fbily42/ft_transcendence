@@ -351,6 +351,15 @@ export class ChatService {
 			channelName = `${user}_${target}`;
 		else channelName = `${target}_${user}`;
 		try {
+			const senderUser = await this.prisma.user.findUnique({
+				where: {
+					id: userId,
+				}
+			})
+			if (!senderUser)
+				throw new Error('Bad request')
+			if (senderUser.blocked?.includes(target))
+				throw new Error('You have blocked this user')
 			const channel = await this.prisma.channel.findUnique({
 				where: {
 					name: channelName,
