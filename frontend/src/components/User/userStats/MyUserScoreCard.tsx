@@ -22,6 +22,7 @@ import {
     FirstWin,
 } from '@/assets/badgesAssociation'
 import { AchievementType, Badge, BadgeDTO } from '@/lib/Profile/profile.types'
+import PingaModal from '@/assets/other/Pinga-over-modal.svg'
 
 export default function MyUserScoreCard(): JSX.Element {
     const [open, setOpen] = useState<boolean>(false)
@@ -88,10 +89,11 @@ export default function MyUserScoreCard(): JSX.Element {
                 </div>
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogContent>
-                        <DialogHeader>
+                        <DialogHeader className='relative'>
+                            <img className='absolute right-0 top-[-80px]' src={PingaModal} alt="" />
                             <DialogTitle>Achievements</DialogTitle>
                             <DialogDescription>
-                                Choose the badge you want to display on your
+                                Select the badge you want to display on your
                                 profile.
                             </DialogDescription>
                         </DialogHeader>
