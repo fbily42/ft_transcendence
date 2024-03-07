@@ -11,7 +11,7 @@ export default function FriendsList(): JSX.Element {
     const param = useParams<string>()
 
     const { data: friends } = useQuery<FriendData[]>({
-        queryKey: ['userFriend'],
+        queryKey: ['userFriend', param.id],
         queryFn: () => getFriends(param.id!),
     })
 

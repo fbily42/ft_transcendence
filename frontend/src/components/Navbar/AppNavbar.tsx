@@ -12,12 +12,22 @@ import {
 import axios from 'axios'
 import GameForm from '../Pong/GameForm'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import Logo from "../../../public/pingu.png"
+import Logo from '../../../public/pingu.png'
+import { useQuery } from '@tanstack/react-query'
+import { getUserMe } from '@/lib/Dashboard/dashboard.requests'
+import { UserData } from '@/lib/Dashboard/dashboard.types'
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
+import PinguAvatar from '@/assets/empty-state/pingu-face.svg'
 
 const VerticalNavbar: React.FC = () => {
     const [active, setActive] = useState<number>(0)
     const location = useLocation()
     const [open, setOpen] = useState<boolean>(false)
+
+    const { data: me } = useQuery<UserData>({
+        queryKey: ['me'],
+        queryFn: getUserMe,
+    })
 
     useEffect(() => {
         const path = location.pathname
@@ -82,7 +92,7 @@ const VerticalNavbar: React.FC = () => {
                     className="text-black font-bold text-lg pr-4"
                     onClick={() => handleNavTabs(1)}
                 >
-                    <img src={Logo} alt="logo"/>
+                    <img src={Logo} alt="logo" />
                 </Link>
                 <div className="flex flex-col items-start gap-[33px]">
                     <Link to="/" className="text-black">
@@ -124,7 +134,10 @@ const VerticalNavbar: React.FC = () => {
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
-                            <GameForm handleClose={() => setOpen(false)} name={undefined}></GameForm>
+                            <GameForm
+                                handleClose={() => setOpen(false)}
+                                name={undefined}
+                            ></GameForm>
                         </DialogContent>
                     </Dialog>
                     <Link to="/chat" className="text-black">
@@ -159,7 +172,16 @@ const VerticalNavbar: React.FC = () => {
                                     active === 4 ? 'text-white' : 'text-black'
                                 }`}
                             >
-                                <CircleUserRound className="h-[24px] w-[24px]" />
+                                {/* <CircleUserRound className="h-[24px] w-[24px]" /> */}
+                                <Avatar className="w-[24px] h-[24px] aspect-square rounded-full">
+                                    <AvatarImage
+                                        className="rounded-full object-cover w-[30px] h-[30px] border-2 border-customYellow"
+                                        src={me?.avatar}
+                                    />
+                                    <AvatarFallback>
+                                        <img src={PinguAvatar} alt="pingu" />
+                                    </AvatarFallback>
+                                </Avatar>
                             </div>
                         </Button>
                     </Link>
