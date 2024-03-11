@@ -47,7 +47,7 @@ To build and launch the application, you have two options. Execute either of the
 
 **Option 1: Using Make**
 
-If you prefer a simplified approach and have `make` installed on your system, you can build and start the application by running:
+If and have `make` installed on your system, you can build and start the application by running:
 
 ```
 make
@@ -55,7 +55,7 @@ make
 
 **Option 2: Using Docker Compose**
 
-For those who prefer or need to use Docker directly, you can build and launch the application with:
+For those who prefer to use Docker directly, you can build and launch the application with:
 
 ```
 docker compose up --build
