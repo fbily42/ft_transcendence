@@ -160,7 +160,7 @@ export class UserService {
 					}
 				},
 				orderBy: {
-					score: 'desc',
+					rank: 'asc',
 				},
 				select: {
 					photo42: true,
